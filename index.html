@@ -67,7 +67,7 @@ nav button:hover{border-color:var(--zari)}
 img{display:block;max-width:100%;height:auto}
 
 /* hero carousel: full-bleed campaign photographs, copy sits on the open wall of each photo. Fixed palettes per slide because they sit on the photo, in both themes. */
-.banner{position:relative;overflow:hidden;background:#1f2417;scroll-margin-top:90px;
+.banner{position:relative;overflow:hidden;background:#1f2417;scroll-margin-top:90px;padding:0;border:0;
   margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)))}
 .slides{display:grid;touch-action:pan-y}
 .slide{grid-area:1/1;position:relative;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .8s ease,visibility 0s .8s}
@@ -82,6 +82,10 @@ img{display:block;max-width:100%;height:auto}
 .slide::after{content:"";position:absolute;inset:0;pointer-events:none}
 .slide.left::after{background:linear-gradient(90deg,var(--shade) 0%,color-mix(in srgb,var(--shade) 60%,transparent) 26%,transparent 44%)}
 .slide.right::after{background:linear-gradient(270deg,var(--shade) 0%,color-mix(in srgb,var(--shade) 62%,transparent) 22%,transparent 40%)}
+.slide.no-shade::after{display:none}
+.slide.top .banner-copy{justify-content:flex-start;padding-top:clamp(48px,8vw,110px)}
+.slide.mustard{--acc:#4a2a08;--em:#5a1420;--fg2:rgba(43,19,22,.88)}
+.slide.strong{--shade:rgba(20,16,10,.62)}
 .banner-copy{position:absolute;top:0;bottom:0;z-index:1;display:flex;flex-direction:column;justify-content:center;color:var(--fg);
   width:calc(max(max(16px,env(safe-area-inset-left,0px)),calc(50% - 590px)) + 430px);max-width:46%}
 .slide.left .banner-copy{left:0;padding-left:max(max(16px,env(safe-area-inset-left,0px)),calc(50% - 590px));padding-right:16px}
@@ -239,7 +243,7 @@ footer .note{max-width:46ch}
 
 <section class="banner" id="top" aria-roledescription="carousel" aria-label="Featured collections">
   <div class="slides" id="slides">
-    <article class="slide on-dark left is-active" role="group" aria-roledescription="slide" aria-label="1 of 4">
+    <article class="slide on-dark left is-active" role="group" aria-roledescription="slide" aria-label="1 of 7">
       <picture>
         <source media="(max-width:860px)" srcset="img/hero-window-phone.jpg">
         <img src="img/hero-window-2048.jpg" srcset="img/hero-window-1280.jpg 1440w, img/hero-window-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" fetchpriority="high"
@@ -257,11 +261,11 @@ footer .note{max-width:46ch}
       </div>
       <span class="note">Concept image</span>
     </article>
-    <article class="slide on-light right" role="group" aria-roledescription="slide" aria-label="2 of 4">
+    <article class="slide on-dark left" role="group" aria-roledescription="slide" aria-label="2 of 7">
       <picture>
-        <source media="(max-width:860px)" srcset="img/hero-group-phone.jpg">
-        <img src="img/hero-group-2048.jpg" srcset="img/hero-group-1280.jpg 1440w, img/hero-group-2048.jpg 2540w" sizes="100vw" width="2540" height="1152" loading="lazy"
-          alt="Five women in vibrant silk sarees with gold zari borders pose among giant paper flowers in a warm painted studio">
+        <source media="(max-width:860px)" srcset="img/hero-pink-phone.jpg">
+        <img src="img/hero-pink-2048.jpg" srcset="img/hero-pink-1280.jpg 1440w, img/hero-pink-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" loading="lazy"
+          alt="A woman in a magenta pink Kanjivaram silk saree with a gold border sits on a carved wooden chair against a deep teal wall">
       </picture>
       <div class="banner-copy">
         <p class="eyebrow">Festive edit</p>
@@ -274,11 +278,11 @@ footer .note{max-width:46ch}
       </div>
       <span class="note">Concept image</span>
     </article>
-    <article class="slide on-dark left" role="group" aria-roledescription="slide" aria-label="3 of 4">
+    <article class="slide on-light left no-shade" role="group" aria-roledescription="slide" aria-label="3 of 7">
       <picture>
-        <source media="(max-width:860px)" srcset="img/hero-chair-phone.jpg">
-        <img src="img/hero-chair-2048.jpg" srcset="img/hero-chair-1280.jpg 1440w, img/hero-chair-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" loading="lazy"
-          alt="A woman in a crimson silk saree with a gold border and a green blouse sits on a velvet armchair in an olive-green panelled room">
+        <source media="(max-width:860px)" srcset="img/hero-bride-phone.jpg">
+        <img src="img/hero-bride-2048.jpg" srcset="img/hero-bride-1280.jpg 1440w, img/hero-bride-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" loading="lazy"
+          alt="A bride in a red and gold silk saree with a jasmine and rose garland and gold temple jewellery looks down with a soft smile">
       </picture>
       <div class="banner-copy">
         <p class="eyebrow">The bridal house</p>
@@ -291,19 +295,70 @@ footer .note{max-width:46ch}
       </div>
       <span class="note">Concept image</span>
     </article>
-    <article class="slide on-light right" role="group" aria-roledescription="slide" aria-label="4 of 4">
+    <article class="slide on-light right no-shade mustard" role="group" aria-roledescription="slide" aria-label="4 of 7">
       <picture>
-        <source media="(max-width:860px)" srcset="img/hero-bloom-phone.jpg">
-        <img src="img/hero-bloom-2048.jpg" srcset="img/hero-bloom-1280.jpg 1440w, img/hero-bloom-2048.jpg 2488w" sizes="100vw" width="2488" height="1152" loading="lazy"
-          alt="Four women in silk sarees in pink, yellow, violet and lilac with gold borders, posed among oversized paper flowers">
+        <source media="(max-width:860px)" srcset="img/hero-blue-phone.jpg">
+        <img src="img/hero-blue-2048.jpg" srcset="img/hero-blue-1280.jpg 1440w, img/hero-blue-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" loading="lazy"
+          alt="A woman in a royal blue silk saree with gold buttas and a gold border sits in a mustard arched hall beside a vase of marigolds">
       </picture>
       <div class="banner-copy">
-        <p class="eyebrow">Occasions and parties</p>
-        <h2 class="hl">Wear it <em>together.</em></h2>
-        <p class="lead">Receptions, guest wear and get-togethers, in silks light enough to enjoy the whole evening.</p>
+        <p class="eyebrow">Celebrations</p>
+        <h2 class="hl">Rich blues, <em>gold zari.</em></h2>
+        <p class="lead">Zari-worked silks for pujas, receptions and evenings out.</p>
+        <div class="cta">
+          <button class="btn" data-world="celebrations">Shop celebrations</button>
+          <button class="btn ghost" data-world="parties">Occasions</button>
+        </div>
+      </div>
+      <span class="note">Concept image</span>
+    </article>
+    <article class="slide on-dark right" role="group" aria-roledescription="slide" aria-label="5 of 7">
+      <picture>
+        <source media="(max-width:860px)" srcset="img/hero-wine-phone.jpg">
+        <img src="img/hero-wine-2048.jpg" srcset="img/hero-wine-1280.jpg 1440w, img/hero-wine-2048.jpg 2748w" sizes="100vw" width="2748" height="1152" loading="lazy" style="object-position:46% 50%"
+          alt="A woman in a wine red silk saree with a gold zari pallu and a jasmine braid looks back over her shoulder in a green lamp-lit room">
+      </picture>
+      <div class="banner-copy">
+        <p class="eyebrow">Evening wear</p>
+        <h2 class="hl">An evening <em>in silk.</em></h2>
+        <p class="lead">Deep wine, bottle green and midnight silks for receptions and dinners.</p>
         <div class="cta">
           <button class="btn" data-world="parties">Shop occasions</button>
-          <button class="btn ghost" data-world="everyday">Everyday wear</button>
+          <button class="btn ghost" data-go="builder">Build a look</button>
+        </div>
+      </div>
+      <span class="note">Concept image</span>
+    </article>
+    <article class="slide on-dark left strong" role="group" aria-roledescription="slide" aria-label="6 of 7">
+      <picture>
+        <source media="(max-width:860px)" srcset="img/hero-plate-phone.jpg">
+        <img src="img/hero-plate-2048.jpg" srcset="img/hero-plate-1280.jpg 1440w, img/hero-plate-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" loading="lazy"
+          alt="A smiling bride in a red and gold silk saree with a jasmine garland and layered gold jewellery holds a plate of sweets">
+      </picture>
+      <div class="banner-copy">
+        <p class="eyebrow">Jewellery, matched</p>
+        <h2 class="hl">Every detail, <em>already chosen.</em></h2>
+        <p class="lead">Necklace, earrings, bangles and waistband styled to your saree. Keep the set or change any piece.</p>
+        <div class="cta">
+          <button class="btn" data-go="builder">Build a look</button>
+          <button class="btn ghost" data-go="worlds">Explore by occasion</button>
+        </div>
+      </div>
+      <span class="note">Concept image</span>
+    </article>
+    <article class="slide on-light right top" role="group" aria-roledescription="slide" aria-label="7 of 7">
+      <picture>
+        <source media="(max-width:860px)" srcset="img/hero-mint-phone.jpg">
+        <img src="img/hero-mint-2048.jpg" srcset="img/hero-mint-1280.jpg 1440w, img/hero-mint-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" loading="lazy"
+          alt="A woman in a mint green soft silk saree with a slim gold border holds a cup in a bright airy room with a vase of orange flowers">
+      </picture>
+      <div class="banner-copy">
+        <p class="eyebrow">Everyday and office</p>
+        <h2 class="hl">Silk light enough for <em>every day.</em></h2>
+        <p class="lead">Handloom cotton and easy silk sarees for long working days.</p>
+        <div class="cta">
+          <button class="btn" data-world="everyday">Shop everyday</button>
+          <button class="btn ghost" data-go="builder">Build a look</button>
         </div>
       </div>
       <span class="note">Concept image</span>
