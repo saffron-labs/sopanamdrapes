@@ -36,35 +36,42 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn.ghost:hover{background:var(--tint);filter:none}
 .btn.small{padding:9px 14px;font-size:13px}
 
-/* header */
+/* header: modern store layout. Name left, menu centred, icons right. Menu collapses behind a button on phones. */
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);
   margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px))}
-.bar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;padding-block:16px;max-width:1180px;margin-inline:auto}
-.brand{grid-column:2;grid-row:1;justify-self:center;text-align:center;font-family:var(--display);font-size:clamp(26px,3vw,36px);font-weight:600;letter-spacing:.16em;text-transform:uppercase;line-height:1;background:none;border:0;padding:0 0 0 .16em}
-.brand span{display:block;font-family:var(--body);font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-top:8px;padding-left:.42em}
-.brand::after{content:"";display:block;width:36px;height:1px;background:var(--zari);margin:10px auto 0}
-nav{grid-column:1;grid-row:1;justify-self:start;display:flex;gap:16px;flex-wrap:nowrap;white-space:nowrap}
-.tools{grid-column:3;grid-row:1;justify-self:end}
-@media(max-width:560px){
-  .bar{grid-template-columns:1fr;gap:10px;padding-block:12px}
-  .brand{grid-column:1;grid-row:1;font-size:24px;letter-spacing:.16em;padding-left:.16em}
-  .brand span{letter-spacing:.3em;padding-left:.3em;margin-top:6px}
-  .brand::after{margin-top:8px}
-  .tools{grid-column:1;grid-row:2;justify-self:center;gap:8px}
-  .iconbtn{padding:7px 12px}
-}
-nav button{background:none;border:0;padding:4px 0;font-size:13px;letter-spacing:.03em;border-bottom:1px solid transparent}
+.bar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:32px;padding-block:14px;max-width:1500px;margin-inline:auto;padding-inline:clamp(0px,3vw,48px)}
+.brand{grid-column:1;text-align:left;font-family:var(--display);font-size:28px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;line-height:1;background:none;border:0;padding:0;white-space:nowrap}
+.brand span{display:block;font-family:var(--body);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-top:6px;white-space:nowrap}
+nav{grid-column:2;justify-self:center;display:flex;gap:clamp(18px,2.6vw,40px);white-space:nowrap}
+nav button{background:none;border:0;padding:6px 0;font-size:13px;letter-spacing:.04em;border-bottom:1px solid transparent}
 nav button:hover{border-color:var(--zari)}
-.tools{display:flex;gap:10px;align-items:center}
+.tools{grid-column:3;display:flex;gap:2px;align-items:center}
+.ibtn{position:relative;width:42px;height:42px;display:grid;place-items:center;background:none;border:0;border-radius:50%}
+.ibtn:hover{background:var(--tint)}
+.ibtn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.badge{position:absolute;top:4px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--accent);color:var(--on-accent);font-size:10px;font-weight:600;line-height:16px;text-align:center}
+.menu{display:none;grid-column:1}
 .iconbtn{background:none;border:1px solid var(--line);padding:8px 14px;font-size:13px;font-weight:600;border-radius:2px}
 .iconbtn:hover{border-color:var(--ink)}
-@media(max-width:1200px){
-  .bar{row-gap:12px}
-  nav{grid-column:1/-1;grid-row:2;justify-self:center;gap:28px;padding-top:12px;border-top:1px solid var(--line);width:100%;justify-content:center}
+@media(max-width:1080px){
+  .bar{grid-template-columns:minmax(44px,1fr) auto minmax(44px,1fr);gap:8px;padding-block:10px}
+  .menu{display:grid;justify-self:start}
+  .menu svg{width:24px;height:24px}
+  .brand{grid-column:2;grid-row:1;justify-self:center;text-align:center;font-size:24px;letter-spacing:.12em}
+  .brand span{letter-spacing:.28em;font-size:8.5px}
+  .tools{grid-column:3;grid-row:1;justify-self:end}
+  nav{display:none;position:absolute;left:0;right:0;top:100%;width:auto;justify-self:stretch;flex-direction:column;gap:0;background:var(--bg);border-bottom:1px solid var(--line);padding:6px max(16px,env(safe-area-inset-left,0px)) 12px;box-shadow:0 12px 24px -16px rgba(0,0,0,.35)}
+  header.open nav{display:flex}
+  nav button{font-size:15px;padding:14px 0;text-align:left;border-bottom:1px solid var(--line)}
+  nav button:last-child{border-bottom:0}
 }
-@media(max-width:720px){nav{display:none}}
-
-img{display:block;max-width:100%;height:auto}
+@media(max-width:560px){
+  .bar{padding-inline:0;gap:4px}
+  .brand{font-size:19px;letter-spacing:.08em}
+  .brand span{letter-spacing:.2em;font-size:8px}
+  .ibtn{width:38px;height:38px}
+  .ibtn.hide-m{display:none}
+}
 
 /* hero carousel: full-bleed campaign photographs, copy sits on the open wall of each photo. Fixed palettes per slide because they sit on the photo, in both themes. */
 .banner{position:relative;overflow:hidden;background:#1f2417;scroll-margin-top:90px;padding:0;border:0;
@@ -226,8 +233,9 @@ footer .note{max-width:46ch}
 <div id="app">
 <header>
   <div class="bar">
+    <button class="ibtn menu" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <button class="brand" data-go="top" aria-label="Sopanam Drapes home">Sopanam Drapes<span>Sarees &amp; ornaments</span></button>
-    <nav aria-label="Main">
+    <nav id="mainNav" aria-label="Main">
       <button data-world="bridal">Bridal</button>
       <button data-world="festive">Festive</button>
       <button data-world="celebrations">Celebrations</button>
@@ -235,8 +243,10 @@ footer .note{max-width:46ch}
       <button data-world="everyday">Everyday</button>
     </nav>
     <div class="tools">
-      <button class="iconbtn" id="themeBtn" aria-label="Switch light or dark">Theme</button>
-      <button class="iconbtn" id="bagBtn" aria-label="Open bag">Bag (<span id="bagCount">0</span>)</button>
+      <button class="ibtn hide-m" id="searchBtn" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
+      <button class="ibtn hide-m" id="acctBtn" aria-label="Account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.9-3.8 4-5.6 7.5-5.6s6.6 1.8 7.5 5.6"/></svg></button>
+      <button class="ibtn" id="themeBtn" aria-label="Switch light or dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="currentColor"/></svg></button>
+      <button class="ibtn" id="bagBtn" aria-label="Open bag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8.5h13l-1 11h-11z"/><path d="M9 8.5V7a3 3 0 016 0v1.5"/></svg><span class="badge" id="bagCount" aria-live="polite">0</span></button>
     </div>
   </div>
 </header>
@@ -555,7 +565,7 @@ function setLook(kind){
 }
 function renderBag(){
   const n=state.bag.length;
-  $('#bagCount').textContent=n;
+  $('#bagCount').textContent=n;$('#bagCount').hidden=!n;
   $('#bagSub').textContent=n?n+(n===1?' look':' looks'):'';
   if(!n){$('#bagItems').innerHTML='<div class="empty">Your bag is empty. Build a look and add it here.</div>';$('#bagFoot').innerHTML='';return}
   $('#bagItems').innerHTML=state.bag.map((b,i)=>{const s=saree(b.sid);return `<div class="bi"><div>${art(s)}</div><div><div class="t">${s.name}, ${s.tone}</div><div class="d">${b.names.length?b.names.join(' · '):'Saree only'}</div><div class="f"><span>${inr(b.total)}</span><button data-remove="${i}">Remove</button></div></div></div>`}).join('');
@@ -569,7 +579,7 @@ function styleSaree(id){state.cur=id;state.view='model';state.sel={...saree(id).
 document.addEventListener('click',e=>{
   const t=e.target.closest('button');if(!t)return;
   if(t.dataset.go){go(t.dataset.go==='top'?'top':t.dataset.go);return}
-  if('world' in t.dataset){pickWorld(t.dataset.world);return}
+  if('world' in t.dataset){pickWorld(t.dataset.world);const h=document.querySelector('header');if(h.classList.contains('open')){h.classList.remove('open');$('#menuBtn').setAttribute('aria-expanded','false')}return}
   if(t.dataset.style){styleSaree(t.dataset.style);return}
   if(t.dataset.view){state.view=t.dataset.view;renderBuilder();return}
   if(t.dataset.pick){state.cur=t.dataset.pick;state.view='model';state.sel={...saree(state.cur).combo};renderBuilder();return}
@@ -578,6 +588,8 @@ document.addEventListener('click',e=>{
   if('add' in t.dataset){const s=saree(state.cur),tt=ornTotals();state.bag.push({sid:s.id,names:tt.ids.map(id=>ORN[id][1]),total:tt.total});renderBag();toast('Look added to your bag');return}
   if(t.dataset.remove){state.bag.splice(+t.dataset.remove,1);renderBag();return}
   if('checkout' in t.dataset){toast('Checkout is the next build phase');return}
+  if(t.id==='searchBtn'||t.id==='acctBtn'){toast(t.id==='searchBtn'?'Search arrives with the shop pages':'Accounts arrive with checkout');return}
+  if(t.id==='menuBtn'){const h=t.closest('header'),o=h.classList.toggle('open');t.setAttribute('aria-expanded',o);t.setAttribute('aria-label',o?'Close menu':'Open menu');return}
   if(t.id==='bagBtn'){openBag(true);return}
   if(t.id==='bagClose'){openBag(false);return}
   if(t.id==='themeBtn'){const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark'}
