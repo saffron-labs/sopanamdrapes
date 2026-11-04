@@ -1,0 +1,928 @@
+{
+  "siteInfo": {
+    "companyName": "Sopanam Drapes",
+    "supportEmail": "care@sopanamdrapes.com",
+    "supportPhone": "+91 90000 12345",
+    "tagline": "Drape Your Dream. Complete Your Look."
+  },
+  "occasions": [
+    {
+      "key": "festivals",
+      "label": "Festivals",
+      "tags": [
+        "Onam",
+        "Vishu",
+        "Thiruvathira",
+        "Chingam 1",
+        "Deepavali",
+        "Pooram",
+        "Christmas",
+        "Easter",
+        "Perunnaal",
+        "Cheriya Perunnal",
+        "Valiya Perunnal",
+        "Ramadaan"
+      ]
+    },
+    {
+      "key": "wedding",
+      "label": "Wedding",
+      "tags": []
+    },
+    {
+      "key": "occasional",
+      "label": "Occasional Wear",
+      "tags": []
+    },
+    {
+      "key": "office",
+      "label": "Office Casual Wear",
+      "tags": []
+    }
+  ],
+  "sarees": [
+    {
+      "activeDiscountPercent": 10.0,
+      "blouseType": "unstitched",
+      "color": "Maroon",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "description": "A classic Banarasi silk saree in a deep maroon, woven with gold zari on the border and pallu. Soft drape, rich sheen, and a timeless choice for weddings and festive occasions.",
+      "discountEndsAt": null,
+      "discountPercent": 10.0,
+      "discountStartsAt": null,
+      "effectivePrice": 8099,
+      "fabric": "Banarasi Silk",
+      "highlights": [
+        "Pure Banarasi silk with a real zari weave",
+        "Rich maroon with a gold temple border",
+        "Comes with an unstitched blouse piece",
+        "Ideal for weddings and receptions"
+      ],
+      "id": "SA00001",
+      "image": "/images/sarees/SA00001.png",
+      "images": [
+        "/images/sarees/SA00001.png"
+      ],
+      "name": "Banarasi Silk Saree - Royal Maroon",
+      "occasion": null,
+      "occasionTag": null,
+      "price": 8999.0,
+      "stock": 17,
+      "variantGroup": null,
+      "defaultCombo": {
+        "anklet": null,
+        "bangles": "OR00004",
+        "bracelet": null,
+        "earrings": "OR00009",
+        "necklace": "OR00001",
+        "ring": null,
+        "waistband": null
+      },
+      "defaultPricing": {
+        "discountAmount": 460,
+        "discountPercent": 10,
+        "isDefaultCombo": true,
+        "ornamentOriginalTotal": 4597.0,
+        "ornamentTotal": 4597.0,
+        "pieceCount": 3,
+        "sareeDiscountPercent": 10.0,
+        "sareeOriginalPrice": 8999.0,
+        "sareePrice": 8099,
+        "seasonalSavings": 900,
+        "subtotal": 12696.0,
+        "total": 12236.0
+      }
+    },
+    {
+      "activeDiscountPercent": 0,
+      "blouseType": "unstitched",
+      "color": "Emerald Green",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "description": "A rich emerald Kanjivaram silk saree with a wide contrast zari border and traditional temple motifs on the pallu -- woven in the South Indian style prized for generations.",
+      "discountEndsAt": null,
+      "discountPercent": 0.0,
+      "discountStartsAt": null,
+      "effectivePrice": 12999.0,
+      "fabric": "Kanjivaram Silk",
+      "highlights": [
+        "Authentic Kanjivaram weave",
+        "Wide contrast gold zari border",
+        "Traditional temple-motif pallu",
+        "A statement piece for weddings"
+      ],
+      "id": "SA00002",
+      "image": "/images/sarees/SA00002.png",
+      "images": [
+        "/images/sarees/SA00002.png"
+      ],
+      "lowStockNotified": false,
+      "name": "Kanjivaram Silk Saree - Emerald Green",
+      "occasion": null,
+      "occasionTag": null,
+      "price": 12999.0,
+      "stock": 10,
+      "variantGroup": null,
+      "defaultCombo": {
+        "anklet": null,
+        "bangles": "OR00005",
+        "bracelet": null,
+        "earrings": "OR00008",
+        "necklace": "OR00003",
+        "ring": null,
+        "waistband": null
+      },
+      "defaultPricing": {
+        "discountAmount": 773,
+        "discountPercent": 10,
+        "isDefaultCombo": true,
+        "ornamentOriginalTotal": 7897.0,
+        "ornamentTotal": 7732.0,
+        "pieceCount": 3,
+        "sareeDiscountPercent": 0,
+        "sareeOriginalPrice": 12999.0,
+        "sareePrice": 12999.0,
+        "seasonalSavings": 165,
+        "subtotal": 20731.0,
+        "total": 19958.0
+      }
+    },
+    {
+      "activeDiscountPercent": 15,
+      "blouseType": "stitched",
+      "color": "Peach",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "description": "A soft peach chiffon saree with an all-over floral print -- light enough for an afternoon event, dressy enough for a small celebration.",
+      "discountEndsAt": null,
+      "discountPercent": 15,
+      "discountStartsAt": null,
+      "effectivePrice": 2124,
+      "fabric": "Chiffon",
+      "highlights": [
+        "Lightweight, flowy chiffon",
+        "All-over floral print",
+        "Comes with a matching stitched blouse",
+        "Easy, breathable everyday elegance"
+      ],
+      "id": "SA00003",
+      "image": "/images/sarees/SA00003.png",
+      "images": [
+        "/images/sarees/SA00003.png"
+      ],
+      "name": "Chiffon Printed Saree - Peach",
+      "occasion": "occasional",
+      "occasionTag": null,
+      "price": 2499.0,
+      "stock": 30,
+      "variantGroup": null,
+      "defaultCombo": {
+        "anklet": null,
+        "bangles": "OR00004",
+        "bracelet": null,
+        "earrings": "OR00007",
+        "necklace": null,
+        "ring": null,
+        "waistband": null
+      },
+      "defaultPricing": {
+        "discountAmount": 220,
+        "discountPercent": 10,
+        "isDefaultCombo": true,
+        "ornamentOriginalTotal": 2198.0,
+        "ornamentTotal": 2198.0,
+        "pieceCount": 2,
+        "sareeDiscountPercent": 15,
+        "sareeOriginalPrice": 2499.0,
+        "sareePrice": 2124,
+        "seasonalSavings": 375,
+        "subtotal": 4322.0,
+        "total": 4102.0
+      }
+    },
+    {
+      "activeDiscountPercent": 0,
+      "blouseType": "none",
+      "color": "Royal Blue",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "description": "A royal blue organza saree with a fine sequin border, light enough to hold its shape through a full day of festivities.",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 4499.0,
+      "fabric": "Organza",
+      "highlights": [
+        "Crisp organza with a subtle sheen",
+        "Delicate sequin border",
+        "Saree only -- pair with any blouse you like",
+        "A fresh look for festival gatherings"
+      ],
+      "id": "SA00004",
+      "image": "/images/sarees/SA00004.png",
+      "images": [
+        "/images/sarees/SA00004.png"
+      ],
+      "name": "Organza Saree - Royal Blue",
+      "occasion": "festivals",
+      "occasionTag": "Onam",
+      "price": 4499.0,
+      "stock": 18,
+      "variantGroup": null,
+      "defaultCombo": {
+        "anklet": null,
+        "bangles": null,
+        "bracelet": null,
+        "earrings": "OR00008",
+        "necklace": "OR00002",
+        "ring": null,
+        "waistband": null
+      },
+      "defaultPricing": {
+        "discountAmount": 408,
+        "discountPercent": 10,
+        "isDefaultCombo": true,
+        "ornamentOriginalTotal": 4598.0,
+        "ornamentTotal": 4083,
+        "pieceCount": 2,
+        "sareeDiscountPercent": 0,
+        "sareeOriginalPrice": 4499.0,
+        "sareePrice": 4499.0,
+        "seasonalSavings": 515,
+        "subtotal": 8582.0,
+        "total": 8174.0
+      }
+    },
+    {
+      "activeDiscountPercent": 0,
+      "blouseType": "stitched",
+      "color": "Mustard",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "description": "A handwoven mustard cotton saree with a thin zari-edged border -- comfortable enough for a full day at work, still smart enough for the office.",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 1899.0,
+      "fabric": "Cotton Handloom",
+      "highlights": [
+        "Handwoven pure cotton",
+        "Breathable, perfect for daily wear",
+        "Comes with a matching stitched blouse",
+        "Simple zari-edged border"
+      ],
+      "id": "SA00005",
+      "image": "/images/sarees/SA00005.png",
+      "images": [
+        "/images/sarees/SA00005.png"
+      ],
+      "name": "Cotton Handloom Saree - Mustard",
+      "occasion": "office",
+      "occasionTag": null,
+      "price": 1899.0,
+      "stock": 40,
+      "variantGroup": null,
+      "defaultCombo": {
+        "anklet": null,
+        "bangles": null,
+        "bracelet": null,
+        "earrings": null,
+        "necklace": null,
+        "ring": null,
+        "waistband": null
+      },
+      "defaultPricing": {
+        "discountAmount": 0,
+        "discountPercent": 10,
+        "isDefaultCombo": true,
+        "ornamentOriginalTotal": 0,
+        "ornamentTotal": 0,
+        "pieceCount": 0,
+        "sareeDiscountPercent": 0,
+        "sareeOriginalPrice": 1899.0,
+        "sareePrice": 1899.0,
+        "seasonalSavings": 0,
+        "subtotal": 1899.0,
+        "total": 1899.0
+      }
+    },
+    {
+      "activeDiscountPercent": 20,
+      "blouseType": "stitched",
+      "color": "Wine",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "description": "A wine georgette party saree with a sequin-and-stone border that catches the light -- an easy pick for an evening of celebrations.",
+      "discountEndsAt": null,
+      "discountPercent": 20,
+      "discountStartsAt": null,
+      "effectivePrice": 2879,
+      "fabric": "Georgette",
+      "highlights": [
+        "Flowing georgette with a subtle shimmer",
+        "Sequin and stone embellished border",
+        "Comes with a matching stitched blouse",
+        "Built for evening festivities"
+      ],
+      "id": "SA00006",
+      "image": "/images/sarees/SA00006.png",
+      "images": [
+        "/images/sarees/SA00006.png"
+      ],
+      "name": "Georgette Party Saree - Wine",
+      "occasion": "festivals",
+      "occasionTag": "Deepavali",
+      "price": 3599.0,
+      "stock": 16,
+      "variantGroup": null,
+      "defaultCombo": {
+        "anklet": null,
+        "bangles": "OR00006",
+        "bracelet": null,
+        "earrings": "OR00009",
+        "necklace": "OR00003",
+        "ring": null,
+        "waistband": null
+      },
+      "defaultPricing": {
+        "discountAmount": 767,
+        "discountPercent": 10,
+        "isDefaultCombo": true,
+        "ornamentOriginalTotal": 7997.0,
+        "ornamentTotal": 7667.0,
+        "pieceCount": 3,
+        "sareeDiscountPercent": 20,
+        "sareeOriginalPrice": 3599.0,
+        "sareePrice": 2879,
+        "seasonalSavings": 1050,
+        "subtotal": 10546.0,
+        "total": 9779.0
+      }
+    },
+    {
+      "activeDiscountPercent": 0,
+      "blouseType": "none",
+      "color": "Ivory & Gold",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "description": "The classic Kerala kasavu saree -- off-white cotton with a pure gold zari border, handwoven in the traditional style worn for Onam, Vishu and temple visits.",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 2999.0,
+      "fabric": "Kasavu Cotton",
+      "highlights": [
+        "Traditional Kerala kasavu weave",
+        "Pure gold zari border",
+        "Saree only -- the classic Onam/Vishu choice",
+        "Handwoven on a traditional loom"
+      ],
+      "id": "SA00007",
+      "image": "/images/sarees/SA00007.png",
+      "images": [
+        "/images/sarees/SA00007.png"
+      ],
+      "name": "Kasavu Cotton Saree - Ivory & Gold",
+      "occasion": "festivals",
+      "occasionTag": "Onam",
+      "price": 2999.0,
+      "stock": 25,
+      "variantGroup": null,
+      "defaultCombo": {
+        "anklet": "OR00014",
+        "bangles": "OR00004",
+        "bracelet": null,
+        "earrings": "OR00007",
+        "necklace": "OR00001",
+        "ring": null,
+        "waistband": null
+      },
+      "defaultPricing": {
+        "discountAmount": 620,
+        "discountPercent": 10,
+        "isDefaultCombo": true,
+        "ornamentOriginalTotal": 6196.0,
+        "ornamentTotal": 6196.0,
+        "pieceCount": 4,
+        "sareeDiscountPercent": 0,
+        "sareeOriginalPrice": 2999.0,
+        "sareePrice": 2999.0,
+        "seasonalSavings": 0,
+        "subtotal": 9195.0,
+        "total": 8575.0
+      }
+    },
+    {
+      "activeDiscountPercent": 0,
+      "blouseType": "unstitched",
+      "color": "Rust",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "description": "A rust tussar silk saree with its characteristic textured weave and a hand-printed border -- an easy silk for everyday festive wear.",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 3999.0,
+      "fabric": "Tussar Silk",
+      "highlights": [
+        "Textured tussar silk with a natural sheen",
+        "Hand-printed border motif",
+        "Comes with an unstitched blouse piece",
+        "An earthy, versatile everyday silk"
+      ],
+      "id": "SA00008",
+      "image": "/images/sarees/SA00008.png",
+      "images": [
+        "/images/sarees/SA00008.png"
+      ],
+      "name": "Tussar Silk Saree - Rust",
+      "occasion": "occasional",
+      "occasionTag": null,
+      "price": 3999.0,
+      "stock": 14,
+      "variantGroup": null,
+      "defaultCombo": {
+        "anklet": null,
+        "bangles": "OR00004",
+        "bracelet": null,
+        "earrings": "OR00009",
+        "necklace": null,
+        "ring": null,
+        "waistband": null
+      },
+      "defaultPricing": {
+        "discountAmount": 210,
+        "discountPercent": 10,
+        "isDefaultCombo": true,
+        "ornamentOriginalTotal": 2098.0,
+        "ornamentTotal": 2098.0,
+        "pieceCount": 2,
+        "sareeDiscountPercent": 0,
+        "sareeOriginalPrice": 3999.0,
+        "sareePrice": 3999.0,
+        "seasonalSavings": 0,
+        "subtotal": 6097.0,
+        "total": 5887.0
+      }
+    }
+  ],
+  "ornaments": [
+    {
+      "activeDiscountPercent": 0,
+      "category": "necklace",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 2499.0,
+      "highlights": [
+        "Gold-tone temple design",
+        "Kundan stone work",
+        "Comes with a jewellery pouch"
+      ],
+      "id": "OR00001",
+      "image": "/images/ornaments/OR00001.png",
+      "images": [
+        "/images/ornaments/OR00001.png"
+      ],
+      "name": "Temple Kundan Necklace",
+      "price": 2499.0,
+      "stock": 22
+    },
+    {
+      "activeDiscountPercent": 10,
+      "category": "necklace",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 10,
+      "discountStartsAt": null,
+      "effectivePrice": 3149,
+      "highlights": [
+        "Emerald-green stone drops",
+        "Gold-tone finish",
+        "Adjustable chain length"
+      ],
+      "id": "OR00002",
+      "image": "/images/ornaments/OR00002.png",
+      "images": [
+        "/images/ornaments/OR00002.png"
+      ],
+      "name": "Emerald Drop Necklace",
+      "price": 3499.0,
+      "stock": 13
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "necklace",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0.0,
+      "discountStartsAt": null,
+      "effectivePrice": 4999.0,
+      "highlights": [
+        "Polki stone choker",
+        "Statement bridal piece",
+        "Matching earrings sold separately"
+      ],
+      "id": "OR00003",
+      "image": "/images/ornaments/OR00003.png",
+      "images": [
+        "/images/ornaments/OR00003.png"
+      ],
+      "lowStockNotified": false,
+      "name": "Polki Choker Necklace",
+      "price": 4999.0,
+      "stock": 7
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "bangles",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 1299.0,
+      "highlights": [
+        "Gold-plated finish",
+        "Set of 2, same size",
+        "Everyday to festive wear"
+      ],
+      "id": "OR00004",
+      "image": "/images/ornaments/OR00004.png",
+      "images": [
+        "/images/ornaments/OR00004.png"
+      ],
+      "name": "Gold Plated Bangles (Set of 2)",
+      "price": 1299.0,
+      "stock": 23
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "bangles",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 1799.0,
+      "highlights": [
+        "Bold kada-style pair",
+        "Antique gold finish",
+        "Pairs well with silk sarees"
+      ],
+      "id": "OR00005",
+      "image": "/images/ornaments/OR00005.png",
+      "images": [
+        "/images/ornaments/OR00005.png"
+      ],
+      "name": "Kada Bangles Pair",
+      "price": 1799.0,
+      "stock": 10
+    },
+    {
+      "activeDiscountPercent": 15,
+      "category": "bangles",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 15,
+      "discountStartsAt": null,
+      "effectivePrice": 1869,
+      "highlights": [
+        "Pearl-studded detailing",
+        "Gold-tone base",
+        "Set of 2"
+      ],
+      "id": "OR00006",
+      "image": "/images/ornaments/OR00006.png",
+      "images": [
+        "/images/ornaments/OR00006.png"
+      ],
+      "name": "Pearl Studded Bangles",
+      "price": 2199.0,
+      "stock": 18
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "earrings",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 899.0,
+      "highlights": [
+        "Classic jhumka bell shape",
+        "Lightweight for all-day wear",
+        "Push-back closure"
+      ],
+      "id": "OR00007",
+      "image": "/images/ornaments/OR00007.png",
+      "images": [
+        "/images/ornaments/OR00007.png"
+      ],
+      "name": "Jhumka Earrings",
+      "price": 899.0,
+      "stock": 30
+    },
+    {
+      "activeDiscountPercent": 15,
+      "category": "earrings",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 15,
+      "discountStartsAt": null,
+      "effectivePrice": 934,
+      "highlights": [
+        "Crescent chandbali design",
+        "Kundan and bead work",
+        "Statement festive pick"
+      ],
+      "id": "OR00008",
+      "image": "/images/ornaments/OR00008.png",
+      "images": [
+        "/images/ornaments/OR00008.png"
+      ],
+      "name": "Chandbali Earrings",
+      "price": 1099.0,
+      "stock": 14
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "earrings",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 799.0,
+      "highlights": [
+        "Simple kundan stud",
+        "Easy everyday wear",
+        "Pairs with any neckline"
+      ],
+      "id": "OR00009",
+      "image": "/images/ornaments/OR00009.png",
+      "images": [
+        "/images/ornaments/OR00009.png"
+      ],
+      "name": "Kundan Stud Earrings",
+      "price": 799.0,
+      "stock": 33
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "ring",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 599.0,
+      "highlights": [
+        "One-size adjustable band",
+        "Kundan centre stone",
+        "Gold-tone finish"
+      ],
+      "id": "OR00010",
+      "image": "/images/ornaments/OR00010.png",
+      "images": [
+        "/images/ornaments/OR00010.png"
+      ],
+      "name": "Adjustable Kundan Ring",
+      "price": 599.0,
+      "stock": 30
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "ring",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 699.0,
+      "highlights": [
+        "Floral motif design",
+        "Gold-tone finish",
+        "Everyday wearable"
+      ],
+      "id": "OR00011",
+      "image": "/images/ornaments/OR00011.png",
+      "images": [
+        "/images/ornaments/OR00011.png"
+      ],
+      "name": "Floral Gold Ring",
+      "price": 699.0,
+      "stock": 22
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "ring",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 849.0,
+      "highlights": [
+        "Clustered pearl detail",
+        "Adjustable band",
+        "Delicate, understated look"
+      ],
+      "id": "OR00012",
+      "image": "/images/ornaments/OR00012.png",
+      "images": [
+        "/images/ornaments/OR00012.png"
+      ],
+      "name": "Pearl Cluster Ring",
+      "price": 849.0,
+      "stock": 13
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "anklet",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 1199.0,
+      "highlights": [
+        "Oxidised silver finish",
+        "Classic ghungroo trim",
+        "Sold as a pair"
+      ],
+      "id": "OR00013",
+      "image": "/images/ornaments/OR00013.png",
+      "images": [
+        "/images/ornaments/OR00013.png"
+      ],
+      "name": "Silver Payal Pair",
+      "price": 1199.0,
+      "stock": 22
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "anklet",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 1499.0,
+      "highlights": [
+        "Temple-motif design",
+        "Antique gold finish",
+        "Sold as a pair"
+      ],
+      "id": "OR00014",
+      "image": "/images/ornaments/OR00014.png",
+      "images": [
+        "/images/ornaments/OR00014.png"
+      ],
+      "name": "Temple Anklet Pair",
+      "price": 1499.0,
+      "stock": 16
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "anklet",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 799.0,
+      "highlights": [
+        "Beaded chain detail",
+        "Lightweight, everyday wear",
+        "Sold as a pair"
+      ],
+      "id": "OR00015",
+      "image": "/images/ornaments/OR00015.png",
+      "images": [
+        "/images/ornaments/OR00015.png"
+      ],
+      "name": "Beaded Anklet Pair",
+      "price": 799.0,
+      "stock": 26
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "bracelet",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 899.0,
+      "highlights": [
+        "Simple gold-tone chain",
+        "Adjustable clasp",
+        "Everyday to festive wear"
+      ],
+      "id": "OR00016",
+      "image": "/images/ornaments/OR00016.png",
+      "images": [
+        "/images/ornaments/OR00016.png"
+      ],
+      "name": "Gold Chain Bracelet",
+      "price": 899.0,
+      "stock": 25
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "bracelet",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 999.0,
+      "highlights": [
+        "Single-strand pearl detail",
+        "Gold-tone clasp",
+        "Delicate everyday pick"
+      ],
+      "id": "OR00017",
+      "image": "/images/ornaments/OR00017.png",
+      "images": [
+        "/images/ornaments/OR00017.png"
+      ],
+      "name": "Pearl Bracelet",
+      "price": 999.0,
+      "stock": 20
+    },
+    {
+      "activeDiscountPercent": 10,
+      "category": "bracelet",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 10,
+      "discountStartsAt": null,
+      "effectivePrice": 989,
+      "highlights": [
+        "Multiple charm detailing",
+        "Gold-tone finish",
+        "Adjustable length"
+      ],
+      "id": "OR00018",
+      "image": "/images/ornaments/OR00018.png",
+      "images": [
+        "/images/ornaments/OR00018.png"
+      ],
+      "name": "Charm Bracelet",
+      "price": 1099.0,
+      "stock": 11
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "waistband",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 1599.0,
+      "highlights": [
+        "Traditional kamarbandh style",
+        "Adjustable chain",
+        "Festive and bridal wear"
+      ],
+      "id": "OR00019",
+      "image": "/images/ornaments/OR00019.png",
+      "images": [
+        "/images/ornaments/OR00019.png"
+      ],
+      "name": "Kamarbandh Waist Chain",
+      "price": 1599.0,
+      "stock": 12
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "waistband",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0,
+      "discountStartsAt": null,
+      "effectivePrice": 1899.0,
+      "highlights": [
+        "Temple-motif waist belt",
+        "Antique gold finish",
+        "Statement bridal piece"
+      ],
+      "id": "OR00020",
+      "image": "/images/ornaments/OR00020.png",
+      "images": [
+        "/images/ornaments/OR00020.png"
+      ],
+      "name": "Temple Waist Belt",
+      "price": 1899.0,
+      "stock": 10
+    },
+    {
+      "activeDiscountPercent": 0,
+      "category": "waistband",
+      "createdAt": "2026-10-15T11:24:58+00:00",
+      "discountEndsAt": null,
+      "discountPercent": 0.0,
+      "discountStartsAt": null,
+      "effectivePrice": 1299.0,
+      "highlights": [
+        "Oxidised silver-tone finish",
+        "Bold statement design",
+        "Pairs well with cotton/silk sarees"
+      ],
+      "id": "OR00021",
+      "image": "/images/ornaments/OR00021.png",
+      "images": [
+        "/images/ornaments/OR00021.png"
+      ],
+      "lowStockNotified": false,
+      "name": "Oxidized Waistband",
+      "price": 1299.0,
+      "stock": 9
+    }
+  ]
+}
