@@ -1,9 +1,5 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sopanam Drapes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Albert+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -62,22 +58,41 @@ nav button:hover{border-color:var(--zari)}
 .tools{display:flex;gap:10px;align-items:center}
 .iconbtn{background:none;border:1px solid var(--line);padding:8px 14px;font-size:13px;font-weight:600;border-radius:2px}
 .iconbtn:hover{border-color:var(--ink)}
-@media(max-width:1060px){nav{display:none}}
+@media(max-width:1200px){
+  .bar{row-gap:12px}
+  nav{grid-column:1/-1;grid-row:2;justify-self:center;gap:28px;padding-top:12px;border-top:1px solid var(--line);width:100%;justify-content:center}
+}
+@media(max-width:720px){nav{display:none}}
 
-/* hero */
-.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding-block:56px 64px}
-.hero h1{font-size:clamp(44px,7vw,84px);letter-spacing:-.01em}
-.hero h1 em{font-style:italic;color:var(--accent)}
-:root[data-theme="dark"] .hero h1 em{color:var(--accent)}
-.hero p.lead{margin-top:22px;max-width:46ch;font-size:18px;color:var(--muted)}
-.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
-.assure{display:flex;gap:22px;flex-wrap:wrap;margin-top:34px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
-.assure b{color:var(--ink);font-weight:600}
-.hero-art{position:relative}
 img{display:block;max-width:100%;height:auto}
-.hero-art img{width:100%;border:1px solid var(--line);background:var(--tint)}
-.hero-art figcaption{margin-top:10px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:12px}
-@media(max-width:860px){.hero{grid-template-columns:1fr;gap:32px;padding-block:32px 40px}.hero-art{max-width:420px}}
+
+/* hero banner: full-bleed campaign photograph, copy over the dark curtain at the left. Fixed palette in both themes because it sits on the photo. */
+.banner{position:relative;overflow:hidden;background:#1f2417;color:#f6efe0;scroll-margin-top:90px;
+  margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)))}
+.banner picture,.banner img{display:block;width:100%}
+.banner img{height:auto;max-height:720px;object-fit:cover;object-position:60% 50%}
+.banner::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(24,20,12,.5) 0%,rgba(24,20,12,.3) 26%,rgba(24,20,12,0) 44%)}
+.banner-copy{position:absolute;top:0;bottom:0;left:0;z-index:1;display:flex;flex-direction:column;justify-content:center;
+  width:calc(max(max(16px,env(safe-area-inset-left,0px)),calc(50% - 590px)) + 430px);max-width:46%;
+  padding-left:max(max(16px,env(safe-area-inset-left,0px)),calc(50% - 590px));padding-right:16px}
+.banner .eyebrow{color:#e3c06f}
+.banner h1{font-size:clamp(34px,3.7vw,56px);letter-spacing:-.01em;color:#fbf4e4;margin-top:12px}
+.banner h1 em{font-style:italic;color:#f0cf86}
+.banner .lead{margin-top:18px;max-width:40ch;font-size:16px;color:rgba(251,244,228,.86)}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.banner .btn{background:#f3e6c4;border-color:#f3e6c4;color:#3a1018}
+.banner .btn.ghost{background:transparent;border-color:rgba(251,244,228,.7);color:#fbf4e4}
+.banner .btn.ghost:hover{background:rgba(251,244,228,.1)}
+.assure{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;padding-top:16px;border-top:1px solid rgba(251,244,228,.28);font-size:13px;color:rgba(251,244,228,.78)}
+.assure b{color:#fbf4e4;font-weight:600}
+.banner .note{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:12px;z-index:1;font-size:11px;letter-spacing:.08em;color:rgba(251,244,228,.6)}
+@media(max-width:860px){
+  .banner img{max-height:none}
+  .banner::after{display:none}
+  .banner-copy{position:static;width:auto;max-width:none;padding:28px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+  .banner .note{top:10px;bottom:auto}
+}
 
 /* sections */
 section{padding-block:64px;border-top:1px solid var(--line);scroll-margin-top:72px}
@@ -182,11 +197,8 @@ footer .note{max-width:46ch}
 .bi .f button{background:none;border:0;font-size:13px;color:var(--muted);text-decoration:underline;padding:0}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 20px;font-size:14px;z-index:60;border-radius:2px;max-width:calc(100% - 32px)}
 @media(prefers-reduced-motion:no-preference){.card,.world{transition:border-color .2s}}
-html,body{margin:0}
 </style>
 
-</head>
-<body>
 <div id="app">
 <header>
   <div class="bar">
@@ -205,23 +217,26 @@ html,body{margin:0}
   </div>
 </header>
 
-<main class="wrap" id="top">
-  <div class="hero">
-    <div>
-      <p class="eyebrow">Handpicked in Kerala</p>
-      <h1>Drape your dream. <em>Complete your look.</em></h1>
-      <p class="lead">Choose a saree and we style the jewellery to match, from necklace to waistband. Keep the set, change any piece, or start from the saree alone.</p>
-      <div class="cta">
-        <button class="btn" data-go="builder">Build a look</button>
-        <button class="btn ghost" data-go="worlds">Explore by occasion</button>
-      </div>
-      <div class="assure"><span><b>Pan-India</b> delivery</span><span><b>7-day</b> easy returns</span><span><b>COD</b> and online payment</span></div>
+<div class="banner" id="top">
+  <picture>
+    <source media="(max-width:860px)" srcset="img/hero-window-phone.jpg">
+    <img src="img/hero-window-2048.jpg" srcset="img/hero-window-1280.jpg 1440w, img/hero-window-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" fetchpriority="high"
+      alt="A woman in a plum silk saree with a gold zari border looks out of a tall window in a sage-green drawing room">
+  </picture>
+  <div class="banner-copy">
+    <p class="eyebrow">Handpicked silk sarees</p>
+    <h1>Drape your dream. <em>Complete your look.</em></h1>
+    <p class="lead">Choose a saree and we style the jewellery to match, from necklace to waistband. Keep the set, change any piece, or start from the saree alone.</p>
+    <div class="cta">
+      <button class="btn" data-go="builder">Build a look</button>
+      <button class="btn ghost" data-go="worlds">Explore by occasion</button>
     </div>
-    <figure class="hero-art" style="margin:0">
-      <div id="heroArt"></div>
-      <figcaption><span>Kasavu Cotton Saree, Ivory &amp; Gold</span><span>Concept image</span></figcaption>
-    </figure>
+    <div class="assure"><span><b>Pan-India</b> delivery</span><span><b>7-day</b> easy returns</span><span><b>COD</b> and online payment</span></div>
   </div>
+  <span class="note">Concept image</span>
+</div>
+
+<main class="wrap">
 
   <section id="worlds">
     <div class="head">
@@ -434,8 +449,5 @@ document.addEventListener('click',e=>{
 $('#scrim').addEventListener('click',()=>openBag(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#bag').hidden)openBag(false)});
 
-renderHero();renderWorlds();renderChips();renderGrid();renderBuilder();renderBag();
+renderWorlds();renderChips();renderGrid();renderBuilder();renderBag();
 </script>
-
-</body>
-</html>
