@@ -66,33 +66,53 @@ nav button:hover{border-color:var(--zari)}
 
 img{display:block;max-width:100%;height:auto}
 
-/* hero banner: full-bleed campaign photograph, copy over the dark curtain at the left. Fixed palette in both themes because it sits on the photo. */
-.banner{position:relative;overflow:hidden;background:#1f2417;color:#f6efe0;scroll-margin-top:90px;
+/* hero carousel: full-bleed campaign photographs, copy sits on the open wall of each photo. Fixed palettes per slide because they sit on the photo, in both themes. */
+.banner{position:relative;overflow:hidden;background:#1f2417;scroll-margin-top:90px;
   margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)))}
-.banner picture,.banner img{display:block;width:100%}
-.banner img{height:auto;max-height:720px;object-fit:cover;object-position:60% 50%}
-.banner::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(90deg,rgba(24,20,12,.5) 0%,rgba(24,20,12,.3) 26%,rgba(24,20,12,0) 44%)}
-.banner-copy{position:absolute;top:0;bottom:0;left:0;z-index:1;display:flex;flex-direction:column;justify-content:center;
-  width:calc(max(max(16px,env(safe-area-inset-left,0px)),calc(50% - 590px)) + 430px);max-width:46%;
-  padding-left:max(max(16px,env(safe-area-inset-left,0px)),calc(50% - 590px));padding-right:16px}
-.banner .eyebrow{color:#e3c06f}
-.banner h1{font-size:clamp(34px,3.7vw,56px);letter-spacing:-.01em;color:#fbf4e4;margin-top:12px}
-.banner h1 em{font-style:italic;color:#f0cf86}
-.banner .lead{margin-top:18px;max-width:40ch;font-size:16px;color:rgba(251,244,228,.86)}
+.slides{display:grid;touch-action:pan-y}
+.slide{grid-area:1/1;position:relative;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .8s ease,visibility 0s .8s}
+.slide.is-active{opacity:1;visibility:visible;transition:opacity .8s ease}
+.slide.on-dark{--fg:#fbf4e4;--fg2:rgba(251,244,228,.86);--acc:#e3c06f;--em:#f0cf86;--rule:rgba(251,244,228,.28);--btn:#f3e6c4;--btnfg:#3a1018;--ghost:rgba(251,244,228,.7);--shade:rgba(24,20,12,.5);background:#1f2417}
+.slide.on-light{--fg:#2b1316;--fg2:rgba(43,19,22,.8);--acc:#8a6420;--em:#7a1f2b;--rule:rgba(43,19,22,.2);--btn:#6e1b2b;--btnfg:#fbf4e4;--ghost:#2b1316;--shade:rgba(244,232,206,.72);background:#ecdfc3}
+.slide picture,.slide img{display:block;width:100%}
+.slide picture{height:clamp(460px,56.25vw,720px)}
+.slide img{height:100%;object-fit:cover}
+.slide.left img{object-position:60% 50%}
+.slide.right img{object-position:40% 70%}
+.slide::after{content:"";position:absolute;inset:0;pointer-events:none}
+.slide.left::after{background:linear-gradient(90deg,var(--shade) 0%,color-mix(in srgb,var(--shade) 60%,transparent) 26%,transparent 44%)}
+.slide.right::after{background:linear-gradient(270deg,var(--shade) 0%,color-mix(in srgb,var(--shade) 62%,transparent) 22%,transparent 40%)}
+.banner-copy{position:absolute;top:0;bottom:0;z-index:1;display:flex;flex-direction:column;justify-content:center;color:var(--fg);
+  width:calc(max(max(16px,env(safe-area-inset-left,0px)),calc(50% - 590px)) + 430px);max-width:46%}
+.slide.left .banner-copy{left:0;padding-left:max(max(16px,env(safe-area-inset-left,0px)),calc(50% - 590px));padding-right:16px}
+.slide.right .banner-copy{right:0;padding-right:max(max(16px,env(safe-area-inset-right,0px)),calc(50% - 590px));padding-left:16px}
+.banner .eyebrow{color:var(--acc)}
+.banner h2.hl{font-family:var(--display);font-weight:500;line-height:1.05;font-size:clamp(34px,3.7vw,56px);letter-spacing:-.01em;color:var(--fg);margin-top:12px}
+.banner h2.hl em{font-style:italic;color:var(--em)}
+.banner .lead{margin-top:18px;max-width:40ch;font-size:16px;color:var(--fg2)}
 .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
-.banner .btn{background:#f3e6c4;border-color:#f3e6c4;color:#3a1018}
-.banner .btn.ghost{background:transparent;border-color:rgba(251,244,228,.7);color:#fbf4e4}
-.banner .btn.ghost:hover{background:rgba(251,244,228,.1)}
-.assure{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;padding-top:16px;border-top:1px solid rgba(251,244,228,.28);font-size:13px;color:rgba(251,244,228,.78)}
-.assure b{color:#fbf4e4;font-weight:600}
-.banner .note{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:12px;z-index:1;font-size:11px;letter-spacing:.08em;color:rgba(251,244,228,.6)}
+.banner .btn{background:var(--btn);border-color:var(--btn);color:var(--btnfg)}
+.banner .btn.ghost{background:transparent;border-color:var(--ghost);color:var(--fg)}
+.banner .btn.ghost:hover{background:color-mix(in srgb,var(--fg) 10%,transparent)}
+.assure{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;padding-top:16px;border-top:1px solid var(--rule);font-size:13px;color:var(--fg2)}
+.assure b{color:var(--fg);font-weight:600}
+.slide .note{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:12px;z-index:1;font-size:11px;letter-spacing:.08em;color:var(--fg);opacity:.6}
+.ctrl{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:2px;padding:2px 6px;border-radius:999px;background:rgba(24,20,12,.62);color:#fbf4e4}
+.ctrl button{width:36px;height:36px;display:grid;place-items:center;background:none;border:0;border-radius:50%;color:inherit;font-size:20px;line-height:1}
+.ctrl button:hover{background:rgba(251,244,228,.14)}
+.ctrl button:focus-visible{outline:2px solid #f0cf86;outline-offset:1px}
+.dots{display:flex}
+.dots button::before{content:"";width:8px;height:8px;border-radius:50%;background:rgba(251,244,228,.45);transition:background .2s,width .2s}
+.dots button[aria-current="true"]::before{background:#f0cf86;width:22px;border-radius:4px}
+.ctrl .pp{font-size:11px}
 @media(max-width:860px){
-  .banner img{max-height:none}
-  .banner::after{display:none}
-  .banner-copy{position:static;width:auto;max-width:none;padding:28px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
-  .banner .note{top:10px;bottom:auto}
+  .slide picture{height:auto;aspect-ratio:1080/940;overflow:hidden}
+  .slide::after{display:none}
+  .banner-copy{position:static;width:auto;max-width:none;padding:28px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))!important}
+  .slide .note{top:10px;bottom:auto}
+  .ctrl{bottom:auto;top:calc(100vw*940/1080 - 52px)}
 }
+@media(prefers-reduced-motion:reduce){.slide,.slide.is-active{transition:none}}
 
 /* sections */
 section{padding-block:64px;border-top:1px solid var(--line);scroll-margin-top:72px}
@@ -217,24 +237,85 @@ footer .note{max-width:46ch}
   </div>
 </header>
 
-<div class="banner" id="top">
-  <picture>
-    <source media="(max-width:860px)" srcset="img/hero-window-phone.jpg">
-    <img src="img/hero-window-2048.jpg" srcset="img/hero-window-1280.jpg 1440w, img/hero-window-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" fetchpriority="high"
-      alt="A woman in a plum silk saree with a gold zari border looks out of a tall window in a sage-green drawing room">
-  </picture>
-  <div class="banner-copy">
-    <p class="eyebrow">Handpicked silk sarees</p>
-    <h1>Drape your dream. <em>Complete your look.</em></h1>
-    <p class="lead">Choose a saree and we style the jewellery to match, from necklace to waistband. Keep the set, change any piece, or start from the saree alone.</p>
-    <div class="cta">
-      <button class="btn" data-go="builder">Build a look</button>
-      <button class="btn ghost" data-go="worlds">Explore by occasion</button>
-    </div>
-    <div class="assure"><span><b>Pan-India</b> delivery</span><span><b>7-day</b> easy returns</span><span><b>COD</b> and online payment</span></div>
+<section class="banner" id="top" aria-roledescription="carousel" aria-label="Featured collections">
+  <div class="slides" id="slides">
+    <article class="slide on-dark left is-active" role="group" aria-roledescription="slide" aria-label="1 of 4">
+      <picture>
+        <source media="(max-width:860px)" srcset="img/hero-window-phone.jpg">
+        <img src="img/hero-window-2048.jpg" srcset="img/hero-window-1280.jpg 1440w, img/hero-window-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" fetchpriority="high"
+          alt="A woman in a plum silk saree with a gold zari border looks out of a tall window in a sage-green drawing room">
+      </picture>
+      <div class="banner-copy">
+        <p class="eyebrow">Handpicked silk sarees</p>
+        <h2 class="hl">Drape your dream. <em>Complete your look.</em></h2>
+        <p class="lead">Choose a saree and we style the jewellery to match, from necklace to waistband. Keep the set, change any piece, or start from the saree alone.</p>
+        <div class="cta">
+          <button class="btn" data-go="builder">Build a look</button>
+          <button class="btn ghost" data-go="worlds">Explore by occasion</button>
+        </div>
+        <div class="assure"><span><b>Pan-India</b> delivery</span><span><b>7-day</b> easy returns</span><span><b>COD</b> and online payment</span></div>
+      </div>
+      <span class="note">Concept image</span>
+    </article>
+    <article class="slide on-light right" role="group" aria-roledescription="slide" aria-label="2 of 4">
+      <picture>
+        <source media="(max-width:860px)" srcset="img/hero-group-phone.jpg">
+        <img src="img/hero-group-2048.jpg" srcset="img/hero-group-1280.jpg 1440w, img/hero-group-2048.jpg 2540w" sizes="100vw" width="2540" height="1152" loading="lazy"
+          alt="Five women in vibrant silk sarees with gold zari borders pose among giant paper flowers in a warm painted studio">
+      </picture>
+      <div class="banner-copy">
+        <p class="eyebrow">Festive edit</p>
+        <h2 class="hl">Colour for every <em>celebration.</em></h2>
+        <p class="lead">Jewel-toned silks with the jewellery already matched, for festival days and family gatherings.</p>
+        <div class="cta">
+          <button class="btn" data-world="festive">Shop festive</button>
+          <button class="btn ghost" data-world="celebrations">Celebrations</button>
+        </div>
+      </div>
+      <span class="note">Concept image</span>
+    </article>
+    <article class="slide on-dark left" role="group" aria-roledescription="slide" aria-label="3 of 4">
+      <picture>
+        <source media="(max-width:860px)" srcset="img/hero-chair-phone.jpg">
+        <img src="img/hero-chair-2048.jpg" srcset="img/hero-chair-1280.jpg 1440w, img/hero-chair-2048.jpg 2048w" sizes="100vw" width="2048" height="1152" loading="lazy"
+          alt="A woman in a crimson silk saree with a gold border and a green blouse sits on a velvet armchair in an olive-green panelled room">
+      </picture>
+      <div class="banner-copy">
+        <p class="eyebrow">The bridal house</p>
+        <h2 class="hl">Silk she will be <em>remembered in.</em></h2>
+        <p class="lead">Kanjivaram and Banarasi sarees with a full set of gold, from necklace to waistband.</p>
+        <div class="cta">
+          <button class="btn" data-world="bridal">Explore bridal</button>
+          <button class="btn ghost" data-go="builder">Build a look</button>
+        </div>
+      </div>
+      <span class="note">Concept image</span>
+    </article>
+    <article class="slide on-light right" role="group" aria-roledescription="slide" aria-label="4 of 4">
+      <picture>
+        <source media="(max-width:860px)" srcset="img/hero-bloom-phone.jpg">
+        <img src="img/hero-bloom-2048.jpg" srcset="img/hero-bloom-1280.jpg 1440w, img/hero-bloom-2048.jpg 2488w" sizes="100vw" width="2488" height="1152" loading="lazy"
+          alt="Four women in silk sarees in pink, yellow, violet and lilac with gold borders, posed among oversized paper flowers">
+      </picture>
+      <div class="banner-copy">
+        <p class="eyebrow">Occasions and parties</p>
+        <h2 class="hl">Wear it <em>together.</em></h2>
+        <p class="lead">Receptions, guest wear and get-togethers, in silks light enough to enjoy the whole evening.</p>
+        <div class="cta">
+          <button class="btn" data-world="parties">Shop occasions</button>
+          <button class="btn ghost" data-world="everyday">Everyday wear</button>
+        </div>
+      </div>
+      <span class="note">Concept image</span>
+    </article>
   </div>
-  <span class="note">Concept image</span>
-</div>
+  <div class="ctrl" role="group" aria-label="Carousel controls">
+    <button type="button" id="prevSlide" aria-label="Previous slide">&#8249;</button>
+    <div class="dots" id="dots"></div>
+    <button type="button" id="nextSlide" aria-label="Next slide">&#8250;</button>
+    <button type="button" class="pp" id="ppSlide" aria-label="Pause slideshow">&#10074;&#10074;</button>
+  </div>
+</section>
 
 <main class="wrap">
 
@@ -450,4 +531,35 @@ $('#scrim').addEventListener('click',()=>openBag(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#bag').hidden)openBag(false)});
 
 renderWorlds();renderChips();renderGrid();renderBuilder();renderBag();
+
+/* hero carousel: crossfade, autoplay with pause, swipe, keyboard. No autoplay when reduced motion is on. */
+(()=>{
+  const root=$('#top'),slides=[...root.querySelectorAll('.slide')],dots=$('#dots'),pp=$('#ppSlide');
+  let i=0,timer=null,userPaused=reduce,held=false,x0=null;
+  dots.innerHTML=slides.map((_,k)=>`<button type="button" data-slide="${k}" aria-label="Show slide ${k+1}"></button>`).join('');
+  function show(n){
+    i=(n+slides.length)%slides.length;
+    slides.forEach((el,k)=>{const on=k===i;el.classList.toggle('is-active',on);el.setAttribute('aria-hidden',on?'false':'true');el.inert=!on});
+    [...dots.children].forEach((d,k)=>d.setAttribute('aria-current',k===i?'true':'false'));
+  }
+  function tick(){clearTimeout(timer);if(userPaused||held||document.hidden)return;timer=setTimeout(()=>{show(i+1);tick()},6500)}
+  function setPaused(v){userPaused=v;pp.innerHTML=v?'&#9654;':'&#10074;&#10074;';pp.setAttribute('aria-label',v?'Play slideshow':'Pause slideshow');tick()}
+  root.addEventListener('click',e=>{
+    const t=e.target.closest('button');if(!t)return;
+    if(t.id==='prevSlide'){show(i-1);tick()}
+    else if(t.id==='nextSlide'){show(i+1);tick()}
+    else if(t.id==='ppSlide'){setPaused(!userPaused)}
+    else if(t.dataset.slide){show(+t.dataset.slide);tick()}
+  });
+  root.addEventListener('mouseenter',()=>{held=true;tick()});
+  root.addEventListener('mouseleave',()=>{held=false;tick()});
+  root.addEventListener('focusin',()=>{held=true;tick()});
+  root.addEventListener('focusout',()=>{held=false;tick()});
+  root.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){show(i-1);tick()}if(e.key==='ArrowRight'){show(i+1);tick()}});
+  $('#slides').addEventListener('pointerdown',e=>{x0=e.clientX});
+  $('#slides').addEventListener('pointerup',e=>{if(x0===null)return;const d=e.clientX-x0;x0=null;if(Math.abs(d)>50){show(d<0?i+1:i-1);tick()}});
+  document.addEventListener('visibilitychange',tick);
+  setPaused(userPaused);show(0);
+})();
+
 </script>
