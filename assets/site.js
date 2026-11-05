@@ -1,3 +1,6 @@
+
+function saveTheme(v){try{localStorage.setItem('sd-theme',v)}catch(e){}window.name=window.name.replace(/(^|;)sd-theme=\w+/,'')+';sd-theme='+v}
+document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const h=a.getAttribute('href');const th=document.documentElement.dataset.theme;if(!th||!/^[\w-]+\.html/.test(h))return;const u=new URL(h,location.href);u.searchParams.set('theme',th);a.href=u.href});
 const SLOTS=[['necklace','Necklace'],['bangles','Bangles'],['earrings','Earrings'],['ring','Ring'],['anklet','Anklet'],['bracelet','Bracelet'],['waistband','Waistband']];
 const ORN={
 OR00001:['necklace','Temple Kundan Necklace',2499,2499],OR00002:['necklace','Emerald Drop Necklace',3499,3149],OR00003:['necklace','Polki Choker Necklace',4999,4999],
@@ -79,7 +82,7 @@ document.addEventListener('click',e=>{
   if(t.id==='menuBtn'){const h=t.closest('header'),o=h.classList.toggle('open');t.setAttribute('aria-expanded',o);t.setAttribute('aria-label',o?'Close menu':'Open menu');return}
   if(t.id==='bagBtn'){openBag(true);return}
   if(t.id==='bagClose'){openBag(false);return}
-  if(t.id==='themeBtn'){const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';try{localStorage.setItem('sd-theme',r.dataset.theme)}catch(e){}}
+  if(t.id==='themeBtn'){const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';saveTheme(r.dataset.theme)}
 });
 $('#scrim').addEventListener('click',()=>openBag(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#bag').hidden)openBag(false)});

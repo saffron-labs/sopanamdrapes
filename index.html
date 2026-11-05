@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><script>try{var t=localStorage.getItem("sd-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script><title>Sopanam Drapes</title><style>body{margin:0}</style>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><script>(function(){var t=null;try{t=localStorage.getItem("sd-theme")}catch(e){}if(!t){var m=/(?:^|;)sd-theme=(light|dark)/.exec(window.name);t=m&&m[1]}if(!t){var q=/[?&]theme=(light|dark)/.exec(location.search);t=q&&q[1]}if(t)document.documentElement.dataset.theme=t})()</script><title>Sopanam Drapes</title><style>body{margin:0}</style>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -251,6 +251,8 @@ const WORLDS=[
 {k:'everyday',name:'Everyday & office',line:'Handloom cotton and easy silk for long working days.',tone:'#cf9a22',trim:'#7a5412'}];
 const BRIDAL_FULL={necklace:'OR00003',bangles:'OR00005',earrings:'OR00008',ring:'OR00011',anklet:'OR00014',bracelet:'OR00016',waistband:'OR00020'};
 
+function saveTheme(v){try{localStorage.setItem('sd-theme',v)}catch(e){}window.name=window.name.replace(/(^|;)sd-theme=\w+/,'')+';sd-theme='+v}
+document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const h=a.getAttribute('href');const th=document.documentElement.dataset.theme;if(!th||!/^[\w-]+\.html/.test(h))return;const u=new URL(h,location.href);u.searchParams.set('theme',th);a.href=u.href});
 const $=s=>document.querySelector(s), inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const state={world:'all',cur:'SA00001',view:'model',sel:{...SAREES[0].combo},bag:[]};
@@ -372,7 +374,7 @@ document.addEventListener('click',e=>{
   if(t.id==='menuBtn'){const h=t.closest('header'),o=h.classList.toggle('open');t.setAttribute('aria-expanded',o);t.setAttribute('aria-label',o?'Close menu':'Open menu');return}
   if(t.id==='bagBtn'){openBag(true);return}
   if(t.id==='bagClose'){openBag(false);return}
-  if(t.id==='themeBtn'){const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';try{localStorage.setItem('sd-theme',r.dataset.theme)}catch(e){}}
+  if(t.id==='themeBtn'){const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';saveTheme(r.dataset.theme)}
 });
 $('#scrim').addEventListener('click',()=>openBag(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#bag').hidden)openBag(false)});
