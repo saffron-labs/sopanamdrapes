@@ -361,7 +361,7 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('button');if(!t)return;
   if(t.dataset.go){go(t.dataset.go==='top'?'top':t.dataset.go);return}
   if(t.dataset.filter){pickWorld(t.dataset.filter);return}
-  if('world' in t.dataset){location.href=PAGES[t.dataset.world];return}
+  if('world' in t.dataset){const u=new URL(PAGES[t.dataset.world],location.href),th=document.documentElement.dataset.theme;if(th)u.searchParams.set('theme',th);location.href=u.href;return}
   if(t.dataset.style){styleSaree(t.dataset.style);return}
   if(t.dataset.view){state.view=t.dataset.view;renderBuilder();return}
   if(t.dataset.pick){state.cur=t.dataset.pick;state.view='model';state.sel={...saree(state.cur).combo};renderBuilder();return}
