@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Festive Kerala · Sopanam Drapes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Albert+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>body{margin:0}</style>
+</head><body>
+<div id="app">
+<header>
+  <div class="bar">
+    <button class="ibtn menu" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <a class="brand" href="index.html" aria-label="Sopanam Drapes home">Sopanam Drapes<span>Sarees &amp; ornaments</span></a>
+    <nav id="mainNav" aria-label="Main"><a href="bridal.html">Bridal</a><a href="festive.html" aria-current="page">Festive</a><a href="celebrations.html">Celebrations</a><a href="occasions.html">Occasions</a><a href="everyday.html">Everyday</a></nav>
+    <div class="tools">
+      <button class="ibtn hide-m" id="searchBtn" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
+      <button class="ibtn hide-m" id="acctBtn" aria-label="Account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.9-3.8 4-5.6 7.5-5.6s6.6 1.8 7.5 5.6"/></svg></button>
+      <button class="ibtn" id="themeBtn" aria-label="Switch light or dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="currentColor"/></svg></button>
+      <button class="ibtn" id="bagBtn" aria-label="Open bag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8.5h13l-1 11h-11z"/><path d="M9 8.5V7a3 3 0 016 0v1.5"/></svg><span class="badge" id="bagCount" aria-live="polite">0</span></button>
+    </div>
+  </div>
+</header>
+<section class="banner" aria-label="Festive Kerala">
+  <div class="slides"><article class="slide on-dark left is-active">
+    <picture>
+        <source media="(max-width:860px)" srcset="img/hero-pink-phone.jpg">
+        <img src="img/hero-pink-2048.jpg" srcset="img/hero-pink-1280.jpg 1440w, img/hero-pink-2048.jpg 2048w" sizes="100vw" width="2048" height="1152"
+          alt="A woman in a magenta pink Kanjivaram silk saree with a gold border sits on a carved wooden chair against a deep teal wall">
+      </picture>
+    <div class="banner-copy">
+      <p class="eyebrow">Festive edit</p>
+      <h1 class="hl">Colour for <em>festival days.</em></h1>
+      <p class="lead">Kasavu and silk for Onam, Vishu, Thiruvathira and temple days, with the jewellery already matched.</p>
+      <div class="cta"><a class="btn" href="#collection">Shop the edit</a><a class="btn ghost" href="#look">See the styled set</a></div>
+    </div>
+    <span class="note">Concept image</span>
+  </article></div>
+</section>
+<main class="wrap">
+  <div class="crumbs"><a href="index.html">Home</a> / Festive Kerala</div>
+  <section class="intro" style="border-top:0;padding-top:24px">
+    <div><p class="eyebrow">Festive edit</p><h2 style="margin-top:12px">Onam to temple days</h2><p class="body">Ivory and gold kasavu for the morning, jewel-toned silk for the evening. Every saree comes with a set chosen for it.</p></div>
+    <dl class="facts" id="facts"></dl>
+  </section>
+  <section id="collection">
+    <div class="head"><h2>The collection</h2><p id="count" class="eyebrow"></p></div>
+    <div class="grid" id="grid"></div>
+  </section>
+  <section id="look">
+    <div class="head"><h2>Complete the look</h2><p>Our styling for the Kasavu Cotton saree. Two or more pieces take 10% off the ornaments.</p></div>
+    <div class="look">
+      <div class="art" id="lookArt"></div>
+      <div>
+        <h3 id="lookName" style="font-size:32px"></h3>
+        <ul id="lookList"></ul>
+        <div class="totals" id="lookTotal" style="margin-top:0;border-top:0"></div>
+        <div class="cta" style="margin-top:20px"><button class="btn" id="lookAdd">Add look to bag</button><a class="btn ghost" id="lookEdit" href="index.html#builder">Change any piece</a></div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="head"><h2>More to wear with it</h2><p>From the other edits.</p></div>
+    <div class="grid" id="more"></div>
+  </section>
+  <section>
+    <div class="head"><h2>Other edits</h2></div>
+    <div class="edits" id="edits"></div>
+  </section>
+  <footer>
+    <div><b>Sopanam Drapes</b>care@sopanamdrapes.com</div>
+    <p class="note">First prototype. Photographs are AI-generated concept images and stand in for real product photography. Bag and checkout are not connected yet.</p>
+  </footer>
+</main>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="bag" id="bag" hidden aria-label="Your bag">
+  <h2>Your bag</h2>
+  <p class="eyebrow" id="bagSub"></p>
+  <div class="items" id="bagItems"></div>
+  <div id="bagFoot"></div>
+  <button class="btn ghost small" id="bagClose" style="margin-top:12px;justify-content:center">Keep browsing</button>
+</aside>
+<div class="toast" id="toast" hidden role="status"></div>
+</div>
+<script>window.PAGE_CFG={"key": "festive", "sarees": ["SA00007", "SA00002", "SA00001", "SA00004"], "more": ["SA00006", "SA00008", "SA00003"], "lead": "SA00007", "set": "combo"};</script>
+<script src="assets/site.js"></script>
+</body></html>
