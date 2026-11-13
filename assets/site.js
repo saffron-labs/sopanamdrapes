@@ -973,17 +973,17 @@
     const grid = $('#worldGrid');
     if (!grid) return;
     const houseEdits = [
-      { k: 'dresses', name: 'Dresses', sub: 'Collections', img: 'img/popout-dresses.png', href: 'bridal.html' },
-      { k: 'sarees', name: 'Sarees', sub: 'Collections', img: 'img/popout-sarees.png', href: 'occasions.html' },
-      { k: 'lehanga', name: 'Lehanga', sub: 'Collections', img: 'img/popout-lehanga.png', href: 'celebrations.html' },
-      { k: 'scarf', name: 'Scarf', sub: 'Collections', img: 'img/popout-scarf.png', href: 'everyday.html' },
-      { k: 'kurta', name: 'Kurta Sets', sub: 'Collections', img: 'img/popout-kurta.png', href: 'ornaments.html' }
+      { k: 'dresses', name: 'Dresses', sub: 'Collections', img: 'img/popout-dresses.webp', href: 'bridal.html' },
+      { k: 'sarees', name: 'Sarees', sub: 'Collections', img: 'img/popout-sarees.webp', href: 'occasions.html' },
+      { k: 'lehanga', name: 'Lehanga', sub: 'Collections', img: 'img/popout-lehanga.webp', href: 'celebrations.html' },
+      { k: 'scarf', name: 'Scarf', sub: 'Collections', img: 'img/popout-scarf.webp', href: 'everyday.html' },
+      { k: 'kurta', name: 'Kurta Sets', sub: 'Collections', img: 'img/popout-kurta.webp', href: 'ornaments.html' }
     ];
     grid.className = 'house-edit-grid';
     grid.innerHTML = houseEdits.map(w => `
       <a class="house-popout-card" href="${w.href}" data-world="${w.k}" aria-label="${w.name} ${w.sub}">
         <div class="house-popout-art">
-          <img src="${w.img}" alt="${w.name} ${w.sub}" width="640" height="840" loading="lazy">
+          <img src="${w.img}" alt="${w.name} ${w.sub}" width="800" height="1320" loading="lazy">
         </div>
       </a>`).join('');
   }
@@ -1101,11 +1101,11 @@
     const editsEl = $('#edits');
     if (!editsEl) return;
     const houseEdits = [
-      { k: 'dresses', name: 'Dresses', sub: 'Collections', img: 'img/popout-dresses.png', href: 'bridal.html' },
-      { k: 'sarees', name: 'Sarees', sub: 'Collections', img: 'img/popout-sarees.png', href: 'occasions.html' },
-      { k: 'lehanga', name: 'Lehanga', sub: 'Collections', img: 'img/popout-lehanga.png', href: 'celebrations.html' },
-      { k: 'scarf', name: 'Scarf', sub: 'Collections', img: 'img/popout-scarf.png', href: 'everyday.html' },
-      { k: 'kurta', name: 'Kurta Sets', sub: 'Collections', img: 'img/popout-kurta.png', href: 'ornaments.html' }
+      { k: 'dresses', name: 'Dresses', sub: 'Collections', img: 'img/popout-dresses.webp', href: 'bridal.html' },
+      { k: 'sarees', name: 'Sarees', sub: 'Collections', img: 'img/popout-sarees.webp', href: 'occasions.html' },
+      { k: 'lehanga', name: 'Lehanga', sub: 'Collections', img: 'img/popout-lehanga.webp', href: 'celebrations.html' },
+      { k: 'scarf', name: 'Scarf', sub: 'Collections', img: 'img/popout-scarf.webp', href: 'everyday.html' },
+      { k: 'kurta', name: 'Kurta Sets', sub: 'Collections', img: 'img/popout-kurta.webp', href: 'ornaments.html' }
     ];
     const pageKeyMap = {
       bridal: 'dresses',
@@ -1120,7 +1120,7 @@
     editsEl.innerHTML = list.map(c => `
       <a class="house-popout-card" href="${c.href}" aria-label="${c.name} ${c.sub}">
         <div class="house-popout-art">
-          <img src="${c.img}" alt="${c.name} ${c.sub}" width="640" height="840" loading="lazy">
+          <img src="${c.img}" alt="${c.name} ${c.sub}" width="800" height="1320" loading="lazy">
         </div>
       </a>`).join('');
   }
