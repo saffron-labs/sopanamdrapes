@@ -576,10 +576,10 @@ function renderProfile(){
   const rows=[['occasion','Occasion'],['skinTone','Skin tone'],['undertone','Undertone'],['heightCm','Height'],['build','Build'],['jewellery','Jewellery'],['budget','Budget']];
   $('#prof').innerHTML=rows.map(([k,l])=>{const v=profile[k];let txt=v===undefined||v===null||v===''?'<span style="color:var(--muted)">Not set</span>':esc(labelFor(k,v));
     if(k==='skinTone'&&v)txt=`<span><span class="sw" style="background:${TONE(v).hex}"></span>${txt}</span>`;
-    return `<div><dt>${l}</dt><dd>${txt}<button data-edit="${k}">${v?'Change':'Add'}</button></dd></div>`}).join('');
+    return `<div><dt>${l}</dt><dd>${txt}<button data-edit="${k}" aria-label="${v?'Change':'Add'} ${l.toLowerCase()}">${v?'Edit':'Add'}</button></dd></div>`}).join('');
   $('#saved').innerHTML=saved.length?saved.map((x,i)=>`<div class="sl"><img src="img/${x.sid}.jpg" alt=""><div>${esc(x.title)}<small>${inr(x.total)} · ${x.n} pieces</small></div><button data-unsave="${i}">Remove</button></div>`).join(''):'<p class="none">Save a look and it will wait for you here.</p>';
 }
-function toggleSide(o){const side=$('#skSide');side.classList.toggle('open',o);$('#profileBtn').setAttribute('aria-expanded',o);if(o&&!side.querySelector('.sk-close')){const b=document.createElement('button');b.className='btn small ghost sk-close';b.textContent='Back to chat';b.style.marginBottom='16px';b.addEventListener('click',()=>toggleSide(false));side.querySelector('.sk-side-in').prepend(b)}}
+function toggleSide(o){const side=$('#skSide');side.classList.toggle('open',o);const pb=$('#profileBtn');if(pb)pb.setAttribute('aria-expanded',o);const sc=$('#sideScrim');if(sc)sc.hidden=!o}
 
 /* ---------- bag ---------- */
 function renderBag(){
@@ -598,7 +598,7 @@ function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTi
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   const d=b.dataset;
-  if((d.chip||d.photo)&&b.closest('.sk-hello'))hideHello();
+  if((d.chip||d.photo)&&b.closest('.sk-hello,.sk-starters'))hideHello();
   if(d.ans){const [k,v]=d.ans.split('|');answer(k,k==='budget'?+v:v===''&&k==='jewellery'?'':v,b);return}
   if(d.skip){if(!quiz){curStep()&&curStep().remove();return}const k=quiz.steps[quiz.i];answer(k,null,b);return}
   if(d.back){if(quiz&&quiz.i>0){quiz.i--;const m=[...log.querySelectorAll('.m.me')].pop();if(m)m.remove();nextStep(true)}return}
@@ -630,7 +630,9 @@ document.addEventListener('click',e=>{
   if('checkout' in d){toast('Checkout is the next build phase');return}
   if(d.mode){pm.mode=d.mode;$('#pmFile').click();return}
   switch(b.id){
-    case 'restartBtn':if(confirmRestart())restart();return;
+    case 'restartBtn':case 'newChatBtn':toggleSide(false);if(confirmRestart())restart();return;
+    case 'menuSideBtn':toggleSide(true);return;
+    case 'sideCloseBtn':toggleSide(false);return;
     case 'restyleBtn':toggleSide(false);me('Restyle me');return styleNow();
     case 'profileBtn':toggleSide(!$('#skSide').classList.contains('open'));return;
     case 'photoBtn':openPhoto();return;
@@ -671,23 +673,20 @@ const I_SPARK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l1.9 
 const I_PIC='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/></svg>';
 const I_FACE='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9 14.5c.8.9 1.8 1.4 3 1.4s2.2-.5 3-1.4"/><path d="M9.2 10h.01M14.8 10h.01" stroke-width="2.4" stroke-linecap="round"/></svg>';
 const I_GO='<svg class="ha-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg>';
-function hideHello(){const h=log.querySelector('.sk-hello');if(h)h.remove()}
+function hideHello(){const h=log.querySelector('.sk-hello');if(h)h.remove();const st=$('#starters');if(st)st.innerHTML='';const c=$('.sk-chat');if(c)c.classList.remove('is-empty')}
 function hello(back){
   const d=document.createElement('div');d.className='sk-hello';
-  const qs=['What suits dusky skin?','Kanjivaram vs Banarasi?','How do I care for silk?','What is your return policy?'];
   const summary=[profile.occasion&&OCC_LABEL[profile.occasion],profile.skinTone&&TONE(profile.skinTone)&&TONE(profile.skinTone).label.toLowerCase()+' skin'].filter(Boolean).join(', ');
-  d.innerHTML=`<span class="hello-av" aria-hidden="true">S</span>
-   <h2>${back?'Welcome back':'Hi, I’m Sakhi'}</h2>
-   <p>${back?'Pick up where we left off'+(summary?' with '+esc(summary):'')+', or start something new.':esc(HELLO[FROM]||'Your personal stylist. I’ll put together a complete look for you: saree, ornaments and how to wear it.')}</p>
-   <div class="hello-acts">
-    ${back?`<button class="ha primary" data-chip="Restyle me">${I_SPARK}<span><b>Show my looks again</b><small>Using the details you gave me</small></span>${I_GO}</button>`
-         :`<button class="ha primary" data-chip="Find my look">${I_SPARK}<span><b>Style my look</b><small>4 quick taps · saree + ornaments</small></span>${I_GO}</button>`}
-    <button class="ha" data-chip="${back?'Style a new look':'Match an inspiration photo'}">${back?I_SPARK:I_PIC}<span><b>${back?'Style a new look':'Match a photo'}</b><small>${back?'For a different occasion':'Upload a saree you love'}</small></span>${I_GO}</button>
-    <button class="ha" data-chip="${back?'Match an inspiration photo':'Read my skin tone from a selfie'}">${back?I_PIC:I_FACE}<span><b>${back?'Match a photo':'Find my colours'}</b><small>${back?'Upload a saree you love':'Read my skin tone from a selfie'}</small></span>${I_GO}</button>
-   </div>
-   <p class="hello-or">Or ask me</p>
-   <div class="hello-q">${qs.map(q=>`<button class="chip" data-chip="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+  d.innerHTML=`<h1>${back?'Welcome back':'What are we dressing for?'}</h1>
+   <p>${back?(summary?'Last time: '+esc(summary)+'. Pick up there, or start something new.':'Pick up where we left off, or start something new.'):esc(HELLO[FROM]||'I’m Sakhi, your personal stylist. I’ll put together the saree, the ornaments and how to wear it.')}</p>`;
   log.appendChild(d);
+  const acts=back
+    ?[['Restyle me','Show my looks again',I_SPARK],['Style a new look','Style a new look',I_SPARK],['Match an inspiration photo','Match a photo',I_PIC]]
+    :[['Find my look','Style my look',I_SPARK],['Match an inspiration photo','Match a photo',I_PIC],['Read my skin tone from a selfie','Find my colours',I_FACE]];
+  const qs=['What suits dusky skin?','Kanjivaram vs Banarasi?','How do I care for silk?'];
+  $('#starters').innerHTML=acts.map(([c,l,i])=>`<button class="starter" data-chip="${esc(c)}" type="button">${i}${esc(l)}</button>`).join('')
+    +qs.map(q=>`<button class="starter q" data-chip="${esc(q)}" type="button">${esc(q)}</button>`).join('');
+  $('.sk-chat').classList.add('is-empty');
 }
 function greet(fresh){
   const back=!fresh&&Object.keys(profile).some(k=>profile[k]);
@@ -698,6 +697,7 @@ function greet(fresh){
 document.addEventListener('click',e=>{const b=e.target.closest('[data-chip="Restyle me"]');if(b){e.stopImmediatePropagation();hideHello();chips([]);me('Show my looks');styleNow()}},true);
 if(EMBED){$('#closeEmbed').hidden=false}
 document.body.classList.add('sk-page');
+{const sc=document.createElement('div');sc.id='sideScrim';sc.className='sk-side-scrim';sc.hidden=true;sc.addEventListener('click',()=>toggleSide(false));document.body.appendChild(sc)}
 function setHH(){const h=document.querySelector('.site-head');document.documentElement.style.setProperty('--hh',(EMBED||!h?0:h.getBoundingClientRect().height)+'px')}
 setHH();addEventListener('resize',setHH);
 renderProfile();renderBag();greet(false);
