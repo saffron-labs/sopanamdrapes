@@ -1087,7 +1087,49 @@
 
     // Mobile Action Bar
     renderMobileBuilderBar(s, t);
+    tellSakhi();
   }
+
+  // Sakhi sits in the room's side panel and always knows what is on the stage
+  function stageText() {
+    const s = saree(homeState.cur) || SAREES[0];
+    const t = ornTotalsHome();
+    return `${s.name}, ${s.tone}, ${s.fabric}, ${inr(s.eff)}; ornaments: ${t.ids.map(id => ORN[id][1]).join(', ') || 'none'}; look total ${inr(t.total)}`;
+  }
+  function tellSakhi() {
+    const f = $('#sakhiPane iframe');
+    if (f && f.contentWindow) { try { f.contentWindow.postMessage({ type: 'sd-stage', text: stageText() }, location.origin); } catch (e) { } }
+  }
+  function setPanelTab(tab) {
+    const pane = $('#sakhiPane'), browse = $('#browsePane');
+    if (!pane || !browse) return;
+    const sk = tab === 'sakhi';
+    if (sk && !pane.firstChild) {
+      const th = document.documentElement.dataset.theme;
+      const f = document.createElement('iframe');
+      f.title = 'Sakhi, your stylist';
+      f.src = 'stylist.html?embed=1&room=1&from=styling-room&v=20261114e' + (th ? '&theme=' + th : '');
+      f.addEventListener('load', tellSakhi);
+      pane.appendChild(f);
+    }
+    pane.hidden = !sk;
+    browse.hidden = sk;
+    $$('[data-ptab]').forEach(b => b.setAttribute('aria-selected', b.dataset.ptab === tab));
+    const b = $('#builder');
+    if (b) b.classList.toggle('is-sakhi', sk);
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || !e.data || !$('#builder')) return;
+    if (e.data.type === 'sd-look' && saree(e.data.sid)) {
+      homeState.cur = e.data.sid;
+      homeState.view = 'model';
+      homeState.pickOpen = false;
+      homeState.sel = { ...(e.data.sel || {}) };
+      renderBuilder();
+      if (innerWidth <= 980) $('#stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+    if (e.data.type === 'sd-added') { reloadBag(); afterAdd('Look added to your bag'); }
+  });
 
   // Home: a slim preview of the Styling Room with one composed look
   function renderRoomTeaser() {
@@ -1114,7 +1156,7 @@
           </div>
           <div class="rt-cta">
             <a class="btn" href="styling-room.html">Compose your own look <span aria-hidden="true">→</span></a>
-            <a class="btn ghost" href="styling-room.html?style=${s.id}">Style this one</a>
+            <a class="btn ghost" href="styling-room.html?sakhi=1">Help me choose</a>
           </div>
         </div>
         <div class="rt-starts">
@@ -1827,6 +1869,10 @@
       renderBuilder();
       return;
     }
+    if (t.dataset.ptab) {
+      setPanelTab(t.dataset.ptab);
+      return;
+    }
     if ('pickopen' in t.dataset) {
       homeState.pickOpen = !homeState.pickOpen;
       renderBuilder();
@@ -2127,7 +2173,16 @@
         homeState.cur = styleParam;
         homeState.view = 'model';
         homeState.sel = { ...(saree(styleParam) || {}).combo };
+        const selParam = urlParams.get('sel');
+        if (selParam !== null) {
+          homeState.sel = {};
+          selParam.split(',').forEach(id => { if (ORN[id]) homeState.sel[ORN[id][0]] = id; });
+        }
         renderBuilder();
+      }
+      if ($('#builder')) {
+        window.SD.openSakhi = () => { setPanelTab('sakhi'); if (innerWidth <= 980) $('#sakhiPane').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+        if (urlParams.get('sakhi') === '1') { setPanelTab('sakhi'); if (innerWidth <= 980) setTimeout(() => $('.studio-tabs').scrollIntoView({ block: 'start' }), 300); }
       }
     }
   }

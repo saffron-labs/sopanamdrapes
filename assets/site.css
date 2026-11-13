@@ -5753,3 +5753,22 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
   .studio-total .room-add { letter-spacing: .12em; }
 }
 @media (max-width: 980px) { .studio-orns { margin-inline: 0 -16px; padding: 3px 16px 3px 2px; } }
+
+/* Styling Room: Browse / Ask Sakhi */
+.studio-tabs { display: flex; gap: 4px; margin: 14px 14px 0; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.studio-tabs button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; border: 0; border-radius: 999px; background: none; font: inherit; font-size: 14px; font-weight: 500; color: var(--muted); cursor: pointer; }
+.studio-tabs button[aria-selected="true"] { background: var(--bg); color: var(--ink); box-shadow: 0 2px 8px rgba(40, 16, 14, .12); }
+.studio-tabs i { font-style: normal; font-weight: 400; font-size: 12.5px; color: var(--muted); }
+.st-mono { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; font-family: var(--display); font-size: 14px; }
+.studio-sakhi { flex: 1; min-height: 0; }
+.studio-sakhi[hidden], .studio-scroll[hidden] { display: none; }
+.studio-sakhi iframe { width: 100%; height: 100%; border: 0; display: block; background: transparent; }
+.studio-scroll { padding-top: 20px; }
+@media (min-width: 981px) { .studio-body .sk-launch, .studio-body .sk-tease { display: none; } }
+@media (max-width: 980px) {
+  .studio-tabs { margin: 12px 12px 0; }
+  .studio-sakhi { height: 72svh; flex: none; }
+  .studio-scroll { padding-top: 18px; }
+}
+.studio-tabs button { white-space: nowrap; }
+@media (max-width: 980px) { .studio-tabs i { display: none; } }

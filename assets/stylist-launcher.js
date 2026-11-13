@@ -1,12 +1,9 @@
 /* Puts "Ask Sakhi" on every store page and opens the stylist in a side drawer. */
 (function(){
-  var V='20261114c'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
+  var V='20261114d'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
   var page=(location.pathname.split('/').pop()||'index.html').replace('.html','')||'index';
   var lines={bridal:'Style my bridal look',festive:'Style my Onam look',celebrations:'Style my festive look',occasions:'Style my party look',everyday:'Style my office look',ornaments:'Help me pick ornaments'};
   var css=document.createElement('link');css.rel='stylesheet';css.href='assets/stylist-launcher.css?v='+V;document.head.appendChild(css);
-  // add Stylist to the main nav
-  var nav=document.getElementById('mainNav');
-  if(nav&&!nav.querySelector('a[href="stylist.html"]')){var a=document.createElement('a');a.href='stylist.html';a.textContent='Stylist';nav.appendChild(a)}
   var btn=document.createElement('button');btn.className='sk-launch';btn.type='button';btn.setAttribute('aria-haspopup','dialog');
   btn.innerHTML='<span class="mono" aria-hidden="true">S</span><span class="txt">Ask Sakhi<small>'+(lines[page]||'Your personal stylist')+'</small></span>';
   btn.setAttribute('aria-label','Ask Sakhi, your personal stylist');
@@ -14,6 +11,7 @@
   var drawer=null,scrim=null;
   function open(){
     if(typeof dropTease==='function')dropTease();
+    if(window.SD&&SD.openSakhi){SD.openSakhi();return}
     if(innerWidth<600){location.href='stylist.html?from='+page;return}
     scrim=document.createElement('div');scrim.className='sk-dscrim';scrim.addEventListener('click',close);
     drawer=document.createElement('div');drawer.className='sk-drawer';drawer.setAttribute('role','dialog');drawer.setAttribute('aria-label','Sakhi, your stylist');

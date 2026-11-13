@@ -5,7 +5,10 @@
 'use strict';
 const $=s=>document.querySelector(s), inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const qs=new URLSearchParams(location.search), EMBED=qs.get('embed')==='1', FROM=qs.get('from')||'';
+const qs=new URLSearchParams(location.search), EMBED=qs.get('embed')==='1', FROM=qs.get('from')||'', ROOM=qs.get('room')==='1';
+let stage='';
+const roomUrl=L=>'styling-room.html?style='+L.s.id+'&sel='+Object.values(L.sel).filter(Boolean).join(',');
+function toStage(L){try{parent.postMessage({type:'sd-look',sid:L.s.id,sel:L.sel},location.origin)}catch(e){}}
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 // On GitHub Pages (saffronlabs.in) there is no server, so the AI route is called on Vercel.
 const API=/vercel\.app$|^localhost/.test(location.hostname)?'/api/chat':'https://sopanam-drapes.vercel.app/api/chat';
@@ -302,7 +305,8 @@ function lookCard(L,key){
     ${pieces?`<div class="lk-orn"><span>Styled with</span><div class="lk-pcs">${pieces}</div></div>`:''}
     <div class="lk-price"><b>${inr(t.total)}</b><span>full look${t.ids.length?' · '+(t.ids.length+1)+' pieces':''}</span>${saving?`<em>Save ${inr(saving)}</em>`:''}</div>
     <div class="lk-acts">
-     <button class="btn lk-add" data-addlook="${key}">Add look to bag</button>
+     ${ROOM?`<button class="btn lk-add" data-stage="${key}">See it on the stage</button>`:`<a class="btn lk-add" href="${roomUrl(L)}" target="${EMBED?'_top':'_self'}">Open in the Styling Room</a>`}
+     <button class="lk-ic" data-addlook="${key}" aria-label="Add look to bag" title="Add look to bag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8.5h13l-1 11h-11z"/><path d="M9 8.5V7a3 3 0 016 0v1.5"/></svg></button>
      <button class="lk-ic" data-save="${key}" aria-pressed="${isSaved}" aria-label="${isSaved?'Saved':'Save look'}" title="Save look"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0112 7.4 4.3 4.3 0 0119.5 10c0 5.6-7.5 10-7.5 10z"/></svg></button>
      <button class="lk-ic" data-share="${key}" aria-label="Share on WhatsApp" title="Share on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></svg></button>
     </div>
@@ -311,7 +315,6 @@ function lookCard(L,key){
       <h5>Why it suits you</h5><ul>${L.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>
       <h5>How to wear it</h5><ul>${L.tips.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>
       <h5>Price</h5><ul><li>Saree ${inr(s.eff)}${s.mrp>s.eff?' (was '+inr(s.mrp)+')':''} · ${esc(s.blouse)}</li>${t.ids.map(id=>`<li>${esc(ORN[id][1])} ${inr(ORN[id][2])}</li>`).join('')}${t.save?'<li>10% off ornaments when bought as a look</li>':''}${L.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>
-      <a class="lk-link" href="styling-room.html?style=${s.id}" target="${EMBED?'_top':'_self'}">Style it in the Styling Room →</a>
      </div>
     </details>
    </div></article>`;
@@ -322,6 +325,7 @@ function showLooks(list,intro){
   const wrap=document.createElement('div');wrap.className='looks';
   wrap.innerHTML=list.map(L=>lookCard(L,'L'+(++lookSeq))).join('');
   log.appendChild(wrap);
+  if(ROOM&&list[0])toStage(list[0]);
   list.forEach(L=>{if(!shown.includes(L.s.id))shown.push(L.s.id)});
   history.push({role:'assistant',content:'[Showed looks: '+list.map(L=>L.s.name+' '+L.s.tone+' with '+Object.values(L.sel).map(id=>ORN[id][1]).join(', ')+' = '+inr(totals(L.s,L.sel).total)).join(' | ')+']'});
   scrollDown();
@@ -392,7 +396,7 @@ async function styleNow(intro){
 
 /* ---------- AI ---------- */
 async function askAI(text,image){
-  const payload={messages:history.slice(-14),profile,page:FROM,shown};
+  const payload={messages:history.slice(-14),profile,page:FROM,shown,stage};
   const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),20000);
   try{
     const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctl.signal});
@@ -618,8 +622,9 @@ document.addEventListener('click',e=>{
     if(c==='Go back to my best match'){me(c);return styleNow()}
     send(c);return}
   if(d.swap){const [key,slot]=d.swap.split('|');const L=looks[key];if(!L)return;const opts=SLOT_OPTS[slot];const next=opts[(opts.indexOf(L.sel[slot])+1)%opts.length];L.sel={...L.sel,[slot]:next};
-    const card=b.closest('.lk');const tmp=document.createElement('div');tmp.innerHTML=lookCard(L,key);card.replaceWith(tmp.firstElementChild);return}
-  if(d.addlook){const L=looks[d.addlook],t=totals(L.s,L.sel);bag.push({sid:L.s.id,names:t.ids.map(id=>ORN[id][1]),total:t.total});store.set('sd-bag',bag);renderBag();notifyParent();toast('Look added to your bag');return}
+    const card=b.closest('.lk');const tmp=document.createElement('div');tmp.innerHTML=lookCard(L,key);card.replaceWith(tmp.firstElementChild);if(ROOM)toStage(L);return}
+  if(d.stage){toStage(looks[d.stage]);toast('On the stage');return}
+  if(d.addlook){const L=looks[d.addlook],t=totals(L.s,L.sel);bag.push({sid:L.s.id,names:t.ids.map(id=>ORN[id][1]),total:t.total});store.set('sd-bag',bag);renderBag();if(ROOM){try{parent.postMessage({type:'sd-added'},location.origin)}catch(e){}}else{notifyParent();toast('Look added to your bag')}return}
   if(d.save){const L=looks[d.save],k=sig(L),i=saved.findIndex(x=>x.key===k);
     if(i>=0){saved.splice(i,1);b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Save look')}else{const t=totals(L.s,L.sel);saved.unshift({key:k,sid:L.s.id,title:L.s.name+', '+L.s.tone,total:t.total,n:t.ids.length+1,sel:L.sel});b.setAttribute('aria-pressed','true');b.setAttribute('aria-label','Saved');toast('Saved to your profile')}
     store.set('sd-sakhi-saved',saved);renderProfile();return}
@@ -695,7 +700,8 @@ function greet(fresh){
   history.push({role:'assistant',content:back?'Welcome back. Shall I restyle you, or is there something new?':"Hello, I'm Sakhi, your Sopanam stylist. I can style a complete look or answer anything about sarees."});
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-chip="Restyle me"]');if(b){e.stopImmediatePropagation();hideHello();chips([]);me('Show my looks');styleNow()}},true);
-if(EMBED){$('#closeEmbed').hidden=false}
+if(EMBED&&!ROOM){$('#closeEmbed').hidden=false}
+if(ROOM){document.documentElement.classList.add('room');addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.type==='sd-stage')stage=String(e.data.text||'')})}
 document.body.classList.add('sk-page');
 {const sc=document.createElement('div');sc.id='sideScrim';sc.className='sk-side-scrim';sc.hidden=true;sc.addEventListener('click',()=>toggleSide(false));document.body.appendChild(sc)}
 function setHH(){const h=document.querySelector('.site-head');document.documentElement.style.setProperty('--hh',(EMBED||!h?0:h.getBoundingClientRect().height)+'px')}

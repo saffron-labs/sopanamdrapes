@@ -337,3 +337,11 @@ html.embed .sk-log, html.embed .sk-dock { padding-inline: 14px; }
 .sk-chat.is-empty .sk-dock { margin-bottom: auto; padding-bottom: 12vh; }
 /* edge to edge: cancel the site's body side padding on this page */
 html:not(.embed) body.sk-page .sk { margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
+
+/* Sakhi inside the Styling Room */
+a.lk-add{text-decoration:none;justify-content:center;display:inline-flex;align-items:center;text-align:center}
+html.room .sk-top{display:none}
+html.room body,html.room .sk,html.room .sk-chat{background:transparent}
+html.room .sk-log,html.room .sk-dock{padding-inline:18px}
+html.room .lk-ph{display:none}
+html.room .sk-fine{display:none}

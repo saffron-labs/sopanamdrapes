@@ -110,7 +110,8 @@ module.exports = async (req, res) => {
   const profile = body.profile || {};
   const context = `Known customer profile so far: ${JSON.stringify(profile)}.` +
     (body.page ? ` They opened the stylist from the "${body.page}" page.` : '') +
-    (body.shown && body.shown.length ? ` Looks already shown: ${body.shown.join(', ')}.` : '');
+    (body.shown && body.shown.length ? ` Looks already shown: ${body.shown.join(', ')}.` : '') +
+    (body.stage && typeof body.stage === 'string' ? ` The customer is in the Styling Room and is looking at this on screen right now: ${body.stage.slice(0, 400)}. When they say "this", "it" or "this look", they mean that.` : '');
 
   const messages = [{ role: 'system', content: SYSTEM + '\n\n' + context }];
   for (const m of history) {

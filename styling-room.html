@@ -17,7 +17,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Albert+Sans:wght@400;500;600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/site.css?v=20261114k">
+  <link rel="stylesheet" href="assets/site.css?v=20261114l">
   <style>
     /* phone: keep the hero compact so the page below the photo is reachable */
     @media(max-width:860px) {
@@ -114,7 +114,12 @@
           </div>
 
           <aside class="studio-panel" aria-label="Suggestions and ornaments">
-            <div class="studio-scroll">
+            <div class="studio-tabs" role="tablist" aria-label="How to style">
+              <button role="tab" id="tabBrowse" data-ptab="browse" aria-selected="true" type="button">Browse</button>
+              <button role="tab" id="tabSakhi" data-ptab="sakhi" aria-selected="false" type="button"><span class="st-mono" aria-hidden="true">S</span>Ask Sakhi<i>your stylist</i></button>
+            </div>
+            <div class="studio-sakhi" id="sakhiPane" role="tabpanel" aria-labelledby="tabSakhi" hidden></div>
+            <div class="studio-scroll" id="browsePane" role="tabpanel" aria-labelledby="tabBrowse">
               <section class="studio-block studio-sugg">
                 <div class="studio-block-h"><div><h2>Style suggestions</h2><p>Three ways to wear this saree</p></div></div>
                 <div class="studio-looks" id="sets" role="group" aria-label="Curated looks"></div>
@@ -272,7 +277,7 @@
   </div>
 
   <script src="assets/data.js"></script>
-  <script src="assets/site.js?v=20261114k"></script>
-  <script src="assets/stylist-launcher.js?v=20261114c" defer></script>
+  <script src="assets/site.js?v=20261114l"></script>
+  <script src="assets/stylist-launcher.js?v=20261114d" defer></script>
 </body>
 </html>
