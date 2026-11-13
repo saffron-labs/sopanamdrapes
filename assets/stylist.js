@@ -7,6 +7,8 @@ const $=s=>document.querySelector(s), inr=n=>'₹'+Math.round(n).toLocaleString(
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const qs=new URLSearchParams(location.search), EMBED=qs.get('embed')==='1', FROM=qs.get('from')||'';
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+// On GitHub Pages (saffronlabs.in) there is no server, so the AI route is called on Vercel.
+const API=/vercel\.app$|^localhost/.test(location.hostname)?'/api/chat':'https://sopanam-drapes.vercel.app/api/chat';
 
 /* ---------- catalogue ---------- */
 const SLOTS=[['necklace','Necklace'],['bangles','Bangles'],['earrings','Earrings'],['ring','Ring'],['anklet','Anklet'],['bracelet','Bracelet'],['waistband','Waistband']];
@@ -376,7 +378,7 @@ async function askAI(text,image){
   const payload={messages:history.slice(-14),profile,page:FROM,shown};
   const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),20000);
   try{
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctl.signal});
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctl.signal});
     clearTimeout(to);
     if(!r.ok)throw new Error('status '+r.status);
     const d=await r.json();if(!d||!d.reply)throw new Error('empty');

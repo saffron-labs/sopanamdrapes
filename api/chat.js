@@ -86,7 +86,17 @@ function extractJson(text) {
   return { reply: text, sarees: [], chips: [] };
 }
 
+const ALLOWED = ['https://saffronlabs.in', 'https://www.saffronlabs.in', 'https://saffron-labs.github.io'];
+
 module.exports = async (req, res) => {
+  const origin = req.headers.origin;
+  if (origin && (ALLOWED.includes(origin) || /\.vercel\.app$/.test(origin))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') { res.statusCode = 204; return res.end(); }
   if (req.method === 'GET') return json(res, 200, { ok: true, model: MODEL });
   if (req.method !== 'POST') return json(res, 405, { error: 'POST only' });
 
