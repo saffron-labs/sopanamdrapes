@@ -5831,3 +5831,33 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
 @media (max-width: 1240px) { .studio-views { overflow-x: auto; scrollbar-width: none; } .studio-views button { padding: 9px 11px; gap: 6px; } }
 @media (max-width: 980px) { .studio-views { left: 10px; right: 10px; transform: none; justify-content: flex-start; } }
 @media (min-width: 981px) and (max-width: 1640px) { .studio-views svg { display: none; } .studio-views button { padding: 9px 13px; } }
+
+/* Heritage band packs to the photo; category pages get a slim Styling Room invite */
+#heritage.heritage-band { padding: 0; border-top: 0; }
+#look.room-invite { padding: 0; background: var(--tint, #efe6d6); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); scroll-margin-top: 90px; }
+.ri-in { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 28px; padding-block: 22px; }
+.ri-art { position: relative; display: block; width: 92px; height: 112px; flex: none; }
+.ri-art > img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; border-radius: 10px; display: block; }
+.ri-orn { position: absolute; left: 62px; bottom: 8px; display: flex; align-items: center; }
+.ri-orn img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--bg); margin-right: -10px; box-shadow: 0 2px 8px rgba(0, 0, 0, .2); }
+.ri-orn i { margin-left: 16px; font-style: normal; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.ri-copy { padding-left: clamp(60px, 9vw, 150px); }
+.ri-copy h2 { font-family: var(--display); font-weight: 500; font-size: clamp(24px, 2.2vw, 32px); line-height: 1.15; margin: 0 0 6px; }
+.ri-copy p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: 62ch; }
+.ri-cta { display: flex; gap: 10px; }
+.ri-cta .btn { white-space: nowrap; }
+@media (max-width: 900px) {
+  .ri-in { grid-template-columns: auto minmax(0, 1fr); gap: 14px 18px; padding-block: 18px; }
+  .ri-art { width: 64px; height: 80px; }
+  .ri-orn { display: none; }
+  .ri-copy { padding-left: 0; }
+  .ri-copy h2 { font-size: 21px; }
+  .ri-copy p { font-size: 13.5px; }
+  .ri-cta { grid-column: 1 / -1; }
+  .ri-cta .btn { flex: 1; justify-content: center; }
+}
+.rt-look { flex-wrap: nowrap; }
+.rt-piece { flex: 0 1 92px; min-width: 52px; width: auto; }
+.rt-piece img { width: 100%; }
+.rt-total { flex: none; }
+@media (max-width: 760px) { .rt-look { flex-wrap: wrap; } .rt-total { margin-top: 0; flex-basis: 100%; } .rt-eq { display: none; } }

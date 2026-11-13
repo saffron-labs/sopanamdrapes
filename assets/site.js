@@ -1660,6 +1660,23 @@
           `<div class="row total"><span>Ensemble Total</span><span>${inr(t.total)}</span></div>`;
       }
       if (lookAdd) lookAdd.dataset.look = '1';
+      const inv = $('#look.room-invite');
+      if (inv) {
+        const ids = t.ids;
+        const url = `styling-room.html?style=${s.id}&sel=${ids.join(',')}`;
+        inv.innerHTML = `
+          <div class="wrap ri-in">
+            <a class="ri-art" href="${url}" aria-hidden="true" tabindex="-1">${photo(s.id, '')}<span class="ri-orn">${ids.slice(0, 4).map(id => `<img src="img/orn/${id}-s.jpg" alt="" loading="lazy">`).join('')}${ids.length > 4 ? `<i>+${ids.length - 4}</i>` : ''}</span></a>
+            <div class="ri-copy">
+              <h2>Complete the look in the Styling Room</h2>
+              <p>The ${s.name} with ${ids.length ? ids.length + ' matching ' + (ids.length === 1 ? 'ornament' : 'ornaments') : 'ornaments of your choice'}${ids.length ? ', ' + inr(t.total) : ''}. See it from every angle, swap pieces, or let Sakhi style it for you.</p>
+            </div>
+            <div class="ri-cta">
+              <a class="btn" href="${url}">Open this look</a>
+              <a class="btn ghost" href="styling-room.html?sakhi=1">Ask Sakhi</a>
+            </div>
+          </div>`;
+      }
       if (lookEdit) lookEdit.href = `styling-room.html?style=${s.id}`;
     }
 
