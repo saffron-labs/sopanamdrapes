@@ -12,6 +12,7 @@
   document.body.appendChild(btn);
   var drawer=null,scrim=null;
   function open(){
+    if(typeof dropTease==='function')dropTease();
     if(innerWidth<600){location.href='stylist.html?from='+page;return}
     scrim=document.createElement('div');scrim.className='sk-dscrim';scrim.addEventListener('click',close);
     drawer=document.createElement('div');drawer.className='sk-drawer';drawer.setAttribute('role','dialog');drawer.setAttribute('aria-label','Sakhi, your stylist');
@@ -23,6 +24,16 @@
   }
   function close(){if(drawer){drawer.remove();scrim.remove();drawer=scrim=null;btn.hidden=false;document.documentElement.style.overflow='';btn.focus()}}
   btn.addEventListener('click',open);
+  // one gentle nudge per visit, never on the stylist page itself
+  var tease=null;
+  function dropTease(){if(tease){tease.remove();tease=null}try{sessionStorage.setItem('sk-tease','1')}catch(e){}}
+  try{if(!sessionStorage.getItem('sk-tease'))setTimeout(function(){
+    if(drawer||tease)return;
+    tease=document.createElement('div');tease.className='sk-tease';tease.setAttribute('role','status');
+    tease.innerHTML='<b>Not sure what suits you?</b>I can style a full look for you in 4 taps.<button type="button" aria-label="Dismiss">×</button>';
+    tease.addEventListener('click',function(e){var x=e.target.closest('button');dropTease();if(!x)open()});
+    document.body.appendChild(tease);
+  },6000)}catch(e){}
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&drawer)close()});
   addEventListener('message',function(e){
     if(e.origin!==location.origin||!e.data)return;

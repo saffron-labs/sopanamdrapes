@@ -281,26 +281,39 @@ function say(text,opts){opts=opts||{};const d=document.createElement('div');d.cl
 function me(text,img){const d=document.createElement('div');d.className='m me';d.innerHTML=md(text)+(img?`<img src="${img}" alt="Photo you shared">`:'');log.appendChild(d);scrollDown();return d}
 function typing(){const d=document.createElement('div');d.className='m bot';d.innerHTML='<span class="typing" aria-label="Sakhi is typing"><i></i><i></i><i></i></span>';log.appendChild(d);scrollDown();return d}
 const wait=ms=>new Promise(r=>setTimeout(r,reduce?0:ms));
-function chips(list){$('#chips').innerHTML=(list||[]).map(c=>`<button class="chip" data-chip="${esc(c)}">${esc(c)}</button>`).join('')}
+function chips(list){$('#chips').innerHTML=(list||[]).slice(0,4).map(c=>`<button class="chip" data-chip="${esc(c)}">${esc(c)}</button>`).join('')}
 
 function lookCard(L,key){
   const s=L.s,t=totals(s,L.sel);
   looks[key]=L;
   const pieces=SLOTS.filter(([k])=>L.sel[k]).map(([k,l])=>{const id=L.sel[k],o=ORN[id];
-    return `<button class="piece" data-swap="${key}|${k}" title="Tap to try another ${l.toLowerCase()}"><img src="img/orn/${id}-s.jpg" alt="" loading="lazy"><span>${esc(o[1])}<small>${l} · ${inr(o[2])}</small></span></button>`}).join('');
+    return `<button class="lk-pc" data-swap="${key}|${k}" title="${esc(o[1])} · ${inr(o[2])}. Tap to try another ${l.toLowerCase()}" aria-label="${esc(o[1])}, ${l}, ${inr(o[2])}. Tap to swap"><img src="img/orn/${id}-s.jpg" alt="" loading="lazy"></button>`}).join('');
   const isSaved=saved.some(x=>x.key===sig(L));
+  const saving=t.save+t.mrpSave;
   return `<article class="lk" data-key="${key}">
-   <div class="ph"><img src="img/${s.id}.jpg" alt="${esc(s.name+', '+s.tone)}" loading="lazy"></div>
-   <div class="bd">
-    <div><div class="rank">${L.rank===0?'<b>Best match</b> · ':''}${L.match}% match for you</div>
-    <h4>${esc(s.name)}, ${esc(s.tone)}</h4><div class="sub">${esc(s.fabric)} · ${esc(s.blouse)}${s.stock<=14?' · only '+s.stock+' left':''}</div></div>
-    <div class="two">
-     <div><h5>Why it suits you</h5><ul>${L.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div>
-     <div><h5>How to wear it</h5><ul>${L.tips.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div>
+   <div class="lk-ph"><img src="img/${s.id}.jpg" alt="${esc(s.name+', '+s.tone)}" loading="lazy">${L.rank===0?'<span class="lk-badge">Best match</span>':''}</div>
+   <div class="lk-head">
+    <div class="lk-meta"><span class="lk-score">${L.match}% match</span>${s.stock<=14?`<span class="lk-low">Only ${s.stock} left</span>`:''}</div>
+    <h4>${esc(s.name)}</h4>
+    <p class="lk-tone">${esc(s.tone)} · ${esc(s.fabric)}</p>
+    <p class="lk-why">${esc(L.why[0]||'')}</p>
+   </div>
+   <div class="lk-rest">
+    ${pieces?`<div class="lk-orn"><span>Styled with</span><div class="lk-pcs">${pieces}</div></div>`:''}
+    <div class="lk-price"><b>${inr(t.total)}</b><span>full look${t.ids.length?' · '+(t.ids.length+1)+' pieces':''}</span>${saving?`<em>Save ${inr(saving)}</em>`:''}</div>
+    <div class="lk-acts">
+     <button class="btn lk-add" data-addlook="${key}">Add look to bag</button>
+     <button class="lk-ic" data-save="${key}" aria-pressed="${isSaved}" aria-label="${isSaved?'Saved':'Save look'}" title="Save look"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0112 7.4 4.3 4.3 0 0119.5 10c0 5.6-7.5 10-7.5 10z"/></svg></button>
+     <button class="lk-ic" data-share="${key}" aria-label="Share on WhatsApp" title="Share on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></svg></button>
     </div>
-    ${pieces?`<div><h5>Ornaments Sakhi picked · tap one to swap</h5><div class="pieces">${pieces}</div></div>`:''}
-    <div class="tot"><span>Saree ${inr(s.eff)}${t.ids.length?' + '+t.ids.length+' ornament'+(t.ids.length>1?'s':''):''}</span><b>${inr(t.total)}</b>${t.save||t.mrpSave?`<span class="sv">You save ${inr(t.save+t.mrpSave)}</span>`:''}${t.save?'<span class="tn">Includes 10% off ornaments for styling them as a look.</span>':''}${L.notes.map(n=>`<span class="tn">${esc(n)}</span>`).join('')}</div>
-    <div class="acts"><button class="btn small" data-addlook="${key}">Add look to bag</button><button class="iconbtn" data-save="${key}" aria-pressed="${isSaved}">${isSaved?'Saved':'Save look'}</button><button class="iconbtn" data-share="${key}">Share on WhatsApp</button><a class="iconbtn" href="index.html?style=${s.id}#builder" target="${EMBED?'_top':'_self'}">Open in builder</a></div>
+    <details class="lk-more"><summary>Why it suits you &amp; how to wear it</summary>
+     <div class="lk-more-in">
+      <h5>Why it suits you</h5><ul>${L.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>
+      <h5>How to wear it</h5><ul>${L.tips.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>
+      <h5>Price</h5><ul><li>Saree ${inr(s.eff)}${s.mrp>s.eff?' (was '+inr(s.mrp)+')':''} · ${esc(s.blouse)}</li>${t.ids.map(id=>`<li>${esc(ORN[id][1])} ${inr(ORN[id][2])}</li>`).join('')}${t.save?'<li>10% off ornaments when bought as a look</li>':''}${L.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>
+      <a class="lk-link" href="index.html?style=${s.id}#builder" target="${EMBED?'_top':'_self'}">Open in the look builder →</a>
+     </div>
+    </details>
    </div></article>`;
 }
 let lookSeq=0;
@@ -316,32 +329,37 @@ function showLooks(list,intro){
 const sig=L=>L.s.id+':'+Object.values(L.sel).sort().join(',');
 
 /* ---------- guided flow ---------- */
-const STEPS=['occasion','skinTone','undertone','heightCm','build','jewellery','budget'];
+const STEPS=['occasion','skinTone','heightCm','budget'];
+const ALL_STEPS=['occasion','skinTone','undertone','heightCm','build','jewellery','budget'];
 function startQuiz(fromStep){
-  quiz={i:fromStep?STEPS.indexOf(fromStep):0,single:!!fromStep};
+  quiz={steps:fromStep?[fromStep]:STEPS,i:0,single:!!fromStep};
   nextStep();
 }
-function nextStep(){
+function curStep(){return log.querySelector('.step.live')}
+function nextStep(force){
   if(!quiz)return;
-  while(quiz.i<STEPS.length&&!quiz.single&&profile[STEPS[quiz.i]]!==undefined)quiz.i++;
-  if(quiz.i>=STEPS.length){quiz=null;return styleNow()}
-  renderStep(STEPS[quiz.i]);
+  while(!force&&quiz.i<quiz.steps.length&&!quiz.single&&profile[quiz.steps[quiz.i]]!==undefined)quiz.i++;
+  if(quiz.i>=quiz.steps.length){quiz=null;return styleNow()}
+  renderStep(quiz.steps[quiz.i]);
 }
 function stepShell(title,note,body,skip){
-  const d=document.createElement('div');d.className='step';
-  d.innerHTML=`<h3>${title}</h3>${note?`<p class="q-note">${note}</p>`:''}${body}${skip?`<div class="row-act"><button class="opt link" data-skip="1">Skip this</button></div>`:''}`;
+  const old=curStep();if(old)old.remove();
+  const n=quiz?quiz.steps.length:1,i=quiz?quiz.i:0,single=!quiz||quiz.single;
+  const d=document.createElement('div');d.className='step live';
+  d.innerHTML=`<div class="step-top">${single?'<span class="step-count">Update your details</span>':`<button class="step-back" data-back="1" ${i===0?'disabled':''} aria-label="Previous question"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg></button><span class="step-count">${i+1} of ${n}</span><span class="step-bar" aria-hidden="true"><i style="width:${Math.round((i+1)/n*100)}%"></i></span>`}${skip||single?`<button class="step-skip" data-skip="1">${single?'Cancel':'Skip'}</button>`:''}</div>
+  <h3>${title}</h3>${note?`<p class="q-note">${note}</p>`:''}${body}`;
   log.appendChild(d);scrollDown();return d;
 }
 function renderStep(k){
   chips([]);
-  if(k==='occasion')stepShell('What is the occasion?','I will match the saree and how much jewellery to wear.',`<div class="opts">${OCC.map(o=>`<button class="opt" data-ans="occasion|${o.k}">${o.label}<small>${o.note}</small></button>`).join('')}</div>`);
-  if(k==='skinTone')stepShell('Which is closest to your skin tone?','Every tone is beautiful. This just tells me which shades will make yours glow.',`<div class="tones">${TONES.map(t=>`<button class="tone" data-ans="skinTone|${t.k}"><span style="background:${t.hex}"></span>${t.label}</button>`).join('')}</div><div class="row-act"><button class="opt" data-photo="skin">Read it from a selfie instead</button><button class="opt link" data-skip="1">Skip this</button></div>`);
-  if(k==='undertone')stepShell('Which looks better on you, gold or silver?','A quick way to read your undertone.',`<div class="opts"><button class="opt" data-ans="undertone|warm">Gold<small>Warm undertone</small></button><button class="opt" data-ans="undertone|cool">Silver<small>Cool undertone</small></button><button class="opt" data-ans="undertone|neutral">Both look fine<small>Neutral</small></button></div>`,true);
-  if(k==='heightCm'){const v=profile.heightCm||160;const d=stepShell('How tall are you?','Height decides border width and how to wear the pallu.',`<div class="height"><output id="hOut">${fmtH(v)}</output><input type="range" id="hRange" min="140" max="190" step="1" value="${v}" aria-label="Height in centimetres"><div class="scale"><span>4′7″</span><span>5′3″</span><span>6′3″</span></div></div><div class="row-act"><button class="btn small" data-hset="1">That is me</button><button class="opt link" data-skip="1">Skip this</button></div>`);
-    const r=d.querySelector('#hRange');r.addEventListener('input',()=>{d.querySelector('#hOut').textContent=fmtH(+r.value)});r.removeAttribute('id');d.querySelector('#hOut').removeAttribute('id');d.querySelector('[data-hset]').dataset.hset='x';d._range=r;}
-  if(k==='build')stepShell('How would you describe your build?','Optional. It helps me choose between fluid and structured fabrics.',`<div class="opts">${BUILDS.map(b=>`<button class="opt" data-ans="build|${b.k}">${b.label}</button>`).join('')}</div>`,true);
-  if(k==='jewellery')stepShell('What jewellery do you love?','I will style the ornaments in this direction.',`<div class="opts">${JEWEL.map(j=>`<button class="opt" data-ans="jewellery|${j.k}">${j.label}<small>${j.note}</small></button>`).join('')}<button class="opt" data-ans="jewellery|">Surprise me<small>Sakhi decides</small></button></div>`);
-  if(k==='budget')stepShell('What is your budget for the full look?','Saree and ornaments together.',`<div class="opts">${BUDGETS.map(b=>`<button class="opt" data-ans="budget|${b.k}">${b.label}</button>`).join('')}</div>`);
+  if(k==='occasion')stepShell('What are you dressing for?','',`<div class="opts g2">${OCC.map(o=>`<button class="opt" data-ans="occasion|${o.k}">${o.label}<small>${o.note}</small></button>`).join('')}</div>`);
+  if(k==='skinTone')stepShell('Which is closest to your skin tone?','So I pick shades that make yours glow.',`<div class="tones">${TONES.map(t=>`<button class="tone" data-ans="skinTone|${t.k}"><span style="background:${t.hex}"></span>${t.label}</button>`).join('')}</div><button class="step-alt" data-photo="skin"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6" width="17" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="3.4"/></svg>Not sure? Read it from a selfie</button>`,true);
+  if(k==='undertone')stepShell('Gold or silver: which looks better on you?','',`<div class="opts g3"><button class="opt" data-ans="undertone|warm">Gold<small>Warm</small></button><button class="opt" data-ans="undertone|cool">Silver<small>Cool</small></button><button class="opt" data-ans="undertone|neutral">Both<small>Neutral</small></button></div>`,true);
+  if(k==='heightCm'){const v=profile.heightCm||160;const d=stepShell('How tall are you?','It decides the border width and how to wear the pallu.',`<div class="height"><output>${fmtH(v)}</output><input type="range" min="140" max="190" step="1" value="${v}" aria-label="Height in centimetres"><div class="scale"><span>4′7″</span><span>5′3″</span><span>6′3″</span></div></div><button class="btn step-go" data-hset="x">Continue</button>`,true);
+    const r=d.querySelector('input[type=range]');r.addEventListener('input',()=>{d.querySelector('output').textContent=fmtH(+r.value)});d._range=r;}
+  if(k==='build')stepShell('How would you describe your build?','',`<div class="opts g3">${BUILDS.map(b=>`<button class="opt" data-ans="build|${b.k}">${b.label}</button>`).join('')}</div>`,true);
+  if(k==='jewellery')stepShell('What jewellery do you love?','',`<div class="opts g2">${JEWEL.map(j=>`<button class="opt" data-ans="jewellery|${j.k}">${j.label}<small>${j.note}</small></button>`).join('')}<button class="opt" data-ans="jewellery|">Surprise me<small>Sakhi decides</small></button></div>`);
+  if(k==='budget')stepShell('Budget for the full look?','Saree and ornaments together.',`<div class="opts g2">${BUDGETS.map(b=>`<button class="opt" data-ans="budget|${b.k}">${b.label}</button>`).join('')}</div>`);
 }
 const fmtH=cm=>{const inch=Math.round(cm/2.54),f=Math.floor(inch/12),i=inch%12;return `${f}′${i}″ · ${cm} cm`};
 function labelFor(k,v){
@@ -355,12 +373,11 @@ function labelFor(k,v){
   return v;
 }
 function answer(k,v,el){
-  const step=el&&el.closest('.step');
-  if(step){step.querySelectorAll('button').forEach(b=>{b.disabled=true;if(b===el)b.setAttribute('aria-pressed','true')})}
-  if(v===null){profile[k]=null;me('Skip')}else{profile[k]=v;me(labelFor(k,v))}
+  const step=el&&el.closest('.step');if(step)step.remove();
+  if(v===null){if(!(quiz&&quiz.single)){profile[k]=null;me('Skip')}}else{profile[k]=v;me(labelFor(k,v))}
   saveProfile();
-  if(quiz&&quiz.single){quiz=null;return styleNow('Updated. Here is your restyled edit.')}
-  if(quiz){quiz.i++;setTimeout(nextStep,reduce?0:260)}
+  if(quiz&&quiz.single){quiz=null;if(v===null){chips(defaultChips());return}return styleNow('Updated. Here is your restyled edit.')}
+  if(quiz){quiz.i++;setTimeout(nextStep,reduce?0:200)}
 }
 async function styleNow(intro){
   chips([]);
@@ -369,8 +386,8 @@ async function styleNow(intro){
   const list=recommend(p);
   const tone=p.skinTone?TONE(p.skinTone).label.toLowerCase()+' skin':'';
   const bits=[p.occasion?OCC_LABEL[p.occasion].toLowerCase():null,tone,p.heightCm?fmtH(p.heightCm).split(' · ')[0]:null,p.budget?'under '+inr(p.budget):null].filter(Boolean);
-  showLooks(list,intro||(`Here is your edit${bits.length?' for '+bits.join(', '):''}. I ranked every saree on colour, fabric and occasion, then styled the ornaments to match.`));
-  chips(['Show me other options','Make it cheaper','Lighter jewellery','Go full bridal','How do I drape it?']);
+  showLooks(list,intro||(`Here are your looks${bits.length?' for '+bits.join(', '):''}. Tap an ornament to swap it.`));
+  chips(['Show me other options','Make it cheaper','Lighter jewellery','How do I drape it?']);
 }
 
 /* ---------- AI ---------- */
@@ -397,6 +414,7 @@ function applyProfile(up){
 /* ---------- main send ---------- */
 async function send(text,image){
   text=text.trim();if(!text&&!image)return;
+  hideHello();
   quiz=null;chips([]);
   me(text||'Here is a look I like.',image);
   history.push({role:'user',content:text||'Find the closest look to this photo in your collection and explain.',image:image||undefined});
@@ -521,11 +539,11 @@ $('#pmUse').addEventListener('click',async()=>{
   closePhoto();
   if(pm.mode==='skin'){
     const r=pm.sample;
-    const step=[...log.querySelectorAll('.step')].pop();if(step)step.querySelectorAll('button').forEach(b=>b.disabled=true);
+    const step=curStep();if(step)step.remove();
     profile.skinTone=r.tone;profile.undertone=r.under;saveProfile();
     me('Read from my selfie: '+TONE(r.tone).label+', '+r.under+' undertone');
     say(`Your skin reads as **${TONE(r.tone).label.toLowerCase()}** with a **${r.under}** undertone. ${r.under==='warm'?'Yellow gold will glow on you.':r.under==='cool'?'Pearl, polki and silver tones will look lovely, and jewel colours suit you.':'You can wear both gold and silver tones.'} You can change this any time in your profile.`);
-    if(quiz){quiz.i=STEPS.indexOf('heightCm');nextStep()}else if(profile.occasion)styleNow();else startQuiz();
+    if(quiz){quiz.i++;if(quiz.single){quiz=null;styleNow()}else nextStep()}else if(profile.occasion)styleNow();else startQuiz();
   }else{
     const s=pm.match;
     const small=await shrink(pm.img,512);
@@ -547,7 +565,14 @@ async function sendInspo(s,img){
 }
 
 /* ---------- profile panel ---------- */
+function renderCtx(){
+  const el=$('#ctx');if(!el)return;
+  const bits=[profile.occasion&&OCC_LABEL[profile.occasion],profile.skinTone&&TONE(profile.skinTone)&&TONE(profile.skinTone).label,profile.heightCm&&fmtH(profile.heightCm).split(' · ')[0],profile.budget?'Under '+inr(profile.budget):null].filter(Boolean);
+  el.hidden=!bits.length;
+  el.innerHTML=bits.length?`<span class="ctx-l">Styling for</span><span class="ctx-v">${bits.map(esc).join(' · ')}</span><button class="ctx-e" data-ctxedit="1">Edit</button>`:'';
+}
 function renderProfile(){
+  renderCtx();
   const rows=[['occasion','Occasion'],['skinTone','Skin tone'],['undertone','Undertone'],['heightCm','Height'],['build','Build'],['jewellery','Jewellery'],['budget','Budget']];
   $('#prof').innerHTML=rows.map(([k,l])=>{const v=profile[k];let txt=v===undefined||v===null||v===''?'<span style="color:var(--muted)">Not set</span>':esc(labelFor(k,v));
     if(k==='skinTone'&&v)txt=`<span><span class="sw" style="background:${TONE(v).hex}"></span>${txt}</span>`;
@@ -573,12 +598,16 @@ function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTi
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   const d=b.dataset;
+  if((d.chip||d.photo)&&b.closest('.sk-hello'))hideHello();
   if(d.ans){const [k,v]=d.ans.split('|');answer(k,k==='budget'?+v:v===''&&k==='jewellery'?'':v,b);return}
-  if(d.skip){const k=STEPS[quiz?quiz.i:0];answer(k,null,b);return}
+  if(d.skip){if(!quiz){curStep()&&curStep().remove();return}const k=quiz.steps[quiz.i];answer(k,null,b);return}
+  if(d.back){if(quiz&&quiz.i>0){quiz.i--;const m=[...log.querySelectorAll('.m.me')].pop();if(m)m.remove();nextStep(true)}return}
+  if(d.ctxedit){toggleSide(true);return}
   if(d.hset){const step=b.closest('.step');answer('heightCm',+step._range.value,b);return}
   if(d.photo){openPhoto(d.photo);return}
   if(d.chip){const c=d.chip;
-    if(c==='Find my look'){chips([]);me('Find my look');say('Wonderful. A few quick questions and I will put together your looks.');startQuiz();return}
+    if(c==='Find my look'){chips([]);me('Style my look');startQuiz();return}
+    if(c==='Style a new look'){chips([]);me(c);delete profile.occasion;saveProfile();startQuiz();return}
     if(c==='Match an inspiration photo'){openPhoto('inspo');return}
     if(c==='Read my skin tone from a selfie'){openPhoto('skin');return}
     if(c==='Make it cheaper'&&aiOK===false){me(c);return cheaper()}
@@ -592,7 +621,7 @@ document.addEventListener('click',e=>{
     const card=b.closest('.lk');const tmp=document.createElement('div');tmp.innerHTML=lookCard(L,key);card.replaceWith(tmp.firstElementChild);return}
   if(d.addlook){const L=looks[d.addlook],t=totals(L.s,L.sel);bag.push({sid:L.s.id,names:t.ids.map(id=>ORN[id][1]),total:t.total});store.set('sd-bag',bag);renderBag();notifyParent();toast('Look added to your bag');return}
   if(d.save){const L=looks[d.save],k=sig(L),i=saved.findIndex(x=>x.key===k);
-    if(i>=0){saved.splice(i,1);b.setAttribute('aria-pressed','false');b.textContent='Save look'}else{const t=totals(L.s,L.sel);saved.unshift({key:k,sid:L.s.id,title:L.s.name+', '+L.s.tone,total:t.total,n:t.ids.length+1,sel:L.sel});b.setAttribute('aria-pressed','true');b.textContent='Saved';toast('Saved to your profile')}
+    if(i>=0){saved.splice(i,1);b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Save look')}else{const t=totals(L.s,L.sel);saved.unshift({key:k,sid:L.s.id,title:L.s.name+', '+L.s.tone,total:t.total,n:t.ids.length+1,sel:L.sel});b.setAttribute('aria-pressed','true');b.setAttribute('aria-label','Saved');toast('Saved to your profile')}
     store.set('sd-sakhi-saved',saved);renderProfile();return}
   if(d.share){const L=looks[d.share],t=totals(L.s,L.sel);const txt=`My look from Sopanam Drapes, styled by Sakhi:\n${L.s.name}, ${L.s.tone} (${inr(L.s.eff)})\n${t.ids.map(id=>'+ '+ORN[id][1]).join('\n')}\nFull look: ${inr(t.total)}\n${location.origin}/index.html?style=${L.s.id}`;window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');return}
   if(d.edit){toggleSide(false);me('Change my '+d.edit.replace('Cm','').replace(/([A-Z])/g,' $1').toLowerCase());startQuiz(d.edit);return}
@@ -617,7 +646,8 @@ function confirmRestart(){return true}
 $('#scrim').addEventListener('click',()=>openBag(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#photoModal').hidden)closePhoto();else if(!$('#bag').hidden)openBag(false);else if($('#skSide').classList.contains('open'))toggleSide(false);else if(EMBED){try{parent.postMessage({type:'sd-close'},location.origin)}catch(err){}}}});
 $('#photoModal').addEventListener('click',e=>{if(e.target.id==='photoModal')closePhoto()});
-$('#form').addEventListener('submit',e=>{e.preventDefault();const v=$('#msg').value;$('#msg').value='';send(v)});
+$('#form').addEventListener('submit',e=>{e.preventDefault();const v=$('#msg').value;$('#msg').value='';$('#sendBtn').disabled=true;send(v)});
+$('#msg').addEventListener('input',()=>{$('#sendBtn').disabled=!$('#msg').value.trim()});
 
 // voice input, en-IN
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -636,18 +666,36 @@ function restart(){
   log.innerHTML='';history=[];shown=[];looks={};quiz=null;
   profile={};store.set('sd-sakhi-profile',profile);renderProfile();greet(true);
 }
+const HELLO={bridal:'Planning your wedding look? I will style the full bridal set around you.',festive:'Getting ready for Onam or Vishu? Let me style a kasavu look for you.',celebrations:'Deepavali, Christmas or Perunnal? I will find your evening saree.',occasions:'Party or reception? I will find something light, dressy and right for you.',everyday:'Something for work or everyday? I will keep it comfortable and smart.',ornaments:'Choosing ornaments? Tell me the saree and occasion and I will style them.'};
+const I_SPARK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>';
+const I_PIC='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/></svg>';
+const I_FACE='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9 14.5c.8.9 1.8 1.4 3 1.4s2.2-.5 3-1.4"/><path d="M9.2 10h.01M14.8 10h.01" stroke-width="2.4" stroke-linecap="round"/></svg>';
+const I_GO='<svg class="ha-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg>';
+function hideHello(){const h=log.querySelector('.sk-hello');if(h)h.remove()}
+function hello(back){
+  const d=document.createElement('div');d.className='sk-hello';
+  const qs=['What suits dusky skin?','Kanjivaram vs Banarasi?','How do I care for silk?','What is your return policy?'];
+  const summary=[profile.occasion&&OCC_LABEL[profile.occasion],profile.skinTone&&TONE(profile.skinTone)&&TONE(profile.skinTone).label.toLowerCase()+' skin'].filter(Boolean).join(', ');
+  d.innerHTML=`<span class="hello-av" aria-hidden="true">S</span>
+   <h2>${back?'Welcome back':'Hi, I’m Sakhi'}</h2>
+   <p>${back?'Pick up where we left off'+(summary?' with '+esc(summary):'')+', or start something new.':esc(HELLO[FROM]||'Your personal stylist. I’ll put together a complete look for you: saree, ornaments and how to wear it.')}</p>
+   <div class="hello-acts">
+    ${back?`<button class="ha primary" data-chip="Restyle me">${I_SPARK}<span><b>Show my looks again</b><small>Using the details you gave me</small></span>${I_GO}</button>`
+         :`<button class="ha primary" data-chip="Find my look">${I_SPARK}<span><b>Style my look</b><small>4 quick taps · saree + ornaments</small></span>${I_GO}</button>`}
+    <button class="ha" data-chip="${back?'Style a new look':'Match an inspiration photo'}">${back?I_SPARK:I_PIC}<span><b>${back?'Style a new look':'Match a photo'}</b><small>${back?'For a different occasion':'Upload a saree you love'}</small></span>${I_GO}</button>
+    <button class="ha" data-chip="${back?'Match an inspiration photo':'Read my skin tone from a selfie'}">${back?I_PIC:I_FACE}<span><b>${back?'Match a photo':'Find my colours'}</b><small>${back?'Upload a saree you love':'Read my skin tone from a selfie'}</small></span>${I_GO}</button>
+   </div>
+   <p class="hello-or">Or ask me</p>
+   <div class="hello-q">${qs.map(q=>`<button class="chip" data-chip="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+  log.appendChild(d);
+}
 function greet(fresh){
   const back=!fresh&&Object.keys(profile).some(k=>profile[k]);
-  if(back){
-    say(`Welcome back. I still have your details${profile.occasion?' for '+OCC_LABEL[profile.occasion].toLowerCase():''}. Shall I restyle you, or is there something new?`);
-    chips(['Restyle me','Find my look','Match an inspiration photo','What is your return policy?']);
-    return;
-  }
-  say("Hello, I'm **Sakhi**, your Sopanam stylist.\n\n"+(OPENERS[FROM]||'Tell me the occasion, your skin tone and height, and I will style a complete look from our collection: the saree, the ornaments, the drape and the blouse. Or ask me anything about sarees.'));
-  if(OCC_FROM[FROM]&&!profile.occasion){profile.occasion=OCC_FROM[FROM];saveProfile()}
-  chips(['Find my look','Match an inspiration photo','Read my skin tone from a selfie','What suits dusky skin?','Kanjivaram vs Banarasi?']);
+  if(!back&&OCC_FROM[FROM]&&!profile.occasion){profile.occasion=OCC_FROM[FROM];saveProfile()}
+  hello(back);chips([]);
+  history.push({role:'assistant',content:back?'Welcome back. Shall I restyle you, or is there something new?':"Hello, I'm Sakhi, your Sopanam stylist. I can style a complete look or answer anything about sarees."});
 }
-document.addEventListener('click',e=>{const b=e.target.closest('[data-chip="Restyle me"]');if(b){e.stopImmediatePropagation();chips([]);me('Restyle me');styleNow()}},true);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-chip="Restyle me"]');if(b){e.stopImmediatePropagation();hideHello();chips([]);me('Show my looks');styleNow()}},true);
 if(EMBED){$('#closeEmbed').hidden=false}
 document.body.classList.add('sk-page');
 function setHH(){const h=document.querySelector('.site-head');document.documentElement.style.setProperty('--hh',(EMBED||!h?0:h.getBoundingClientRect().height)+'px')}
