@@ -5378,3 +5378,17 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
   .atl-total-v { font-size: 32px; }
   .atl-add { width: 100%; }
 }
+
+/* Home: pull The House Edit up so the frames sit right under the hero.
+   Title and line share one row; minimal padding above. */
+.worlds-section { padding-top: clamp(20px, 2.2vw, 32px); padding-bottom: clamp(36px, 4vw, 56px); }
+.worlds-section .house-edit-header {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 28px;
+  margin-bottom: 0;
+}
+.worlds-section .house-edit-title-wrap { margin-bottom: 0; }
+.worlds-section .house-edit-title-wrap h2 { font-size: clamp(26px, 2.4vw, 34px); }
+.worlds-section .house-edit-rule { margin-top: 6px; }
+.worlds-section .house-edit-sub { margin: 0; }
+#worldGrid.house-edit-grid { padding-top: 0; margin-top: 4px; }
+@media (max-width: 1400px) { #worldGrid.house-edit-grid { padding-top: 6px; } }
