@@ -800,47 +800,45 @@
     const s = saree(homeState.cur) || SAREES[0];
     if (!s) return;
 
-    // Saree Picker (compact horizontal strip beneath model stage)
+    // 1. Saree picker
     const pickerEl = $('#picker');
     if (pickerEl) {
       pickerEl.innerHTML = SAREES.map(x => `
-        <button class="pick" data-pick="${x.id}" aria-pressed="${x.id === homeState.cur}" aria-label="${x.name}, ${x.tone}" title="${x.name} (${x.tone})">
-          ${photo(x.id, `${x.name}, ${x.tone}`)}
+        <button class="pick" data-pick="${x.id}" aria-pressed="${x.id === homeState.cur}" aria-label="${x.name}, ${x.tone}" title="${x.name} · ${x.tone}">
+          ${photo(x.id, '')}
         </button>`).join('');
     }
 
-    // Stage Art & Views
+    // Large photo + view switch
     const hasD = (HAS_DETAIL || []).includes(s.id);
     const isDetail = hasD && homeState.view === 'detail';
     const stageArtEl = $('#stageArt');
     if (stageArtEl) {
       stageArtEl.innerHTML = isDetail ? photo(s.id + '-detail', `Weave detail of the ${s.name}`) : photo(s.id, `${s.name}, ${s.tone}, worn by a model`);
     }
-
     const viewsEl = $('#views');
     if (viewsEl) {
       viewsEl.innerHTML = hasD ? `
-        <button class="tab-btn-sm" data-view="model" aria-pressed="${!isDetail}">On the Model</button>
-        <button class="tab-btn-sm" data-view="detail" aria-pressed="${isDetail}">Weave Close-Up</button>` : '';
+        <button class="atl-view" data-view="model" aria-pressed="${!isDetail}">On the model</button>
+        <button class="atl-view" data-view="detail" aria-pressed="${isDetail}">The weave</button>` : '';
     }
 
-    // Presets with Active Detection
+    // 2. Pairing presets
     const setsEl = $('#sets');
     if (setsEl) {
       const selStr = JSON.stringify(Object.entries(homeState.sel || {}).filter(([, v]) => v).sort());
       const eq = obj => JSON.stringify(Object.entries(obj || {}).filter(([, v]) => v).sort()) === selStr;
-      const isDefault = eq(s.combo);
-      const isBridal = eq(BRIDAL_FULL);
-      const isLight = eq({ earrings: s.combo.earrings || 'OR00009' });
       const isNone = Object.keys(homeState.sel || {}).filter(k => homeState.sel[k]).length === 0;
-      setsEl.innerHTML = `
-        <button class="tab-btn-sm" data-set="default" aria-pressed="${isDefault}">Atelier Pairing</button>
-        <button class="tab-btn-sm" data-set="bridal" aria-pressed="${isBridal}">Full Bridal</button>
-        <button class="tab-btn-sm" data-set="light" aria-pressed="${isLight}">Earrings Only</button>
-        <button class="tab-btn-sm" data-set="none" aria-pressed="${isNone}">Drape Alone</button>`;
+      const sets = [
+        ['default', 'Our pairing', eq(s.combo)],
+        ['bridal', 'Full bridal', eq(BRIDAL_FULL)],
+        ['light', 'Just earrings', eq({ earrings: s.combo.earrings || 'OR00009' })],
+        ['none', 'Saree only', isNone]
+      ];
+      setsEl.innerHTML = sets.map(([k, l, on]) => `<button class="atl-set" data-set="${k}" aria-pressed="${on}" type="button">${l}</button>`).join('');
     }
 
-    // Studio Slot Category Switcher
+    // Ornament type tabs
     const slotGroups = {
       primary: ['necklace', 'bangles'],
       ears: ['earrings', 'ring'],
@@ -848,81 +846,59 @@
       all: SLOTS.map(([k]) => k)
     };
     const visibleSlots = slotGroups[homeState.slotGroup] || slotGroups.primary;
-
     const slotTabsEl = $('#slotTabs');
     if (slotTabsEl) {
-      const tabDefs = [
-        ['primary', 'Necklace & Bangles'],
-        ['ears', 'Earrings & Rings'],
-        ['acc', 'Anklets & Waist'],
-        ['all', 'All 7']
-      ];
-      slotTabsEl.innerHTML = tabDefs.map(([k, label]) => `
-        <button class="studio-slot-tab" data-slot-group="${k}" aria-pressed="${homeState.slotGroup === k}" type="button">${label}</button>
-      `).join('');
+      const tabDefs = [['primary', 'Necklace & bangles'], ['ears', 'Earrings & ring'], ['acc', 'Anklet & waist'], ['all', 'Everything']];
+      slotTabsEl.innerHTML = tabDefs.map(([k, label]) => {
+        const n = slotGroups[k].filter(x => homeState.sel[x]).length;
+        return `<button class="atl-tab" data-slot-group="${k}" aria-pressed="${homeState.slotGroup === k}" type="button">${label}${n && k !== 'all' ? `<span class="atl-tab-n">${n}</span>` : ''}</button>`;
+      }).join('');
     }
 
-    const startBtn = $('#startStylingBtn');
-    if (startBtn) {
-      startBtn.innerHTML = homeState.slotGroup === 'all'
-        ? 'Compact View <span aria-hidden="true">↑</span>'
-        : 'Start Styling <span aria-hidden="true">→</span>';
-    }
-
-    // Slots & Options with clean white square/4:3 jewellery tiles
+    // Ornament rows: one row per slot, options side by side
     const slotsEl = $('#slots');
     if (slotsEl) {
-      slotsEl.innerHTML = SLOTS.map(([k, label]) => {
-        const isVis = visibleSlots.includes(k);
+      slotsEl.innerHTML = SLOTS.filter(([k]) => visibleSlots.includes(k)).map(([k, label]) => {
         const selId = homeState.sel[k];
         return `
-        <div class="slot studio-slot${isVis ? '' : ' is-hidden'}">
-          <div class="sh">
-            <span>Select ${label}</span>
-            <small>
-              ${selId ? `${ORN[selId][1]} <button class="studio-clear-btn" data-clear-slot="${k}" type="button" aria-label="Remove ${label}">Clear</button>` : 'Optional'}
-            </small>
+        <div class="atl-slot">
+          <div class="atl-slot-h">
+            <span>${label}</span>
+            ${selId ? `<button class="atl-clear" data-clear-slot="${k}" type="button" aria-label="Remove ${label}">Remove</button>` : '<small>Optional</small>'}
           </div>
-          <div class="opts studio-opts">
+          <div class="atl-opts">
             ${(OPTS[k] || []).map(id => {
-          const o = ORN[id];
-          return `
-                <button class="opt studio-opt" data-slot="${k}" data-id="${id}" aria-pressed="${selId === id}">
-                  <span class="opt-img-box"><img class="opt-img" src="img/orn/${id}-s.jpg" alt="${o[1]}" width="120" height="80" loading="lazy"></span>
-                  <span class="n">${o[1]}</span>
-                  <span class="p">${o[3] < o[2] ? `<s>${inr(o[2])}</s>` : ''}${inr(o[3])}</span>
-                </button>`;
-        }).join('')}
+              const o = ORN[id];
+              return `
+              <button class="atl-opt" data-slot="${k}" data-id="${id}" aria-pressed="${selId === id}" type="button">
+                <span class="atl-opt-img"><img src="img/orn/${id}-s.jpg" alt="" width="120" height="120" loading="lazy"></span>
+                <span class="atl-opt-n">${o[1]}</span>
+                <span class="atl-opt-p">${inr(o[3])}${o[3] < o[2] ? ` <s>${inr(o[2])}</s>` : ''}</span>
+              </button>`;
+            }).join('')}
           </div>
         </div>`;
       }).join('');
     }
 
-    // Yours Label
+    // Saree line under step 1
     const t = ornTotalsHome();
-    const names = t.ids.map(id => ORN[id] ? ORN[id][1] : id);
     const yoursEl = $('#yours');
     if (yoursEl) {
-      yoursEl.innerHTML = `<b>${s.name} · ${s.tone}</b><span>${names.length ? names.join(' · ') : 'Drape only, no ornaments selected'}</span>`;
+      yoursEl.innerHTML = `${s.name} <span>${s.tone} · ${s.disc ? `<s>${inr(s.mrp)}</s> ` : ''}${inr(s.eff)}</span>`;
     }
 
-    // Totals Breakdown — Framed "Your Look" Studio Card
+    // Total bar
     const totalsEl = $('#totals');
     if (totalsEl) {
+      const n = t.ids.length;
       totalsEl.innerHTML = `
-        <h3 class="look-card-title">Your Look</h3>
-        <div class="look-card-thumb" data-style="${s.id}" role="button" tabindex="0" aria-label="Preview ${s.name}">
-          ${photo(s.id, `${s.name}, ${s.tone}`)}
+        <div class="atl-total-l">
+          <span class="atl-total-k">Your look</span>
+          <span class="atl-total-d">Saree ${inr(s.eff)}${n ? ` + ${n} ornament${n === 1 ? '' : 's'} ${inr(t.sum)}` : ''}${t.save ? ` <em>−${inr(t.save)} look saving</em>` : n === 1 ? ' · <i>add one more ornament for 10% off</i>' : ''}</span>
         </div>
-        <div class="look-card-meta">${s.name} · ${t.ids.length} ${t.ids.length === 1 ? 'piece' : 'pieces'}</div>
-        <div class="look-card-breakdown">
-          <div class="row"><span>Saree</span><span>${s.disc ? `<s>${inr(s.mrp)}</s> ` : ''}${inr(s.eff)}</span></div>
-          <div class="row"><span>Ornaments (${t.ids.length})</span><span>${inr(t.sum)}</span></div>
-          ${t.save ? `<div class="row save"><span>Atelier Privilege (10%)</span><span>−${inr(t.save)}</span></div>` : ''}
-        </div>
-        <div class="look-card-total">${inr(t.total)}</div>
-        ${!t.save ? `<p class="look-card-hint">${t.ids.length === 1 ? 'Add 1 more piece for 10% off' : 'Pair 2+ ornaments for 10% off'}</p>` : ''}
-        <button class="btn look-card-btn" data-add type="button">Add to Bag</button>`;
+        <b class="atl-total-v">${inr(t.total)}</b>
+        <button class="btn atl-add" data-add type="button">Add look to bag</button>`;
     }
 
     // Mobile Action Bar
@@ -935,7 +911,17 @@
       bar = document.createElement('div');
       bar.id = 'mobileBuilderBar';
       bar.className = 'mobile-builder-bar';
+      bar.hidden = true;
       document.body.appendChild(bar);
+      // Only show the bar while the atelier is on screen, and lift Sakhi above it
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(([e]) => {
+          bar.hidden = !e.isIntersecting;
+          document.body.classList.toggle('has-mbar', e.isIntersecting);
+        }, { rootMargin: '-20% 0px -20% 0px' }).observe($('#builder'));
+      } else {
+        bar.hidden = false;
+      }
     }
     if (bar) {
       bar.innerHTML = `
@@ -977,7 +963,9 @@
       { k: 'sarees', name: 'Sarees', sub: 'Collections', img: 'img/popout-sarees.webp', href: 'occasions.html' },
       { k: 'lehanga', name: 'Lehanga', sub: 'Collections', img: 'img/popout-lehanga.webp', href: 'celebrations.html' },
       { k: 'scarf', name: 'Scarf', sub: 'Collections', img: 'img/popout-scarf.webp', href: 'everyday.html' },
-      { k: 'kurta', name: 'Kurta Sets', sub: 'Collections', img: 'img/popout-kurta.webp', href: 'ornaments.html' }
+      { k: 'kurta', name: 'Kurta Sets', sub: 'Collections', img: 'img/popout-kurta.webp', href: 'ornaments.html' },
+      { k: 'trending', name: 'Trending', sub: 'Right now', img: 'img/popout-trending.webp', href: 'occasions.html' },
+      { k: 'newstock', name: 'New Stock', sub: 'Just arrived', img: 'img/popout-newstock.webp', href: 'index.html#collection' }
     ];
     grid.className = 'house-edit-grid';
     grid.innerHTML = houseEdits.map(w => `
@@ -1012,17 +1000,17 @@
 
     if (countEl) {
       countEl.textContent = (homeState.world === 'all' && !homeState.showAllSarees)
-        ? `${list.length} of ${SAREES.length} Sarees`
+        ? `${SAREES.length} Sarees`
         : `${list.length} ${list.length === 1 ? 'Piece' : 'Pieces'}`;
     }
     if (viewAllBtn) {
       viewAllBtn.innerHTML = (homeState.world === 'all' && homeState.showAllSarees)
-        ? 'Show 4 highlights <span aria-hidden="true">↑</span>'
-        : 'View all sarees <span aria-hidden="true">→</span>';
+        ? 'Back to the reel <span aria-hidden="true">↑</span>'
+        : 'See all as a grid <span aria-hidden="true">→</span>';
     }
     if (noteEl) noteEl.innerHTML = w ? `<strong>${w.name}</strong><span>${w.line}</span>` : '';
 
-    gridEl.innerHTML = list.length ? list.map(s => `
+    const plate = s => `
       <article class="saree-plate">
         <div class="saree-plate-art" data-style="${s.id}" role="button" tabindex="0" aria-label="Style ${s.name} in the atelier">
           ${photo(s.id, `${s.name}, ${s.tone}, worn by a model`)}
@@ -1033,14 +1021,32 @@
           </div>
         </div>
         <div class="saree-plate-info">
-          <h3 class="plate-title">${s.name},</h3>
+          <h3 class="plate-title">${s.name}</h3>
           <div class="plate-tone">${s.tone}</div>
           <div class="plate-price">
             <b>${inr(s.eff)}</b>${s.disc ? `<s>${inr(s.mrp)}</s>` : ''}
           </div>
         </div>
-      </article>
-    `).join('') : '<div class="empty">No sarees in this edit yet.</div>';
+      </article>`;
+
+    // Default view: every saree on a slow, endless reel across the full width.
+    // The second copy only exists to make the loop seamless, so it is hidden from
+    // screen readers and can't be tabbed into.
+    const reel = homeState.world === 'all' && !homeState.showAllSarees;
+    gridEl.className = 'collection-grid' + (reel ? ' is-reel' : '');
+    if (reel) {
+      const set = SAREES.map(plate).join('');
+      gridEl.innerHTML = `
+        <div class="saree-reel${homeState.reelPaused ? ' is-paused' : ''}">
+          <div class="reel-track">
+            <div class="reel-set">${set}</div>
+            <div class="reel-set" aria-hidden="true" inert>${set}</div>
+          </div>
+        </div>
+        <button class="reel-toggle" id="reelToggle" type="button" aria-pressed="${!!homeState.reelPaused}">${homeState.reelPaused ? 'Play' : 'Pause'} reel</button>`;
+      return;
+    }
+    gridEl.innerHTML = list.length ? list.map(plate).join('') : '<div class="empty">No sarees in this edit yet.</div>';
   }
 
   function pickWorld(k) {
@@ -1105,7 +1111,9 @@
       { k: 'sarees', name: 'Sarees', sub: 'Collections', img: 'img/popout-sarees.webp', href: 'occasions.html' },
       { k: 'lehanga', name: 'Lehanga', sub: 'Collections', img: 'img/popout-lehanga.webp', href: 'celebrations.html' },
       { k: 'scarf', name: 'Scarf', sub: 'Collections', img: 'img/popout-scarf.webp', href: 'everyday.html' },
-      { k: 'kurta', name: 'Kurta Sets', sub: 'Collections', img: 'img/popout-kurta.webp', href: 'ornaments.html' }
+      { k: 'kurta', name: 'Kurta Sets', sub: 'Collections', img: 'img/popout-kurta.webp', href: 'ornaments.html' },
+      { k: 'trending', name: 'Trending', sub: 'Right now', img: 'img/popout-trending.webp', href: 'occasions.html' },
+      { k: 'newstock', name: 'New Stock', sub: 'Just arrived', img: 'img/popout-newstock.webp', href: 'index.html#collection' }
     ];
     const pageKeyMap = {
       bridal: 'dresses',
@@ -1536,6 +1544,14 @@
         homeState.showAllSarees = !homeState.showAllSarees;
       }
       renderGrid();
+      return;
+    }
+    if (t.id === 'reelToggle') {
+      homeState.reelPaused = !homeState.reelPaused;
+      const r = $('.saree-reel');
+      if (r) r.classList.toggle('is-paused', homeState.reelPaused);
+      t.setAttribute('aria-pressed', homeState.reelPaused);
+      t.textContent = homeState.reelPaused ? 'Play reel' : 'Pause reel';
       return;
     }
     if (t.id === 'startStylingBtn') {

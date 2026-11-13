@@ -31,3 +31,6 @@
   .sk-launch .txt{display:none}
   .sk-tease{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 58px)}
 }
+
+/* lift above the phone 'Add look' bar on the home page */
+@media(max-width:900px){body.has-mbar .sk-launch{bottom:calc(84px + env(safe-area-inset-bottom,0px))}body.has-mbar .sk-tease{display:none}}

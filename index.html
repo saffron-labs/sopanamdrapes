@@ -17,7 +17,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Albert+Sans:wght@400;500;600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/site.css?v=20261114a">
   <style>
     /* phone: keep the hero compact so the page below the photo is reachable */
     @media(max-width:860px) {
@@ -151,39 +151,34 @@
         </div>
       </section>
 
-      <section id="builder" class="atelier-band full-bleed-edge">
-        <div class="wrap studio-wrap">
-          <div class="studio-grid">
-            <div class="studio-model">
-              <div class="studio-art-wrap">
-                <div class="art studio-canvas" id="stageArt"></div>
-                <div class="studio-views-overlay" id="views" role="group" aria-label="Photo view"></div>
-              </div>
-              <div class="studio-picker-row">
-                <span class="studio-mini-label">Select Drape</span>
-                <div class="picker" id="picker" role="group" aria-label="Choose a saree"></div>
-              </div>
+      <section id="builder" class="atl-band full-bleed-edge" aria-labelledby="atlTitle">
+        <div class="wrap atl">
+          <div class="atl-stage">
+            <div class="atl-photo art" id="stageArt"></div>
+            <div class="atl-views" id="views" role="group" aria-label="Photo view"></div>
+          </div>
+
+          <div class="atl-panel">
+            <div class="atl-head">
+              <p class="eyebrow">The Atelier</p>
+              <h2 id="atlTitle">Complete the look</h2>
+              <p class="atl-sub">Choose a saree, then dress it. Two or more ornaments take 10% off the jewellery.</p>
             </div>
 
-            <div class="studio-copy">
-              <h2>Complete<br>the look</h2>
-              <p class="studio-sub">Style your saree with matching ornaments and accessories.</p>
-              <button class="btn studio-start-btn" id="startStylingBtn" type="button">Start Styling <span aria-hidden="true">→</span></button>
-              <div class="studio-presets-wrap">
-                <span class="studio-mini-label">Curated Pairings</span>
-                <div class="sets studio-sets" id="sets"></div>
+            <div class="atl-step">
+              <div class="atl-step-h"><span class="atl-n">1</span><h3>The saree</h3><p class="atl-now" id="yours"></p></div>
+              <div class="picker atl-picker" id="picker" role="group" aria-label="Choose a saree"></div>
+            </div>
+
+            <div class="atl-step" id="studioSelectors">
+              <div class="atl-step-h"><span class="atl-n">2</span><h3>The ornaments</h3>
+                <div class="atl-sets" id="sets" role="group" aria-label="Start from a pairing"></div>
               </div>
-              <p class="yours studio-caption" id="yours"></p>
+              <div class="atl-tabs" id="slotTabs" role="group" aria-label="Ornament type"></div>
+              <div id="slots" class="atl-slots"></div>
             </div>
 
-            <div class="studio-selectors" id="studioSelectors">
-              <div class="studio-slot-tabs" id="slotTabs" role="group" aria-label="Ornament categories"></div>
-              <div id="slots" class="studio-slots"></div>
-            </div>
-
-            <div class="studio-summary">
-              <div class="totals studio-look-card" id="totals"></div>
-            </div>
+            <div class="atl-total" id="totals" aria-live="polite"></div>
           </div>
         </div>
       </section>
@@ -421,7 +416,7 @@
   </div>
 
   <script src="assets/data.js"></script>
-  <script src="assets/site.js"></script>
-  <script src="assets/stylist-launcher.js?v=20261113b" defer></script>
+  <script src="assets/site.js?v=20261114a"></script>
+  <script src="assets/stylist-launcher.js?v=20261114a" defer></script>
 </body>
 </html>
