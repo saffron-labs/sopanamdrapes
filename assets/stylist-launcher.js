@@ -1,8 +1,9 @@
 /* Puts "Ask Sakhi" on every store page and opens the stylist in a side drawer. */
 (function(){
+  var V='20261113b'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
   var page=(location.pathname.split('/').pop()||'index.html').replace('.html','')||'index';
   var lines={bridal:'Style my bridal look',festive:'Style my Onam look',celebrations:'Style my festive look',occasions:'Style my party look',everyday:'Style my office look',ornaments:'Help me pick ornaments'};
-  var css=document.createElement('link');css.rel='stylesheet';css.href='assets/stylist-launcher.css';document.head.appendChild(css);
+  var css=document.createElement('link');css.rel='stylesheet';css.href='assets/stylist-launcher.css?v='+V;document.head.appendChild(css);
   // add Stylist to the main nav
   var nav=document.getElementById('mainNav');
   if(nav&&!nav.querySelector('a[href="stylist.html"]')){var a=document.createElement('a');a.href='stylist.html';a.textContent='Stylist';nav.appendChild(a)}
@@ -17,7 +18,7 @@
     scrim=document.createElement('div');scrim.className='sk-dscrim';scrim.addEventListener('click',close);
     drawer=document.createElement('div');drawer.className='sk-drawer';drawer.setAttribute('role','dialog');drawer.setAttribute('aria-label','Sakhi, your stylist');
     var th=document.documentElement.dataset.theme;
-    drawer.innerHTML='<iframe title="Sakhi, your stylist" src="stylist.html?embed=1&from='+page+(th?'&theme='+th:'')+'"></iframe>';
+    drawer.innerHTML='<iframe title="Sakhi, your stylist" src="stylist.html?embed=1&v='+V+'&from='+page+(th?'&theme='+th:'')+'"></iframe>';
     document.body.appendChild(scrim);document.body.appendChild(drawer);btn.hidden=true;
     document.documentElement.style.overflow='hidden';
     setTimeout(function(){try{drawer.querySelector('iframe').focus()}catch(e){}},50);
