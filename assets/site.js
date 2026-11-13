@@ -813,10 +813,13 @@
           <span class="room-saree-t">${x.tone}</span>
         </button>`).join('');
       pickerEl.scrollLeft = keep;
-      if (!pickerEl.dataset.init) {
-        pickerEl.dataset.init = '1';
+      if (pickerEl.dataset.cur !== homeState.cur) {
+        pickerEl.dataset.cur = homeState.cur;
         const on = pickerEl.querySelector('[aria-pressed="true"]');
-        if (on) pickerEl.scrollLeft = on.getBoundingClientRect().left - pickerEl.getBoundingClientRect().left - 4;
+        if (on) {
+          const pr = pickerEl.getBoundingClientRect(), r = on.getBoundingClientRect();
+          if (r.left < pr.left || r.right > pr.right) pickerEl.scrollLeft += r.left - pr.left - 4;
+        }
       }
     }
 
