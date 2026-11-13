@@ -345,3 +345,9 @@ html.room body,html.room .sk,html.room .sk-chat{background:transparent}
 html.room .sk-log,html.room .sk-dock{padding-inline:18px}
 html.room .lk-ph{display:none}
 html.room .sk-fine{display:none}
+
+.lk-views{display:flex;gap:6px;margin-top:10px}
+.lk-views button{width:44px;height:54px;padding:0;border:0;border-radius:7px;overflow:hidden;cursor:pointer;background:none;outline:2px solid transparent;outline-offset:1px;opacity:.75}
+.lk-views button:hover{opacity:1}
+.lk-views button[aria-pressed="true"]{outline-color:var(--accent);opacity:1}
+.lk-views img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block}

@@ -5823,3 +5823,11 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
   .studio-stage.has-board { height: auto; min-height: min(64svh, 600px); }
   .studio-stage.has-board .studio-board { position: relative; padding: 14px 12px 70px; overflow: visible; }
 }
+
+/* Styling Room: real shots on the view bar */
+.studio-tools button[aria-pressed="true"] { background: rgba(110, 27, 43, .12); }
+.studio-views { max-width: calc(100% - 28px); }
+.studio-views button { padding: 9px 13px; }
+@media (max-width: 1240px) { .studio-views { overflow-x: auto; scrollbar-width: none; } .studio-views button { padding: 9px 11px; gap: 6px; } }
+@media (max-width: 980px) { .studio-views { left: 10px; right: 10px; transform: none; justify-content: flex-start; } }
+@media (min-width: 981px) and (max-width: 1640px) { .studio-views svg { display: none; } .studio-views button { padding: 9px 13px; } }

@@ -300,6 +300,7 @@ function lookCard(L,key){
     <h4>${esc(s.name)}</h4>
     <p class="lk-tone">${esc(s.tone)} · ${esc(s.fabric)}</p>
     <p class="lk-why">${esc(L.why[0]||'')}</p>
+    <div class="lk-views" role="group" aria-label="More photos of this saree">${[['','Full view'],...[['close','Close-up'],['back','Back'],['pallu','Pallu'],['detail','The weave']]].map(([k,l],i)=>`<button data-lkview="${key}|${k}" aria-pressed="${i===0}" title="${l}" aria-label="${l}"><img src="img/${s.id}${k?'-'+k:''}.jpg" alt="" loading="lazy"></button>`).join('')}</div>
    </div>
    <div class="lk-rest">
     ${pieces?`<div class="lk-orn"><span>Styled with</span><div class="lk-pcs">${pieces}</div></div>`:''}
@@ -592,7 +593,7 @@ function renderBag(){
   if(!n){$('#bagItems').innerHTML='<div class="empty">Your bag is empty. Ask Sakhi for a look and add it here.</div>';$('#bagFoot').innerHTML='';return}
   $('#bagItems').innerHTML=bag.map((b,i)=>{const s=b.sid?S(b.sid):null;const img=s?`img/${s.id}.jpg`:`img/orn/${b.oid}-s.jpg`;const title=s?s.name+', '+s.tone:b.names[0];
     return `<div class="bi"><div><img src="${img}" alt=""></div><div><div class="t">${esc(title)}</div><div class="d">${esc((b.names||[]).join(', ')||'Saree only')}</div><div class="f"><span>${inr(b.total)}</span><button data-remove="${i}">Remove</button></div></div></div>`}).join('');
-  $('#bagFoot').innerHTML=`<div class="row total"><span>Subtotal</span><span>${inr(bag.reduce((a,b)=>a+b.total,0))}</span></div><button class="btn" style="width:100%;justify-content:center;margin-top:12px" data-checkout>Request this order →</button><p style="margin:8px 0 0;text-align:center;font-size:12px;color:var(--muted)">No payment now. We confirm on WhatsApp first.</p>`;
+  $('#bagFoot').innerHTML=`<div class="row total"><span>Subtotal</span><span>${inr(bag.reduce((a,b)=>a+b.total,0))}</span></div><button class="btn" style="width:100%;justify-content:center;margin-top:12px" data-checkout>Buy now →</button><p style="margin:8px 0 0;text-align:center;font-size:12px;color:var(--muted)">UPI, cards or cash on delivery. Ships in 24 hours.</p>`;
 }
 function openBag(o){$('#bag').hidden=!o;$('#scrim').hidden=!o}
 function notifyParent(){try{if(EMBED&&parent!==window)parent.postMessage({type:'sd-bag'},location.origin)}catch(e){}}
@@ -623,6 +624,8 @@ document.addEventListener('click',e=>{
     send(c);return}
   if(d.swap){const [key,slot]=d.swap.split('|');const L=looks[key];if(!L)return;const opts=SLOT_OPTS[slot];const next=opts[(opts.indexOf(L.sel[slot])+1)%opts.length];L.sel={...L.sel,[slot]:next};
     const card=b.closest('.lk');const tmp=document.createElement('div');tmp.innerHTML=lookCard(L,key);card.replaceWith(tmp.firstElementChild);if(ROOM)toStage(L);return}
+  if(d.lkview!==undefined){const [key,v]=d.lkview.split('|');const L=looks[key];if(!L)return;const card=b.closest('.lk');card.querySelectorAll('[data-lkview]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    if(ROOM){try{parent.postMessage({type:'sd-view',sid:L.s.id,sel:L.sel,view:v||'model'},location.origin)}catch(e){}}else{card.querySelector('.lk-ph img').src='img/'+L.s.id+(v?'-'+v:'')+'.jpg'}return}
   if(d.stage){toStage(looks[d.stage]);toast('On the stage');return}
   if(d.addlook){const L=looks[d.addlook],t=totals(L.s,L.sel);bag.push({sid:L.s.id,names:t.ids.map(id=>ORN[id][1]),total:t.total});store.set('sd-bag',bag);renderBag();if(ROOM){try{parent.postMessage({type:'sd-added'},location.origin)}catch(e){}}else{notifyParent();toast('Look added to your bag')}return}
   if(d.save){const L=looks[d.save],k=sig(L),i=saved.findIndex(x=>x.key===k);

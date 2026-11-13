@@ -60,11 +60,13 @@ var WORLDS = window.WORLDS = [
   {k:'festive', name:'Festive Kerala', line:'Kasavu and silk for Onam, Vishu, Thiruvathira and temple days.', tone:'#f2e9d0', trim:'#c79a2e'},
   {k:'celebrations', name:'Celebrations', line:'Deepavali, Christmas, Perunnal. Evening colour and stone borders.', tone:'#6c1536', trim:'#e0c27a'},
   {k:'parties', name:'Occasions & parties', line:'Receptions and guest wear, ready to drape in a lighter fabric.', tone:'#efb399', trim:'#fff1e6'},
-  {k:'everyday', name:'Everyday & office', line:'Handloom cotton and easy silk for long working days.', tone:'#cf9a22', trim:'#7a5412'}
+  {k:'everyday', name:'Everyday & office', line:'Cotton and easy silk for long working days.', tone:'#cf9a22', trim:'#7a5412'}
 ];
 
 var BRIDAL_FULL = window.BRIDAL_FULL = {necklace:'OR00003', bangles:'OR00005', earrings:'OR00008', ring:'OR00011', anklet:'OR00014', bracelet:'OR00016', waistband:'OR00020'};
-var HAS_DETAIL = window.HAS_DETAIL = ['SA00001', 'SA00002'];
+var HAS_DETAIL = window.HAS_DETAIL = ['SA00001', 'SA00002', 'SA00003', 'SA00004', 'SA00005', 'SA00006', 'SA00007', 'SA00008'];
+// Extra shots of each saree: img/<id>-<key>.jpg
+var SHOTS = window.SHOTS = [['close', 'Close-up'], ['back', 'Back'], ['pallu', 'Pallu'], ['detail', 'The weave']];
 var PAGES = window.PAGES = {bridal:'bridal.html', festive:'festive.html', celebrations:'celebrations.html', parties:'occasions.html', everyday:'everyday.html'};
 var WSID = window.WSID = {bridal:'SA00002', festive:'SA00007', celebrations:'SA00006', parties:'SA00003', everyday:'SA00005'};
 

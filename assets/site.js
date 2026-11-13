@@ -58,7 +58,7 @@
     return `
       <article class="card catalog-card">
         <div class="art">
-          <a class="art-link" href="styling-room.html?style=${s.id}" aria-label="Style ${s.name} in the atelier">
+          <a class="art-link" href="styling-room.html?style=${s.id}" aria-label="Style ${s.name} in the Styling Room">
             ${photo(s.id, `${s.name}, ${s.tone}, worn by a model`)}
             ${hasD ? photo(s.id + '-detail', `Weave detail of the ${s.name}`, 'alt') : ''}
           </a>
@@ -143,7 +143,7 @@
   }
 
   // --- Journey: saree -> ornaments -> bag -> order request ---
-  const JOURNEY = ['Saree', 'Ornaments', 'Bag', 'Request'];
+  const JOURNEY = ['Saree', 'Ornaments', 'Bag', 'Checkout'];
   function journey(at) {
     return `<ol class="sd-journey" aria-label="Your progress">${JOURNEY.map((n, i) =>
       `<li class="${i < at ? 'done' : i === at ? 'now' : ''}"${i === at ? ' aria-current="step"' : ''}><span aria-hidden="true">${i < at ? '✓' : i + 1}</span>${n}</li>`).join('')}</ol>`;
@@ -158,9 +158,9 @@
   }
   const LEAD_COPY = {
     hold: {
-      t: 'Hold this look for 48 hours?',
-      p: 'Handloom pieces are woven in small runs, so the one you picked may not be here tomorrow. Leave your WhatsApp number and we will set these pieces aside for you.',
-      b: 'Hold my look'
+      t: 'Keep this look handy?',
+      p: 'Leave your WhatsApp number and we will send you this look with its price, so you can come back to it or share it with family before you buy.',
+      b: 'Send it to me'
     },
     send: {
       t: 'Send this look to your WhatsApp',
@@ -211,7 +211,7 @@
       if (!/^[6-9]\d{9}$/.test(phone)) { $('#leadErr').hidden = false; ph.focus(); return; }
       setLead({ name: $('#leadName').value.trim(), phone, via: kind });
       closeLead(true);
-      toast(kind === 'send' ? `Look sent to +91 ${phone}` : 'Held for 48 hours. We will WhatsApp you.');
+      toast(kind === 'send' ? `Look sent to +91 ${phone}` : `Look sent to +91 ${phone}`);
     });
   }
   function closeLead(go) {
@@ -278,7 +278,7 @@
             </div>
           </div>`;
       }
-      const s = saree(b.sid) || { id: b.sid, name: 'Handloom Saree', tone: '' };
+      const s = saree(b.sid) || { id: b.sid, name: 'Saree', tone: '' };
       return `
         <div class="bi">
           <div><img src="img/${s.id}.jpg" alt="${s.name}"></div>
@@ -305,8 +305,8 @@
       footEl.innerHTML = `
         ${up}
         <div class="row total"><span>Subtotal</span><span>${inr(subtotal)}</span></div>
-        <button class="btn bag-go" data-checkout type="button">Request this order <span aria-hidden="true">→</span></button>
-        <p class="bag-fine">No payment now. We confirm on WhatsApp first.</p>`;
+        <button class="btn bag-go" data-checkout type="button">Buy now <span aria-hidden="true">→</span></button>
+        <p class="bag-fine">UPI, cards or cash on delivery. Ships in 24 hours.</p>`;
     }
   }
 
@@ -401,7 +401,7 @@
               <h4 class="profile-name">Priya Nair</h4>
               <span class="profile-phone">+91 98470 12345</span>
               <span class="profile-location">Kochi, Kerala</span>
-              <span class="profile-tier">Privilege Member · Silk Mark Verified</span>
+              <span class="profile-tier">Sopanam client</span>
             </div>
           </div>
           <div class="account-body">
@@ -431,7 +431,7 @@
       checkoutModal.innerHTML = `
         <div class="modal-box checkout-box">
           <div class="modal-head">
-            <h3 id="checkoutModalTitle">Request your order</h3>
+            <h3 id="checkoutModalTitle">Checkout</h3>
             <button class="ibtn modal-close" id="checkoutClose" aria-label="Close checkout">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
@@ -439,7 +439,7 @@
           <div id="coJourney"></div>
           <div class="checkout-body" id="checkoutBody">
             <form id="checkoutForm" class="checkout-form" onsubmit="return false;" novalidate>
-              <p class="co-lede">No payment now. A Sopanam stylist checks every piece, confirms your blouse and drape details on WhatsApp, then you pay.</p>
+              <p class="co-lede">In stock and ready to ship. Orders placed today leave our store within 24 hours.</p>
               <div class="checkout-step">
                 <h4>Your details</h4>
                 <div class="form-grid">
@@ -471,8 +471,13 @@
                 <div class="payment-methods">
                   <label class="payment-opt active">
                     <input type="radio" name="payMethod" value="upi" checked>
-                    <span class="pay-title">UPI link on WhatsApp</span>
-                    <span class="pay-desc">Sent once we confirm your order</span>
+                    <span class="pay-title">UPI</span>
+                    <span class="pay-desc">Google Pay, PhonePe, Paytm</span>
+                  </label>
+                  <label class="payment-opt">
+                    <input type="radio" name="payMethod" value="card">
+                    <span class="pay-title">Credit or debit card</span>
+                    <span class="pay-desc">Visa, Mastercard, RuPay</span>
                   </label>
                   <label class="payment-opt">
                     <input type="radio" name="payMethod" value="cod">
@@ -483,8 +488,8 @@
               </div>
               <div class="checkout-summary" id="checkoutSummary"></div>
               <div class="checkout-actions">
-                <button type="submit" class="btn" id="placeOrderBtn" style="width:100%;justify-content:center">Send order request <span aria-hidden="true">→</span></button>
-                <p class="co-fine">By sending, you agree to hear from us on WhatsApp about this order.</p>
+                <button type="submit" class="btn" id="placeOrderBtn" style="width:100%;justify-content:center">Pay now</button>
+                <p class="co-fine">Order updates are sent to your WhatsApp number.</p>
               </div>
             </form>
             <div class="order-confirmed" id="orderConfirmed" hidden></div>
@@ -695,7 +700,7 @@
                   <span style="font-weight:600;">${inr(item.total)}</span>
                 </div>`;
       }
-      const s = saree(item.sid) || { name: 'Handloom Saree', tone: '' };
+      const s = saree(item.sid) || { name: 'Saree', tone: '' };
       return `
               <div style="display:flex;align-items:center;gap:10px;">
                 <img src="img/${item.sid}.jpg" alt="" style="width:38px;height:48px;object-fit:cover;border:1px solid var(--line);border-radius:2px;">
@@ -741,11 +746,20 @@
       if (L.name && !$('#shipName').value) $('#shipName').value = L.name;
       if (L.phone && !$('#shipPhone').value) $('#shipPhone').value = L.phone;
       renderCheckoutSummary();
+      syncPayBtn();
       setTimeout(() => { const f = ['#shipName', '#shipPhone', '#shipPin', '#shipAddress'].map(x => $(x)).find(x => x && !x.value); if (f) f.focus(); }, 60);
     } else {
       modal.hidden = true;
       checkScrimState();
     }
+  }
+
+  function syncPayBtn() {
+    const b = $('#placeOrderBtn');
+    if (!b) return;
+    const m = ($('input[name="payMethod"]:checked') || {}).value;
+    const total = bag.reduce((a, x) => a + x.total, 0);
+    b.textContent = m === 'cod' ? `Place order · ${inr(total)}` : `Pay ${inr(total)}`;
   }
 
   function renderCheckoutSummary() {
@@ -787,7 +801,7 @@
         <span>FREE</span>
       </div>
       <div class="row total" style="display:flex;justify-content:space-between;padding-top:10px;border-top:1px dashed var(--line);margin-top:8px;font-size:18px;font-weight:700;">
-        <span>Total <small style="font-weight:400;font-size:12px;color:var(--muted)">pay after we confirm</small></span>
+        <span>Total <small style="font-weight:400;font-size:12px;color:var(--muted)">incl. all taxes</small></span>
         <span>${inr(subtotal)}</span>
       </div>`;
   }
@@ -832,7 +846,8 @@
     const checkedPay = $('input[name="payMethod"]:checked') || $('input[name="paymentMethod"]:checked');
     const payVal = checkedPay ? checkedPay.value : 'upi';
     const payMap = {
-      upi: 'UPI link on WhatsApp',
+      upi: 'UPI',
+      card: 'Credit or debit card',
       cod: 'Cash on delivery'
     };
     const paymentLabel = payMap[payVal] || payVal;
@@ -853,7 +868,7 @@
         pincode: pin,
         address: addr
       },
-      status: 'Requested',
+      status: 'Confirmed',
       needBy: ($('#shipBy') || {}).value || '',
       estDelivery: '4-6 business days'
     };
@@ -883,25 +898,25 @@
       const lines = orderItems.map(b => b.kind === 'orn'
         ? `• ${(ORN[b.oid] || [, 'Ornament'])[1]} (${inr(b.total)})`
         : `• ${(saree(b.sid) || { name: 'Saree' }).name}${b.names && b.names.length ? ' + ' + b.names.join(', ') : ''} (${inr(b.total)})`).join('\n');
-      const waText = `Hi Sopanam Drapes, I just sent order request ${orderId}.\n${lines}\nTotal: ${inr(total)}\nPayment: ${paymentLabel}\nName: ${name}, PIN ${pin}`;
+      const waText = `Hi Sopanam Drapes, I just placed order ${orderId}.\n${lines}\nTotal: ${inr(total)}\nPayment: ${paymentLabel}\nName: ${name}, PIN ${pin}`;
       confirmed.innerHTML = `
         <div class="checkmark-circle">✓</div>
-        <h2>Request sent</h2>
-        <p class="lead-confirm">Thank you, ${first}. Your pieces are set aside. A stylist will message you on WhatsApp at +91 ${phone} within 2 hours.</p>
+        <h2>Order placed</h2>
+        <p class="lead-confirm">Thank you, ${first}. ${payVal === 'cod' ? 'Your order is confirmed' : 'Payment received and your order is confirmed'}. Updates will come to +91 ${phone} on WhatsApp.</p>
         <div class="order-ref-pill">${orderId}</div>
         <ol class="co-next">
-          <li><b>Within 2 hours</b><span>We check each piece and confirm blouse size and drape with you on WhatsApp.</span></li>
-          <li><b>Payment</b><span>${payVal === 'cod' ? 'Pay in cash when your parcel arrives.' : 'We send a secure UPI link in the same chat.'}</span></li>
-          <li><b>Delivery</b><span>Packed by hand and delivered in 4–6 business days.</span></li>
+          <li><b>Today</b><span>Your pieces are checked and packed.</span></li>
+          <li><b>Within 24 hours</b><span>Your parcel leaves our store and we send the tracking link.</span></li>
+          <li><b>Delivery</b><span>At your door in 4–6 business days${payVal === 'cod' ? ', pay in cash on arrival' : ''}.</span></li>
         </ol>
         <div class="co-total"><span>${orderItems.length} ${orderItems.length === 1 ? 'item' : 'items'} · ${paymentLabel}</span><b>${inr(total)}</b></div>
         <div class="confirm-actions">
-          <a class="btn co-wa" href="https://wa.me/919847012345?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener noreferrer">Confirm on WhatsApp</a>
+          <a class="btn co-wa" href="https://wa.me/919847012345?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener noreferrer">Get updates on WhatsApp</a>
           <button class="btn ghost" id="viewInOrdersBtn" type="button">View my orders</button>
         </div>`;
     }
 
-    toast(`Request ${orderId} sent`);
+    toast(`Order ${orderId} placed`);
   }
 
   // --- 4. Look Builder Functionality (index.html) ---
@@ -974,17 +989,26 @@
     }
 
     // Stage photo, view switch and tools
-    const hasD = (HAS_DETAIL || []).includes(s.id);
-    if (homeState.view === 'detail' && !hasD) homeState.view = 'model';
+    const shots = window.SHOTS || [];
+    if (homeState.view !== 'model' && homeState.view !== 'look' && !shots.some(([k]) => k === homeState.view)) homeState.view = 'model';
     const view = homeState.view || 'model';
     const stageArtEl = $('#stageArt');
     if (stageArtEl) {
-      const key = s.id + (view === 'detail' ? '-d' : '');
+      const shot = view === 'look' ? (stageArtEl.dataset.shot || 'model') : view;
+      const key = s.id + '|' + shot;
       if (stageArtEl.dataset.key !== key) {
         stageArtEl.dataset.key = key;
-        stageArtEl.innerHTML = view === 'detail' ? photo(s.id + '-detail', `Weave detail of the ${s.name}`) : photo(s.id, `${s.name}, ${s.tone}, worn by a model`);
+        stageArtEl.dataset.shot = shot;
+        const lbl = (shots.find(([k]) => k === shot) || [])[1];
+        stageArtEl.innerHTML = shot === 'model' ? photo(s.id, `${s.name}, ${s.tone}, worn by a model`) : photo(s.id + '-' + shot, `${s.name}, ${s.tone}: ${lbl}`);
+        if (!stageArtEl.dataset.warm || stageArtEl.dataset.warm !== s.id) {
+          stageArtEl.dataset.warm = s.id;
+          shots.forEach(([k]) => { const im = new Image(); im.src = `img/${s.id}-${k}.jpg`; });
+        }
       }
-      stageArtEl.classList.toggle('is-close', view === 'close');
+      if (view === 'look' || stageArtEl.dataset.zkey !== key) homeState.zoom = false;
+      stageArtEl.dataset.zkey = key;
+      stageArtEl.classList.toggle('is-close', !!homeState.zoom);
       stageArtEl.classList.toggle('is-back', view === 'look');
     }
     // "Your look": everything chosen, laid out on the stage
@@ -1018,8 +1042,14 @@
     }
     const viewsEl = $('#views');
     if (viewsEl) {
-      const V = [['model', 'Full view', '<circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3"/>'], ['close', 'Close-up', '<path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="3"/>']];
-      if (hasD) V.push(['detail', 'The weave', '<path d="M4 8h16M4 12h16M4 16h16M8 4v16M12 4v16M16 4v16"/>']);
+      const IC = {
+        model: '<circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3"/>',
+        close: '<path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="3"/>',
+        back: '<path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-3"/>',
+        pallu: '<path d="M6 4h12v13l-3 3-3-3-3 3-3-3z"/><path d="M6 9h12"/>',
+        detail: '<path d="M4 8h16M4 12h16M4 16h16M8 4v16M12 4v16M16 4v16"/>'
+      };
+      const V = [['model', 'Full view', IC.model], ...shots.map(([k, l]) => [k, l, IC[k]])];
       V.push(['look', `Your look <i>${t.ids.length + 1}</i>`, '<path d="M5.5 8.5h13l-1 11h-11z"/><path d="M9 8.5V7a3 3 0 016 0v1.5"/>']);
       viewsEl.innerHTML = V.map(([k, l, ic]) => `<button data-view="${k}" aria-pressed="${view === k}" type="button"><svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>${l}</button>`).join('');
     }
@@ -1027,7 +1057,7 @@
     if (toolsEl) {
       const fs = !!document.fullscreenElement;
       toolsEl.innerHTML = `
-        <button data-view="${view === 'close' ? 'model' : 'close'}" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>${view === 'close' ? '<path d="M8.5 11h5"/>' : '<path d="M8.5 11h5M11 8.5v5"/>'}</svg>Zoom</button>
+        <button data-zoom aria-pressed="${!!homeState.zoom}" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>${homeState.zoom ? '<path d="M8.5 11h5"/>' : '<path d="M8.5 11h5M11 8.5v5"/>'}</svg>Zoom</button>
         <button data-wish="${s.id}" aria-pressed="${wish.has(s.id)}" type="button"><svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 15.6 12 20 12 20z"/></svg>Save</button>
         ${document.fullscreenEnabled ? `<button data-fullscreen type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>${fs ? 'Exit' : 'Fullscreen'}</button>` : ''}`;
     }
@@ -1139,7 +1169,7 @@
       const th = document.documentElement.dataset.theme;
       const f = document.createElement('iframe');
       f.title = 'Sakhi, your stylist';
-      f.src = 'stylist.html?embed=1&room=1&from=styling-room&v=20261114e' + (th ? '&theme=' + th : '');
+      f.src = 'stylist.html?embed=1&room=1&from=styling-room&v=20261114f' + (th ? '&theme=' + th : '');
       f.addEventListener('load', tellSakhi);
       pane.appendChild(f);
     }
@@ -1156,6 +1186,12 @@
       homeState.view = 'model';
       homeState.pickOpen = false;
       homeState.sel = { ...(e.data.sel || {}) };
+      renderBuilder();
+      if (innerWidth <= 980) $('#stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+    if (e.data.type === 'sd-view') {
+      if (saree(e.data.sid) && e.data.sid !== homeState.cur) { homeState.cur = e.data.sid; homeState.sel = { ...(e.data.sel || saree(e.data.sid).combo) }; }
+      homeState.view = e.data.view || 'model';
       renderBuilder();
       if (innerWidth <= 980) $('#stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
     }
@@ -1304,7 +1340,7 @@
 
     const plate = s => `
       <article class="saree-plate">
-        <div class="saree-plate-art" data-style="${s.id}" role="button" tabindex="0" aria-label="Style ${s.name} in the atelier">
+        <div class="saree-plate-art" data-style="${s.id}" role="button" tabindex="0" aria-label="Style ${s.name} in the Styling Room">
           ${photo(s.id, `${s.name}, ${s.tone}, worn by a model`)}
           ${(HAS_DETAIL || []).includes(s.id) ? photo(s.id + '-detail', `Weave detail of the ${s.name}`, 'alt') : ''}
           <div class="plate-hover-bar">
@@ -1506,7 +1542,7 @@
         </h4>
         <label class="filter-check">
           <input type="checkbox" id="ornSpecialOnly" ${subState.specialOnly ? 'checked' : ''}>
-          <span>Special atelier pricing</span>
+          <span>On offer</span>
         </label>
       </div>
       <div class="filter-group">
@@ -1620,7 +1656,7 @@
           }).join('');
       }
       if (lookTotal) {
-        lookTotal.innerHTML = (t.save ? `<div class="row save"><span>Atelier Privilege (10% on ornaments)</span><span>−${inr(t.save)}</span></div>` : '') +
+        lookTotal.innerHTML = (t.save ? `<div class="row save"><span>Look saving (10% on ornaments)</span><span>−${inr(t.save)}</span></div>` : '') +
           `<div class="row total"><span>Ensemble Total</span><span>${inr(t.total)}</span></div>`;
       }
       if (lookAdd) lookAdd.dataset.look = '1';
@@ -1795,6 +1831,7 @@
         radio.checked = true;
         $$('.payment-opt').forEach(opt => opt.classList.remove('active'));
         t.classList.add('active');
+        syncPayBtn();
       }
       return;
     }
@@ -1902,6 +1939,11 @@
     }
     if (t.dataset.ptab) {
       setPanelTab(t.dataset.ptab);
+      return;
+    }
+    if ('zoom' in t.dataset) {
+      homeState.zoom = !homeState.zoom;
+      renderBuilder();
       return;
     }
     if ('pickopen' in t.dataset) {
