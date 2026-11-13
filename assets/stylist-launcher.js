@@ -2,7 +2,7 @@
 (function(){
   var page=(location.pathname.split('/').pop()||'index.html').replace('.html','')||'index';
   var lines={bridal:'Style my bridal look',festive:'Style my Onam look',celebrations:'Style my festive look',occasions:'Style my party look',everyday:'Style my office look',ornaments:'Help me pick ornaments'};
-  var css=document.createElement('link');css.rel='stylesheet';css.href='assets/stylist.css';document.head.appendChild(css);
+  var css=document.createElement('link');css.rel='stylesheet';css.href='assets/stylist-launcher.css';document.head.appendChild(css);
   // add Stylist to the main nav
   var nav=document.getElementById('mainNav');
   if(nav&&!nav.querySelector('a[href="stylist.html"]')){var a=document.createElement('a');a.href='stylist.html';a.textContent='Stylist';nav.appendChild(a)}

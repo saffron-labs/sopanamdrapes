@@ -3396,6 +3396,8 @@ footer,
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: sticky;
+  top: 96px;
 }
 
 .studio-art-wrap {
@@ -3486,6 +3488,8 @@ footer,
   flex-direction: column;
   align-items: flex-start;
   gap: 14px;
+  position: sticky;
+  top: 96px;
 }
 
 .studio-copy h2 {
@@ -3601,7 +3605,25 @@ footer,
 .studio-slots {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
+  max-height: 530px;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--zari) transparent;
+}
+
+.studio-slots::-webkit-scrollbar {
+  width: 4px;
+}
+
+.studio-slots::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.studio-slots::-webkit-scrollbar-thumb {
+  background: var(--zari);
+  border-radius: 4px;
 }
 
 .studio-slot.is-hidden {
@@ -3647,36 +3669,46 @@ footer,
 }
 
 .studio-opts.opts {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
 }
 
 .studio-opt.opt {
-  background: transparent;
-  border: 0;
-  padding: 0;
-  min-height: 0;
-  border-radius: 0;
-  align-items: center;
-  text-align: center;
-  gap: 5px;
-  box-shadow: none;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  border-radius: 0 !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 4px !important;
+  box-shadow: none !important;
 }
 
 .studio-opt.opt:hover {
   transform: translateY(-2px);
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .opt-img-box {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
+  max-height: 96px;
   background: #fffdf8;
-  border: 1px solid rgba(197, 155, 63, 0.25);
+  border: 1px solid rgba(197, 155, 63, 0.28);
   overflow: hidden;
-  padding: 4px;
+  padding: 5px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 2px;
+  box-sizing: border-box;
 }
 
 [data-theme="dark"] .opt-img-box {
@@ -3687,20 +3719,20 @@ footer,
   width: 100%;
   height: 100%;
   aspect-ratio: auto;
-  object-fit: cover;
+  object-fit: contain;
   border: 0;
   margin: 0;
   border-radius: 0;
 }
 
 .studio-opt.opt[aria-pressed="true"] {
-  background: transparent;
-  box-shadow: none;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .studio-opt.opt[aria-pressed="true"] .opt-img-box {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
+  box-shadow: 0 0 0 1.5px var(--accent);
 }
 
 .studio-opt.opt[aria-pressed="true"]::after {
@@ -3727,6 +3759,10 @@ footer,
 }
 
 /* Zone 4: Framed Vertical "Your Look" Summary Card */
+.studio-summary {
+  position: sticky;
+  top: 96px;
+}
 .studio-look-card.totals {
   margin-top: 0;
   padding: 18px 16px 18px;

@@ -29,25 +29,25 @@ body.sk-page{overflow:hidden}
 @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* question steps */
-.step{max-width:680px;padding-left:16px;border-left:1px solid var(--zari)}
-.step h3{font-size:22px;margin-bottom:4px}
-.step .q-note{font-size:13px;color:var(--muted);margin-bottom:14px}
-.opts{display:flex;flex-wrap:wrap;gap:8px}
-.opt{background:var(--surface);border:1px solid var(--line);padding:10px 14px;font-size:14px;border-radius:2px;text-align:left;line-height:1.3}
-.opt small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
-.opt:hover{border-color:var(--ink)}
-.opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.opt.link{border-color:transparent;background:none;text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
-.tones{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;max-width:520px}
-.tone{background:none;border:1px solid var(--line);padding:6px 6px 8px;border-radius:2px;font-size:12px}
-.tone span{display:block;aspect-ratio:1;margin-bottom:6px;border:1px solid rgba(0,0,0,.08)}
-.tone:hover{border-color:var(--ink)}
-.tone[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.height{max-width:460px}
-.height output{display:block;font-family:var(--display);font-size:34px;line-height:1;margin-bottom:8px;font-variant-numeric:tabular-nums}
-.height input{width:100%;accent-color:var(--accent)}
-.height .scale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:2px}
-.step .row-act{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.sk .step, .sk-chat .step{max-width:680px;padding-left:16px;border-left:1px solid var(--zari)}
+.sk .step h3, .sk-chat .step h3{font-size:22px;margin-bottom:4px}
+.sk .step .q-note, .sk-chat .step .q-note{font-size:13px;color:var(--muted);margin-bottom:14px}
+.sk .opts, .sk-chat .opts{display:flex;flex-wrap:wrap;gap:8px}
+.sk .opt, .sk-chat .opt{background:var(--surface);border:1px solid var(--line);padding:10px 14px;font-size:14px;border-radius:2px;text-align:left;line-height:1.3}
+.sk .opt small, .sk-chat .opt small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.sk .opt:hover, .sk-chat .opt:hover{border-color:var(--ink)}
+.sk .opt[aria-pressed="true"], .sk-chat .opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.sk .opt.link, .sk-chat .opt.link{border-color:transparent;background:none;text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
+.sk .tones, .sk-chat .tones{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;max-width:520px}
+.sk .tone, .sk-chat .tone{background:none;border:1px solid var(--line);padding:6px 6px 8px;border-radius:2px;font-size:12px}
+.sk .tone span, .sk-chat .tone span{display:block;aspect-ratio:1;margin-bottom:6px;border:1px solid rgba(0,0,0,.08)}
+.sk .tone:hover, .sk-chat .tone:hover{border-color:var(--ink)}
+.sk .tone[aria-pressed="true"], .sk-chat .tone[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.sk .height, .sk-chat .height{max-width:460px}
+.sk .height output, .sk-chat .height output{display:block;font-family:var(--display);font-size:34px;line-height:1;margin-bottom:8px;font-variant-numeric:tabular-nums}
+.sk .height input, .sk-chat .height input{width:100%;accent-color:var(--accent)}
+.sk .height .scale, .sk-chat .height .scale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:2px}
+.sk .step .row-act, .sk-chat .step .row-act{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
 
 /* look cards: a lookbook spread, not a product tile */
 .looks{display:flex;flex-direction:column;gap:18px;max-width:880px}
