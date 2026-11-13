@@ -940,24 +940,6 @@
     }
   }
 
-  // Heritage film: silent loop that only loads and plays while on screen
-  function initHeritageFilm() {
-    const v = $('#heritageVideo');
-    const btn = $('#heritagePlay');
-    if (!v) return;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      if (btn) { btn.textContent = 'Play film'; btn.setAttribute('aria-pressed', 'true'); }
-      return;
-    }
-    if (!('IntersectionObserver' in window)) { v.preload = 'auto'; v.play().catch(() => {}); return; }
-    new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && !v.dataset.userPaused) v.play().catch(() => {});
-      else if (!e.isIntersecting) v.pause();
-    }, { threshold: 0.25 }).observe(v);
-  }
-  document.addEventListener('DOMContentLoaded', initHeritageFilm);
-  if (document.readyState !== 'loading') initHeritageFilm();
-
   // --- Home Page Category Grid & Chips ---
   function renderWorlds() {
     const grid = $('#worldGrid');
@@ -1128,7 +1110,7 @@
       ornaments: 'kurta'
     };
     const excludeKey = pageKeyMap[key] || key;
-    const list = houseEdits.filter(c => c.k !== excludeKey).slice(0, 4);
+    const list = houseEdits.filter(c => c.k !== excludeKey);
     editsEl.innerHTML = list.map(c => `
       <a class="house-popout-card" href="${c.href}" aria-label="${c.name} ${c.sub}">
         <div class="house-popout-art">
@@ -1553,16 +1535,6 @@
     if (t.dataset.scroll) {
       const el = $('#' + t.dataset.scroll);
       if (el) el.scrollBy({ left: Number(t.dataset.dir) * el.clientWidth * 0.8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-      return;
-    }
-    if (t.id === 'heritagePlay') {
-      const v = $('#heritageVideo');
-      if (v) {
-        v.dataset.userPaused = v.paused ? '' : '1';
-        if (v.paused) v.play().catch(() => {}); else v.pause();
-        t.textContent = v.paused ? 'Play film' : 'Pause film';
-        t.setAttribute('aria-pressed', v.paused);
-      }
       return;
     }
     if (t.id === 'reelToggle') {

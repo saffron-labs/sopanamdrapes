@@ -5400,26 +5400,6 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
 #worldGrid.house-edit-grid { padding-top: 0; margin-top: 4px; }
 @media (max-width: 1400px) { #worldGrid.house-edit-grid { padding-top: 6px; } }
 
-/* Home · heritage film (silent looping b-roll in place of photo + text) */
-#heritage.heritage-film { position: relative; padding: 0; background: #120a08; overflow: hidden; }
-.heritage-video { display: block; width: 100%; aspect-ratio: 1280 / 568; max-height: 86vh; object-fit: cover; }
-.heritage-play {
-  position: absolute; right: clamp(14px, 2vw, 28px); bottom: clamp(14px, 2vw, 24px);
-  background: rgba(18, 10, 8, .55); color: #fbf6ec; border: 1px solid rgba(251, 246, 236, .35);
-  border-radius: 999px; padding: 7px 16px; font: 500 11px var(--body); letter-spacing: .16em; text-transform: uppercase;
-  cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-}
-.heritage-play:hover { background: rgba(18, 10, 8, .75); }
-.heritage-play:focus-visible { outline: 2px solid var(--zari); outline-offset: 3px; }
-@media (max-width: 700px) { .heritage-video { aspect-ratio: 4 / 3; } }
-.heritage-proto {
-  position: absolute; left: clamp(14px, 2vw, 28px); top: clamp(14px, 2vw, 24px); margin: 0;
-  background: rgba(18, 10, 8, .62); color: #fbf6ec; border: 1px dashed rgba(251, 246, 236, .5);
-  padding: 7px 14px; border-radius: 4px; font: 500 12px var(--body); letter-spacing: .04em;
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); max-width: calc(100% - 28px);
-}
-.heritage-proto b { text-transform: uppercase; letter-spacing: .16em; color: var(--zari-light, #e9c98a); margin-right: 4px; }
-
 /* Inner-page heroes: same height as the home hero. The photos are made at
    2048×720 (the home hero's shape), so on desktop the box keeps that ratio
    and nothing is cropped; very narrow laptops keep a 440px minimum. */
@@ -5427,3 +5407,40 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
   .banner.banner-short .slide picture { height: auto; aspect-ratio: 2048 / 720; min-height: 440px; max-height: 680px; }
   .banner.banner-short .slide img { object-position: 50% 40%; }
 }
+
+/* ==========================================================================
+   Use the full width on large screens (was a 1200px centred column).
+   Content column grows to 1680px; grids add columns instead of
+   stretching four big cards.
+   ========================================================================== */
+.wrap { max-width: min(1680px, calc(100vw - 2 * clamp(16px, 3vw, 56px))); }
+
+@media (min-width: 1024px) {
+  .catalog-main .catalog-grid.grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 24px 18px; }
+}
+.grid.orn, #picks { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+#more.catalog-grid.grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+
+/* Other chapters: all the other pop-out cards on one row */
+.edits { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); align-items: end; }
+
+/* Look card: let the photo grow with the wider column */
+.look { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 4vw, 72px); }
+.look .art { max-width: 620px; }
+
+/* Celebrations / festive rows: keep cards from getting huge, add breathing room */
+@media (min-width: 1500px) {
+  .celeb-row { gap: 24px; }
+  .festive-occ-row, .moodboard-row { gap: 24px; }
+}
+
+/* Inner pages: "Jewellery in this set" and "More to wear with it" share one row
+   on wide screens instead of each leaving the right half empty. */
+@media (min-width: 1100px) {
+  .pair-row { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(32px, 4vw, 72px); align-items: start; }
+  .pair-row > section { min-width: 0; }
+  .pair-row > section + section { border-top: 0; }
+  .pair-row .catalog-grid.grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+/* Other chapters: cards stretch to fill the row */
+.edits { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
