@@ -5412,3 +5412,10 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
 .heritage-play:hover { background: rgba(18, 10, 8, .75); }
 .heritage-play:focus-visible { outline: 2px solid var(--zari); outline-offset: 3px; }
 @media (max-width: 700px) { .heritage-video { aspect-ratio: 4 / 3; } }
+.heritage-proto {
+  position: absolute; left: clamp(14px, 2vw, 28px); top: clamp(14px, 2vw, 24px); margin: 0;
+  background: rgba(18, 10, 8, .62); color: #fbf6ec; border: 1px dashed rgba(251, 246, 236, .5);
+  padding: 7px 14px; border-radius: 4px; font: 500 12px var(--body); letter-spacing: .04em;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); max-width: calc(100% - 28px);
+}
+.heritage-proto b { text-transform: uppercase; letter-spacing: .16em; color: var(--zari-light, #e9c98a); margin-right: 4px; }
