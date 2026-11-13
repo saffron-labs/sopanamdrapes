@@ -929,6 +929,15 @@
     return { ids, sum, save, total: (s ? s.eff : 0) + sum - save };
   }
 
+  const ROOM_ICONS = {
+    necklace: '<path d="M5 4c0 6 3 10 7 10s7-4 7-10"/><path d="M12 14v2.5"/><path d="M12 16.5l2 2.2-2 2.3-2-2.3z"/>',
+    bangles: '<ellipse cx="9.5" cy="12" rx="5.5" ry="7"/><ellipse cx="14.5" cy="12" rx="5.5" ry="7"/>',
+    earrings: '<path d="M8 3.5a2.5 2.5 0 1 1 0 5"/><path d="M8 8.5v2"/><path d="M8 10.5c-2 2.5-3 4.3-3 6a3 3 0 0 0 6 0c0-1.7-1-3.5-3-6z"/><path d="M17 5.5v3"/><circle cx="17" cy="11" r="2.5"/>',
+    ring: '<circle cx="12" cy="15" r="5.5"/><path d="M9.5 6.5h5l1.5 2-4 3-4-3z"/>',
+    more: '<path d="M12 4l1.8 5.2L19 11l-5.2 1.8L12 18l-1.8-5.2L5 11l5.2-1.8z"/>'
+  };
+  const roomIcon = k => `<svg viewBox="0 0 24 24" aria-hidden="true">${ROOM_ICONS[k]}</svg>`;
+
   function renderBuilder() {
     const builderEl = $('#builder');
     if (!builderEl) return;
@@ -936,54 +945,63 @@
     if (!s) return;
 
     const CHECK = '<span class="room-check" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></span>';
+    const label = Object.fromEntries(SLOTS);
+    const t = ornTotalsHome();
 
-    // 1. Saree carousel
-    const pickerEl = $('#picker');
-    if (pickerEl) {
-      const keep = pickerEl.scrollLeft;
-      pickerEl.innerHTML = SAREES.map(x => `
-        <button class="room-saree" data-pick="${x.id}" aria-pressed="${x.id === homeState.cur}" type="button">
-          <span class="room-saree-img">${photo(x.id, '')}${x.id === homeState.cur ? CHECK : ''}</span>
-          <span class="room-saree-n">${x.name}</span>
-          <span class="room-saree-t">${x.tone}</span>
-        </button>`).join('');
-      pickerEl.scrollLeft = keep;
-      if (pickerEl.dataset.cur !== homeState.cur) {
-        pickerEl.dataset.cur = homeState.cur;
-        const on = pickerEl.querySelector('[aria-pressed="true"]');
-        if (on) {
-          const pr = pickerEl.getBoundingClientRect(), r = on.getBoundingClientRect();
-          if (r.left < pr.left || r.right > pr.right) pickerEl.scrollLeft += r.left - pr.left - 4;
-        }
-      }
+    // Ambient backdrop picks up the saree's colour
+    const amb = $('#studioAmb');
+    if (amb && amb.dataset.cur !== s.id) {
+      amb.dataset.cur = s.id;
+      amb.style.backgroundImage = `url(img/${s.id}.jpg)`;
     }
 
-    // Big photo + thumbnail column
+    // 1. Saree: the chosen one, with the rest a tap away
+    const pickerEl = $('#picker');
+    if (pickerEl) {
+      const open = !!homeState.pickOpen;
+      pickerEl.innerHTML = `
+        <button class="studio-saree" data-pickopen aria-expanded="${open}" type="button">
+          ${photo(s.id, '')}
+          <span><b>${s.name}</b><i>${s.tone}</i><em>${inr(s.eff)}${s.disc ? ` <s>${inr(s.mrp)}</s>` : ''}</em></span>
+          <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <div class="studio-saree-list" ${open ? '' : 'hidden'}>
+          ${SAREES.filter(x => x.id !== s.id).map(x => `
+          <button class="studio-saree-opt" data-pick="${x.id}" type="button">
+            ${photo(x.id, '')}<span><b>${x.name}</b><i>${x.tone}</i></span><em>${inr(x.eff)}</em>
+          </button>`).join('')}
+        </div>`;
+    }
+
+    // Stage photo, view switch and tools
     const hasD = (HAS_DETAIL || []).includes(s.id);
-    const isDetail = hasD && homeState.view === 'detail';
+    if (homeState.view === 'detail' && !hasD) homeState.view = 'model';
+    const view = homeState.view || 'model';
     const stageArtEl = $('#stageArt');
     if (stageArtEl) {
-      stageArtEl.innerHTML = (isDetail ? photo(s.id + '-detail', `Weave detail of the ${s.name}`) : photo(s.id, `${s.name}, ${s.tone}, worn by a model`))
-        + `<div class="room-photo-tabs">${hasD ? `<button class="room-ptab" data-view="model" aria-pressed="${!isDetail}" type="button">On the model</button><button class="room-ptab" data-view="detail" aria-pressed="${isDetail}" type="button">The weave</button>` : ''}</div>`;
+      const key = s.id + (view === 'detail' ? '-d' : '');
+      if (stageArtEl.dataset.key !== key) {
+        stageArtEl.dataset.key = key;
+        stageArtEl.innerHTML = view === 'detail' ? photo(s.id + '-detail', `Weave detail of the ${s.name}`) : photo(s.id, `${s.name}, ${s.tone}, worn by a model`);
+      }
+      stageArtEl.classList.toggle('is-close', view === 'close');
     }
     const viewsEl = $('#views');
     if (viewsEl) {
-      viewsEl.innerHTML = `
-        <button class="room-thumb" data-view="model" aria-pressed="${!isDetail}" aria-label="On the model" type="button">${photo(s.id, '')}</button>
-        ${hasD ? `<button class="room-thumb" data-view="detail" aria-pressed="${isDetail}" aria-label="The weave, close up" type="button">${photo(s.id + '-detail', '')}</button>` : ''}`;
+      const V = [['model', 'Full view', '<circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3"/>'], ['close', 'Close-up', '<path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="3"/>']];
+      if (hasD) V.push(['detail', 'The weave', '<path d="M4 8h16M4 12h16M4 16h16M8 4v16M12 4v16M16 4v16"/>']);
+      viewsEl.innerHTML = V.map(([k, l, ic]) => `<button data-view="${k}" aria-pressed="${view === k}" type="button"><svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>${l}</button>`).join('');
+    }
+    const toolsEl = $('#stageTools');
+    if (toolsEl) {
+      const fs = !!document.fullscreenElement;
+      toolsEl.innerHTML = `
+        <button data-view="${view === 'close' ? 'model' : 'close'}" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>${view === 'close' ? '<path d="M8.5 11h5"/>' : '<path d="M8.5 11h5M11 8.5v5"/>'}</svg>Zoom</button>
+        <button data-wish="${s.id}" aria-pressed="${wish.has(s.id)}" type="button"><svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 15.6 12 20 12 20z"/></svg>Save</button>
+        ${document.fullscreenEnabled ? `<button data-fullscreen type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>${fs ? 'Exit' : 'Fullscreen'}</button>` : ''}`;
     }
 
-    // Pairing shortcuts
-    const setsEl = $('#sets');
-    if (setsEl) {
-      const selStr = JSON.stringify(Object.entries(homeState.sel || {}).filter(([, v]) => v).sort());
-      const eq = obj => JSON.stringify(Object.entries(obj || {}).filter(([, v]) => v).sort()) === selStr;
-      const isNone = Object.keys(homeState.sel || {}).filter(k => homeState.sel[k]).length === 0;
-      setsEl.innerHTML = [['default', 'Our pairing', eq(s.combo)], ['bridal', 'Full bridal', eq(BRIDAL_FULL)], ['none', 'Saree only', isNone]]
-        .map(([k, l, on]) => `<button class="room-set" data-set="${k}" aria-pressed="${on}" type="button">${l}</button>`).join('');
-    }
-
-    // Ornament tabs: one per main piece, the rest under More
+    // 2. Ornament types
     const TABS = [['necklace', 'Necklaces', ['necklace']], ['bangles', 'Bangles', ['bangles']], ['earrings', 'Earrings', ['earrings']], ['ring', 'Rings', ['ring']], ['more', 'More', ['anklet', 'bracelet', 'waistband']]];
     if (!TABS.some(([k]) => k === homeState.slotGroup)) homeState.slotGroup = 'necklace';
     const tab = TABS.find(([k]) => k === homeState.slotGroup);
@@ -991,44 +1009,80 @@
     if (slotTabsEl) {
       slotTabsEl.innerHTML = TABS.map(([k, l, ks]) => {
         const n = ks.filter(x => homeState.sel[x]).length;
-        return `<button class="room-tab" data-slot-group="${k}" aria-pressed="${k === homeState.slotGroup}" type="button">${l}${n ? `<i>${n}</i>` : ''}</button>`;
+        return `<button class="studio-chip" data-slot-group="${k}" aria-pressed="${k === homeState.slotGroup}" type="button">${roomIcon(k)}${l}${n ? `<i>${n}</i>` : ''}</button>`;
       }).join('');
     }
 
-    // Ornament carousel
+    // 3. What's in the look
+    const lookEl = $('#lookList');
+    if (lookEl) {
+      const slotOf = id => Object.keys(homeState.sel).find(k => homeState.sel[k] === id);
+      lookEl.innerHTML = `
+        <li><img src="img/${s.id}.jpg" alt=""><span><b>${s.name}</b>${inr(s.eff)}</span></li>
+        ${t.ids.map(id => `<li><img src="img/orn/${id}-s.jpg" alt=""><span><b>${ORN[id][1]}</b>${inr(ORN[id][3])}</span><button data-clear-slot="${slotOf(id)}" type="button" aria-label="Remove ${ORN[id][1]}">×</button></li>`).join('')}
+        ${t.ids.length ? '' : '<li class="hint">No ornaments yet. Pick a type above, or try a suggestion.</li>'}`;
+    }
+    const sideFoot = $('#sideFoot');
+    if (sideFoot) {
+      sideFoot.innerHTML = `
+        <button class="btn studio-save" data-wish="${s.id}" aria-pressed="${wish.has(s.id)}" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg><span class="off">Save look</span><span class="on">Look saved</span></button>
+        <button class="studio-share" data-sendlook type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.2"/><circle cx="17" cy="6" r="2.2"/><circle cx="17" cy="18" r="2.2"/><path d="M8 11l7-4M8 13l7 4"/></svg>Send look to WhatsApp</button>`;
+    }
+
+    // Style suggestions: three curated looks for this saree
+    const setsEl = $('#sets');
+    if (setsEl) {
+      const norm = o => JSON.stringify(Object.entries(o || {}).filter(([, v]) => v).sort());
+      const cur = norm(homeState.sel);
+      const light = { earrings: s.combo.earrings || 'OR00009' };
+      const LOOKS = [
+        ['default', 'Classic pairing', 'Chosen for this saree', s.combo],
+        ['light', 'Light touch', 'Earrings only', light],
+        ['bridal', 'Full bridal', 'Necklace to waistband', BRIDAL_FULL]
+      ];
+      setsEl.innerHTML = LOOKS.map(([k, n, d, sel]) => {
+        const x = lookTotals(s, sel), on = norm(sel) === cur;
+        const pics = x.ids.slice(0, 3);
+        return `
+        <button class="studio-lookcard" data-set="${k}" aria-pressed="${on}" type="button">
+          <span class="lc-art">${photo(s.id, '')}<span class="lc-orn">${pics.map(id => `<img src="img/orn/${id}-s.jpg" alt="" loading="lazy">`).join('')}</span>${on ? CHECK : ''}</span>
+          <b>${n}</b><i>${d}</i><em>${inr(x.total)}</em>
+        </button>`;
+      }).join('');
+    }
+
+    // Ornaments for the chosen type
     const slotsEl = $('#slots');
     if (slotsEl) {
-      const label = Object.fromEntries(SLOTS);
+      const tt = $('#touchTitle'), ts = $('#touchSub');
+      if (tt) tt.textContent = tab[0] === 'more' ? 'Anklets, bracelets and waistbands' : tab[1];
+      if (ts) ts.textContent = t.ids.length >= 2 ? '10% off your ornaments is applied' : 'Two or more ornaments take 10% off';
+      const grp = slotsEl.dataset.grp !== tab[0];
+      slotsEl.dataset.grp = tab[0];
       slotsEl.innerHTML = tab[2].flatMap(k => (OPTS[k] || []).map(id => {
         const o = ORN[id], on = homeState.sel[k] === id;
         return `
-        <button class="room-orn" data-slot="${k}" data-id="${id}" aria-pressed="${on}" type="button" aria-label="${on ? 'Remove' : 'Add'} ${o[1]}, ${inr(o[3])}">
-          <span class="room-orn-img"><img src="img/orn/${id}-s.jpg" alt="" width="240" height="160" loading="lazy">${on ? CHECK : ''}${tab[0] === 'more' ? `<em>${label[k]}</em>` : ''}</span>
-          <span class="room-orn-n">${o[1]}</span>
-          <span class="room-orn-f"><span class="room-orn-p">${inr(o[3])}${o[3] < o[2] ? ` <s>${inr(o[2])}</s>` : ''}</span><span class="room-orn-a">${on ? 'In your look' : 'Add to look <b>+</b>'}</span></span>
+        <button class="studio-orn" data-slot="${k}" data-id="${id}" aria-pressed="${on}" type="button" aria-label="${on ? 'Remove' : 'Add'} ${o[1]}, ${inr(o[3])}">
+          <span class="so-img"><img src="img/orn/${id}-s.jpg" alt="" width="240" height="160" loading="lazy">${on ? CHECK : '<span class="so-plus" aria-hidden="true">+</span>'}${tab[0] === 'more' ? `<em>${label[k]}</em>` : ''}</span>
+          <b>${o[1]}</b>
+          <i>${inr(o[3])}${o[3] < o[2] ? ` <s>${inr(o[2])}</s>` : ''}</i>
         </button>`;
       })).join('');
-      slotsEl.scrollLeft = 0;
+      if (grp) slotsEl.scrollLeft = 0;
     }
 
-    // Composed look summary
-    const t = ornTotalsHome();
+    // Total and the way forward
     const totalsEl = $('#totals');
     if (totalsEl) {
-      const items = [[s.id, s.name, s.eff, `img/${s.id}.jpg`], ...t.ids.map(id => [id, ORN[id][1], ORN[id][3], `img/orn/${id}-s.jpg`])];
       const mrpSave = (s.mrp - s.eff) + t.ids.reduce((a, id) => a + Math.max(0, ORN[id][2] - ORN[id][3]), 0);
       const saving = t.save + mrpSave;
+      const n = t.ids.length + 1;
       totalsEl.innerHTML = `
-        <div class="room-sum-row">
-          <div class="room-sum-items">
-            <span class="room-sum-k">Your composed look</span>
-            <div class="room-sum-list">${items.map(([id, n, p, img], i) => `${i ? '<span class="room-plus" aria-hidden="true">+</span>' : ''}<span class="room-item"><img src="${img}" alt="" loading="lazy"><span><b>${n}</b>${inr(p)}</span></span>`).join('')}</div>
-          </div>
-          <div class="room-sum-save"><span>Ensemble savings</span><b>${saving ? '−' + inr(saving) : '—'}</b>${!t.save ? `<small>${t.ids.length === 1 ? 'Add one more ornament for 10% off' : 'Two or more ornaments: 10% off'}</small>` : ''}</div>
-          <div class="room-sum-total"><span>Total</span><b>${inr(t.total)}</b></div>
+        <div class="st-row">
+          <span>${n} ${n === 1 ? 'piece' : 'pieces'}${saving ? `<small>You save ${inr(saving)}</small>` : ''}</span>
+          <b>${inr(t.total)}</b>
         </div>
-        <button class="btn room-add" data-add type="button">Add complete look to bag <span aria-hidden="true">→</span></button>
-        <button class="room-send" data-sendlook type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.6 17.2L2.5 21.5l4.4-1.1A11 11 0 1 0 20.5 3.5Zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-2.6.7.7-2.5-.2-.3A9 9 0 1 1 12 20.5Z" fill="currentColor"/></svg>Not ready yet? Send this look to your WhatsApp</button>`;
+        <button class="btn room-add" data-add type="button">Add look to bag</button>`;
     }
 
     // Mobile Action Bar
@@ -1773,7 +1827,19 @@
       renderBuilder();
       return;
     }
+    if ('pickopen' in t.dataset) {
+      homeState.pickOpen = !homeState.pickOpen;
+      renderBuilder();
+      return;
+    }
+    if ('fullscreen' in t.dataset) {
+      const st = $('#stage');
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (st && st.requestFullscreen) st.requestFullscreen().catch(() => { });
+      return;
+    }
     if (t.dataset.pick) {
+      homeState.pickOpen = false;
       homeState.cur = t.dataset.pick;
       homeState.view = 'model';
       homeState.sel = { ...(saree(homeState.cur) || {}).combo };
@@ -1793,6 +1859,9 @@
       return;
     }
 
+    if (t.id === 'filterToggle') { toggleFilters(!document.body.classList.contains('filters-open')); return; }
+    if (t.id === 'filterApply') { toggleFilters(false); return; }
+
     // Wishlist toggle across cards
     if (t.dataset.wish) {
       const id = t.dataset.wish;
@@ -1805,6 +1874,7 @@
       }
       saveWish();
       $$(`[data-wish="${id}"]`).forEach(btn => btn.setAttribute('aria-pressed', wish.has(id)));
+      if (wish.has(id) && t.classList.contains('studio-save') && !getLead()) openLead('send');
       return;
     }
 
@@ -1890,6 +1960,7 @@
     if (e.key === 'Escape') {
       const lm = $('#leadModal');
       if (lm && !lm.hidden) { closeLead(true); return; }
+      if (document.body.classList.contains('filters-open')) { toggleFilters(false); return; }
       closeAllModals();
     }
     if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('saree-plate-art') && e.target.dataset.style) {
@@ -1960,6 +2031,14 @@
     }
   });
 
+  function toggleFilters(open) {
+    document.body.classList.toggle('filters-open', open);
+    const b = $('#filterToggle');
+    if (b) b.setAttribute('aria-expanded', open);
+    if (open) { const f = $('.filter-panel input, .filter-panel button'); if (f) f.focus({ preventScroll: true }); }
+    else if (b) b.focus({ preventScroll: true });
+  }
+
   function syncHeaderScroll() {
     const hdr = $('header');
     if (!hdr) return;
@@ -1979,6 +2058,18 @@
     if (/[?&]checkout=1/.test(location.search)) {
       try { history.replaceState(null, '', location.pathname); } catch (e) { }
       if (bag.length) setTimeout(() => openCheckout(true), 80);
+    }
+
+    // Filters live behind a button on phones and tablets
+    const fp = $('.filter-panel'), cc = $('.catalog-controls');
+    if (fp && cc && !$('#filterToggle')) {
+      cc.insertAdjacentHTML('afterbegin', '<button class="filter-toggle" id="filterToggle" type="button" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Filters</button>');
+      fp.insertAdjacentHTML('beforeend', '<button class="btn filter-apply" id="filterApply" type="button">Show results</button>');
+      const bd = document.createElement('div');
+      bd.className = 'filter-backdrop';
+      bd.id = 'filterBackdrop';
+      document.body.appendChild(bd);
+      bd.addEventListener('click', () => toggleFilters(false));
     }
 
     // Check if on subpage or home page
@@ -2046,4 +2137,5 @@
   } else {
     initPage();
   }
+  document.addEventListener('fullscreenchange', () => renderBuilder());
 })();

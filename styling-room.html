@@ -17,7 +17,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Albert+Sans:wght@400;500;600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/site.css?v=20261114j">
+  <link rel="stylesheet" href="assets/site.css?v=20261114k">
   <style>
     /* phone: keep the hero compact so the page below the photo is reachable */
     @media(max-width:860px) {
@@ -38,7 +38,7 @@
   </style>
 </head>
 
-<body class="room-body">
+<body class="room-body studio-body">
 
   <div id="app">
     <header>
@@ -83,35 +83,49 @@
 
 
     <main id="mainContent" class="room-page">
-      <section id="builder" class="room full-bleed-edge" aria-labelledby="roomTitle">
-        <div class="room-in">
-          <div class="room-views" id="views" role="group" aria-label="Photo view"></div>
-          <div class="room-photo art" id="stageArt"></div>
-
-          <div class="room-panel">
-            <p class="room-eyebrow">The Sopanam Styling Room</p>
-            <h1 id="roomTitle" class="room-h1">A look, beautifully composed.</h1>
-            <p class="room-sub">Discover the saree. Find its ornaments. Create something unforgettable.</p>
-
-            <div class="room-row-h">
-              <h3>1. Choose your saree</h3>
-              <div class="room-arrows"><button class="room-arrow" data-scroll="picker" data-dir="-1" type="button" aria-label="Previous sarees">‹</button><button class="room-arrow" data-scroll="picker" data-dir="1" type="button" aria-label="More sarees">›</button></div>
+      <section id="builder" class="studio" aria-labelledby="roomTitle">
+        <div class="studio-amb" id="studioAmb" aria-hidden="true"></div>
+        <div class="studio-in">
+          <aside class="studio-side" aria-label="Build your look">
+            <div class="studio-head">
+              <p class="studio-k"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/><path d="M19 15.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>Sopanam</p>
+              <h1 id="roomTitle">Styling Room</h1>
+              <p class="studio-tag">See it. Style it. Make it yours.</p>
             </div>
-            <div class="room-track room-sarees" id="picker" role="group" aria-label="Choose a saree"></div>
-
-            <div class="room-row-h">
-              <h3>2. Complete your ensemble</h3>
-              <div class="room-sets" id="sets" role="group" aria-label="Start from a pairing"></div>
+            <div class="studio-step">
+              <h2>1. Choose a saree</h2>
+              <div id="picker"></div>
             </div>
-            <div class="room-tabs" id="slotTabs" role="group" aria-label="Ornament type"></div>
-            <div class="room-ens">
-              <button class="room-arrow room-arrow-side" data-scroll="slots" data-dir="-1" type="button" aria-label="Previous ornaments">‹</button>
-              <div class="room-track room-orns" id="slots"></div>
-              <button class="room-arrow room-arrow-side" data-scroll="slots" data-dir="1" type="button" aria-label="More ornaments">›</button>
+            <div class="studio-step">
+              <h2>2. Add ornaments</h2>
+              <div class="studio-chips" id="slotTabs" role="group" aria-label="Ornament type"></div>
             </div>
+            <div class="studio-step studio-step-look">
+              <h2>3. Your look</h2>
+              <ul class="studio-look" id="lookList"></ul>
+            </div>
+            <div class="studio-side-foot" id="sideFoot"></div>
+          </aside>
 
-            <div class="room-sum" id="totals" aria-live="polite"></div>
+          <div class="studio-stage" id="stage">
+            <div class="studio-photo" id="stageArt"></div>
+            <div class="studio-tools" id="stageTools"></div>
+            <div class="studio-views" id="views" role="group" aria-label="Photo view"></div>
           </div>
+
+          <aside class="studio-panel" aria-label="Suggestions and ornaments">
+            <div class="studio-scroll">
+              <section class="studio-block studio-sugg">
+                <div class="studio-block-h"><div><h2>Style suggestions</h2><p>Three ways to wear this saree</p></div></div>
+                <div class="studio-looks" id="sets" role="group" aria-label="Curated looks"></div>
+              </section>
+              <section class="studio-block studio-touch">
+                <div class="studio-block-h"><div><h2 id="touchTitle">Add a finishing touch</h2><p id="touchSub"></p></div></div>
+                <div class="studio-orns" id="slots"></div>
+              </section>
+            </div>
+            <div class="studio-total" id="totals" aria-live="polite"></div>
+          </aside>
         </div>
       </section>
     </main>
@@ -258,7 +272,7 @@
   </div>
 
   <script src="assets/data.js"></script>
-  <script src="assets/site.js?v=20261114j"></script>
+  <script src="assets/site.js?v=20261114k"></script>
   <script src="assets/stylist-launcher.js?v=20261114c" defer></script>
 </body>
 </html>
