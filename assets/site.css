@@ -5491,3 +5491,64 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
 }
 /* room page has no hero: keep clear of the fixed header */
 .room-page { padding-top: 0; }
+
+/* ===== Funnel: journey, lead sheet, bag + order request (2026-11-14) ===== */
+.sd-journey { list-style: none; margin: 6px 0 4px; padding: 0; display: flex; gap: 6px; counter-reset: none; }
+.sd-journey li { flex: 1; display: flex; flex-direction: column; gap: 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.sd-journey li::before { content: ""; height: 3px; border-radius: 2px; background: var(--line); }
+.sd-journey li.done::before, .sd-journey li.now::before { background: var(--accent); }
+.sd-journey li.now { color: var(--ink); font-weight: 600; }
+.sd-journey li.done { color: var(--ink); }
+.sd-journey li span { display: none; }
+#coJourney { padding: 0 0 14px; }
+
+.bag-upsell { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; padding: 12px 14px; margin-bottom: 14px; border: 1px dashed var(--accent); border-radius: 6px; background: rgba(110, 27, 43, .04); color: var(--ink); text-decoration: none; }
+.bag-upsell b { font-size: 14px; font-weight: 600; }
+.bag-upsell span { grid-column: 1; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.bag-upsell i { grid-column: 2; grid-row: 1 / span 2; font-style: normal; font-size: 18px; color: var(--accent); }
+.bag-upsell:hover { background: rgba(110, 27, 43, .08); }
+.bag-go { width: 100%; justify-content: center; margin-top: 14px; min-height: 50px; }
+.bag-fine { margin: 8px 0 0; text-align: center; font-size: 12px; color: var(--muted); }
+.bag .empty .btn { display: inline-flex; }
+
+.catalog-add-btn.btn { text-decoration: none; }
+.catalog-quick { display: block; width: 100%; margin-top: 6px; padding: 4px; background: none; border: 0; font: inherit; font-size: 12px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.catalog-quick:hover { color: var(--accent); }
+
+.room-send { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 8px; padding: 8px; background: none; border: 0; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; }
+.room-send svg { width: 16px; height: 16px; color: #1f8a4c; }
+.room-send:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+.lead-modal { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; background: rgba(20, 8, 10, .45); }
+.lead-modal[hidden] { display: none; }
+.lead-box { position: relative; width: min(420px, 100%); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,.25); padding: 28px 26px 22px; display: flex; flex-direction: column; animation: leadIn .25s cubic-bezier(.16,1,.3,1); }
+@keyframes leadIn { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { .lead-box { animation: none; } }
+.lead-x { position: absolute; top: 10px; right: 10px; }
+.lead-k { margin: 0 0 6px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.lead-box h3 { font-family: var(--display); font-size: 28px; font-weight: 500; line-height: 1.15; margin: 0 0 10px; }
+.lead-p { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+.lead-box label { font-size: 12.5px; font-weight: 600; margin: 0 0 6px; color: var(--ink); }
+.lead-box input { width: 100%; font: inherit; font-size: 15px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface, #fff); color: var(--ink); margin-bottom: 14px; }
+.lead-box input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.lead-tel { display: flex; }
+.lead-tel span { display: grid; place-items: center; padding: 0 12px; border: 1px solid var(--line); border-right: 0; border-radius: 6px 0 0 6px; font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+.lead-tel input { border-radius: 0 6px 6px 0; }
+.lead-err { color: #b3261e; font-size: 12.5px; margin: -8px 0 12px; }
+.lead-go { width: 100%; justify-content: center; min-height: 50px; }
+.lead-skip { margin-top: 8px; padding: 8px; background: none; border: 0; font: inherit; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.lead-fine { margin: 6px 0 0; text-align: center; font-size: 11.5px; color: var(--muted); }
+
+.co-lede { margin: 0 0 16px; padding: 12px 14px; border-left: 3px solid var(--accent); background: rgba(110, 27, 43, .04); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+.co-opt { font-weight: 400; color: var(--muted); font-size: 11.5px; margin-left: 4px; }
+.co-pin { display: block; margin-top: 4px; font-size: 11.5px; color: var(--good, #2f6b4b); }
+.co-fine { margin: 8px 0 0; text-align: center; font-size: 12px; color: var(--muted); }
+.co-next { list-style: none; counter-reset: co; margin: 18px 0; padding: 0; text-align: left; display: flex; flex-direction: column; gap: 12px; }
+.co-next li { counter-increment: co; display: grid; grid-template-columns: 28px 1fr; gap: 2px 12px; font-size: 13.5px; line-height: 1.45; }
+.co-next li::before { content: counter(co); grid-row: 1 / span 2; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent, #fff); font-size: 12px; font-weight: 600; }
+.co-next b { font-weight: 600; }
+.co-next span { color: var(--muted); }
+.co-total { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0; margin-bottom: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.co-total b { font-size: 20px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.co-wa { background: #1f8a4c !important; border-color: #1f8a4c !important; color: #fff !important; text-decoration: none; justify-content: center; }
+.co-wa:hover { background: #18723e !important; }

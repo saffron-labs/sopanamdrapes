@@ -311,7 +311,7 @@ function lookCard(L,key){
       <h5>Why it suits you</h5><ul>${L.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>
       <h5>How to wear it</h5><ul>${L.tips.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>
       <h5>Price</h5><ul><li>Saree ${inr(s.eff)}${s.mrp>s.eff?' (was '+inr(s.mrp)+')':''} · ${esc(s.blouse)}</li>${t.ids.map(id=>`<li>${esc(ORN[id][1])} ${inr(ORN[id][2])}</li>`).join('')}${t.save?'<li>10% off ornaments when bought as a look</li>':''}${L.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>
-      <a class="lk-link" href="styling-room.html?style=${s.id}" target="${EMBED?'_top':'_self'}">Open in the look builder →</a>
+      <a class="lk-link" href="styling-room.html?style=${s.id}" target="${EMBED?'_top':'_self'}">Style it in the Styling Room →</a>
      </div>
     </details>
    </div></article>`;
@@ -588,7 +588,7 @@ function renderBag(){
   if(!n){$('#bagItems').innerHTML='<div class="empty">Your bag is empty. Ask Sakhi for a look and add it here.</div>';$('#bagFoot').innerHTML='';return}
   $('#bagItems').innerHTML=bag.map((b,i)=>{const s=b.sid?S(b.sid):null;const img=s?`img/${s.id}.jpg`:`img/orn/${b.oid}-s.jpg`;const title=s?s.name+', '+s.tone:b.names[0];
     return `<div class="bi"><div><img src="${img}" alt=""></div><div><div class="t">${esc(title)}</div><div class="d">${esc((b.names||[]).join(', ')||'Saree only')}</div><div class="f"><span>${inr(b.total)}</span><button data-remove="${i}">Remove</button></div></div></div>`}).join('');
-  $('#bagFoot').innerHTML=`<div class="row total"><span>Subtotal</span><span>${inr(bag.reduce((a,b)=>a+b.total,0))}</span></div><button class="btn" style="width:100%;justify-content:center;margin-top:12px" data-checkout>Continue to checkout</button>`;
+  $('#bagFoot').innerHTML=`<div class="row total"><span>Subtotal</span><span>${inr(bag.reduce((a,b)=>a+b.total,0))}</span></div><button class="btn" style="width:100%;justify-content:center;margin-top:12px" data-checkout>Request this order →</button><p style="margin:8px 0 0;text-align:center;font-size:12px;color:var(--muted)">No payment now. We confirm on WhatsApp first.</p>`;
 }
 function openBag(o){$('#bag').hidden=!o;$('#scrim').hidden=!o}
 function notifyParent(){try{if(EMBED&&parent!==window)parent.postMessage({type:'sd-bag'},location.origin)}catch(e){}}
@@ -627,7 +627,7 @@ document.addEventListener('click',e=>{
   if(d.edit){toggleSide(false);me('Change my '+d.edit.replace('Cm','').replace(/([A-Z])/g,' $1').toLowerCase());startQuiz(d.edit);return}
   if(d.unsave){saved.splice(+d.unsave,1);store.set('sd-sakhi-saved',saved);renderProfile();return}
   if(d.remove){bag.splice(+d.remove,1);store.set('sd-bag',bag);renderBag();notifyParent();return}
-  if('checkout' in d){toast('Checkout is the next build phase');return}
+  if('checkout' in d){if(EMBED&&parent!==window){try{parent.postMessage({type:'sd-checkout'},location.origin)}catch(e){}}else location.href='index.html?checkout=1';return}
   if(d.mode){pm.mode=d.mode;$('#pmFile').click();return}
   switch(b.id){
     case 'restartBtn':case 'newChatBtn':toggleSide(false);if(confirmRestart())restart();return;

@@ -1,6 +1,6 @@
 /* Puts "Ask Sakhi" on every store page and opens the stylist in a side drawer. */
 (function(){
-  var V='20261114b'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
+  var V='20261114c'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
   var page=(location.pathname.split('/').pop()||'index.html').replace('.html','')||'index';
   var lines={bridal:'Style my bridal look',festive:'Style my Onam look',celebrations:'Style my festive look',occasions:'Style my party look',everyday:'Style my office look',ornaments:'Help me pick ornaments'};
   var css=document.createElement('link');css.rel='stylesheet';css.href='assets/stylist-launcher.css?v='+V;document.head.appendChild(css);
@@ -39,8 +39,7 @@
   addEventListener('message',function(e){
     if(e.origin!==location.origin||!e.data)return;
     if(e.data.type==='sd-close')close();
-    if(e.data.type==='sd-bag'){
-      try{var fresh=JSON.parse(localStorage.getItem('sd-bag')||'[]');if(typeof bag!=='undefined'){bag.length=0;Array.prototype.push.apply(bag,fresh)}if(typeof renderBag==='function')renderBag()}catch(err){}
-    }
+    if(e.data.type==='sd-bag'){if(window.SD)SD.reloadBag()}
+    if(e.data.type==='sd-checkout'){close();if(window.SD){SD.reloadBag();SD.openCheckout()}else location.href='index.html?checkout=1'}
   });
 })();

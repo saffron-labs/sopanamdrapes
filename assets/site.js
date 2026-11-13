@@ -46,7 +46,7 @@
           </div>
         </div>
         <div class="actions">
-          <button class="btn catalog-add-btn" data-orn="${id}" type="button">Add to cart <span aria-hidden="true">→</span></button>
+          <button class="btn catalog-add-btn" data-orn="${id}" type="button">Add to bag <span aria-hidden="true">→</span></button>
         </div>
       </article>`;
   }
@@ -72,7 +72,8 @@
           </div>
         </div>
         <div class="actions">
-          <button class="btn catalog-add-btn" data-quick="${s.id}" type="button">Add to cart <span aria-hidden="true">→</span></button>
+          <a class="btn catalog-add-btn" href="styling-room.html?style=${s.id}">Style this saree <span aria-hidden="true">→</span></a>
+          <button class="catalog-quick" data-quick="${s.id}" type="button">or add the saree only</button>
         </div>
       </article>`;
   }
@@ -136,6 +137,100 @@
   function saveBag() {
     try { localStorage.setItem('sd-bag', JSON.stringify(bag)); } catch (e) { }
   }
+  function reloadBag() {
+    try { bag = JSON.parse(localStorage.getItem('sd-bag') || '[]'); } catch (e) { bag = []; }
+    renderBag();
+  }
+
+  // --- Journey: saree -> ornaments -> bag -> order request ---
+  const JOURNEY = ['Saree', 'Ornaments', 'Bag', 'Request'];
+  function journey(at) {
+    return `<ol class="sd-journey" aria-label="Your progress">${JOURNEY.map((n, i) =>
+      `<li class="${i < at ? 'done' : i === at ? 'now' : ''}"${i === at ? ' aria-current="step"' : ''}><span aria-hidden="true">${i < at ? '✓' : i + 1}</span>${n}</li>`).join('')}</ol>`;
+  }
+
+  // --- Lead (prototype: kept in this browser only, nothing is sent anywhere) ---
+  function getLead() {
+    try { return JSON.parse(localStorage.getItem('sd-lead') || 'null'); } catch (e) { return null; }
+  }
+  function setLead(l) {
+    try { localStorage.setItem('sd-lead', JSON.stringify(Object.assign(getLead() || {}, l))); } catch (e) { }
+  }
+  const LEAD_COPY = {
+    hold: {
+      t: 'Hold this look for 48 hours?',
+      p: 'Handloom pieces are woven in small runs, so the one you picked may not be here tomorrow. Leave your WhatsApp number and we will set these pieces aside for you.',
+      b: 'Hold my look'
+    },
+    send: {
+      t: 'Send this look to your WhatsApp',
+      p: 'Get the saree, ornaments and total on WhatsApp so you can decide with family. A stylist can answer blouse and drape questions in the same chat.',
+      b: 'Send my look'
+    }
+  };
+  let leadNext = null;
+  function openLead(kind, next) {
+    leadNext = next || null;
+    let m = $('#leadModal');
+    if (!m) {
+      m = document.createElement('div');
+      m.id = 'leadModal';
+      m.className = 'lead-modal';
+      m.setAttribute('role', 'dialog');
+      m.setAttribute('aria-modal', 'true');
+      m.setAttribute('aria-labelledby', 'leadTitle');
+      document.body.appendChild(m);
+    }
+    const c = LEAD_COPY[kind] || LEAD_COPY.hold;
+    const L = getLead() || {};
+    m.innerHTML = `
+      <form class="lead-box" id="leadForm" novalidate>
+        <button class="ibtn lead-x" type="button" data-leadskip aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <p class="lead-k">Sopanam Drapes</p>
+        <h3 id="leadTitle">${c.t}</h3>
+        <p class="lead-p">${c.p}</p>
+        <label for="leadName">Your name</label>
+        <input id="leadName" autocomplete="name" value="${L.name || ''}" placeholder="e.g. Anjali">
+        <label for="leadPhone">WhatsApp number</label>
+        <div class="lead-tel"><span>+91</span><input id="leadPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" value="${L.phone || ''}" placeholder="10-digit mobile"></div>
+        <small class="lead-err" id="leadErr" hidden>Enter the 10-digit number you use on WhatsApp.</small>
+        <button class="btn lead-go" type="submit">${c.b}</button>
+        <button class="lead-skip" type="button" data-leadskip>${kind === 'hold' ? 'Skip, just show my bag' : 'Not now'}</button>
+        <p class="lead-fine">We only message you about this look. No spam, no calls.</p>
+      </form>`;
+    m.dataset.kind = kind;
+    m.hidden = false;
+    const ph = $('#leadPhone');
+    setTimeout(() => { (L.phone ? $('.lead-go') : $('#leadName'))?.focus(); }, 30);
+    ph.addEventListener('input', () => { ph.value = ph.value.replace(/\D/g, '').slice(0, 10); $('#leadErr').hidden = true; });
+    $('#leadForm').addEventListener('submit', ev => {
+      ev.preventDefault();
+      const phone = ph.value.trim();
+      if (!/^[6-9]\d{9}$/.test(phone)) { $('#leadErr').hidden = false; ph.focus(); return; }
+      setLead({ name: $('#leadName').value.trim(), phone, via: kind });
+      closeLead(true);
+      toast(kind === 'send' ? `Look sent to +91 ${phone}` : 'Held for 48 hours. We will WhatsApp you.');
+    });
+  }
+  function closeLead(go) {
+    const m = $('#leadModal');
+    if (m) m.hidden = true;
+    const n = leadNext; leadNext = null;
+    if (n && go !== false) n();
+  }
+  function afterAdd(msg) {
+    let asked = false;
+    try { asked = !!sessionStorage.getItem('sd-lead-asked'); } catch (e) { }
+    if (!getLead() && !asked) {
+      try { sessionStorage.setItem('sd-lead-asked', '1'); } catch (e) { }
+      openLead('hold', () => openBag(true));
+    } else {
+      openBag(true);
+      if (msg) toast(msg);
+    }
+  }
 
   function renderBag() {
     const n = bag.length;
@@ -153,8 +248,15 @@
     }
     if (!itemsEl) return;
 
+    const jEl = $('#bagJourney') || (() => {
+      const d = document.createElement('div');
+      d.id = 'bagJourney';
+      itemsEl.parentNode.insertBefore(d, itemsEl);
+      return d;
+    })();
+    jEl.innerHTML = journey(2);
     if (!n) {
-      itemsEl.innerHTML = '<div class="empty">Your bag is empty. Explore our collection and build your look.</div>';
+      itemsEl.innerHTML = '<div class="empty">Your bag is empty.<br><a class="btn small" href="styling-room.html" style="margin-top:14px">Start in the Styling Room</a></div>';
       if (footEl) footEl.innerHTML = '';
       return;
     }
@@ -193,9 +295,18 @@
 
     const subtotal = bag.reduce((a, b) => a + b.total, 0);
     if (footEl) {
+      const bare = bag.find(b => b.kind !== 'orn' && !(b.names && b.names.length));
+      const hasSaree = bag.some(b => b.kind !== 'orn');
+      const up = bare
+        ? `<a class="bag-upsell" href="styling-room.html?style=${bare.sid}"><b>Complete this saree</b><span>Pick its ornaments in the Styling Room. Two or more pieces: 10% off.</span><i aria-hidden="true">→</i></a>`
+        : !hasSaree
+          ? `<a class="bag-upsell" href="styling-room.html"><b>Find the saree for these</b><span>Pair your ornaments with a saree in the Styling Room.</span><i aria-hidden="true">→</i></a>`
+          : '';
       footEl.innerHTML = `
+        ${up}
         <div class="row total"><span>Subtotal</span><span>${inr(subtotal)}</span></div>
-        <button class="btn" style="width:100%;justify-content:center;margin-top:14px" data-checkout>Continue to checkout</button>`;
+        <button class="btn bag-go" data-checkout type="button">Request this order <span aria-hidden="true">→</span></button>
+        <p class="bag-fine">No payment now. We confirm on WhatsApp first.</p>`;
     }
   }
 
@@ -315,67 +426,78 @@
       checkoutModal.setAttribute('aria-labelledby', 'checkoutModalTitle');
       document.body.appendChild(checkoutModal);
     }
-    if (!checkoutModal.querySelector('#checkoutForm')) {
+    if (checkoutModal.dataset.v !== 'req') {
+      checkoutModal.dataset.v = 'req';
       checkoutModal.innerHTML = `
         <div class="modal-box checkout-box">
           <div class="modal-head">
-            <h3 id="checkoutModalTitle">Luxury Checkout</h3>
+            <h3 id="checkoutModalTitle">Request your order</h3>
             <button class="ibtn modal-close" id="checkoutClose" aria-label="Close checkout">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
           </div>
+          <div id="coJourney"></div>
           <div class="checkout-body" id="checkoutBody">
-            <form id="checkoutForm" class="checkout-form" onsubmit="return false;">
+            <form id="checkoutForm" class="checkout-form" onsubmit="return false;" novalidate>
+              <p class="co-lede">No payment now. A Sopanam stylist checks every piece, confirms your blouse and drape details on WhatsApp, then you pay.</p>
               <div class="checkout-step">
-                <h4>1. Delivery Address</h4>
+                <h4>Your details</h4>
                 <div class="form-grid">
                   <div class="form-group full">
-                    <label for="shipName">Full Name</label>
-                    <input type="text" id="shipName" required placeholder="Full Name" value="Priya Nair">
+                    <label for="shipName">Full name</label>
+                    <input type="text" id="shipName" autocomplete="name" required>
                   </div>
                   <div class="form-group">
-                    <label for="shipPhone">Phone (10 digits)</label>
-                    <input type="tel" id="shipPhone" maxlength="10" required placeholder="10-digit mobile number" value="9847012345">
+                    <label for="shipPhone">WhatsApp number</label>
+                    <input type="tel" id="shipPhone" inputmode="numeric" maxlength="10" autocomplete="tel-national" required placeholder="10-digit mobile">
                   </div>
                   <div class="form-group">
-                    <label for="shipPin">PIN Code (6 digits)</label>
-                    <input type="text" id="shipPin" maxlength="6" required placeholder="6-digit PIN code" value="682001">
-                    <small id="pinFeedback" style="display:block;margin-top:4px;font-size:11px;color:var(--good,#2f6b4b);">✓ Kerala Express Delivery (4-6 business days)</small>
+                    <label for="shipPin">PIN code</label>
+                    <input type="text" id="shipPin" inputmode="numeric" maxlength="6" autocomplete="postal-code" required>
+                    <small id="pinFeedback" class="co-pin" hidden></small>
                   </div>
                   <div class="form-group full">
-                    <label for="shipAddress">Delivery Address</label>
-                    <textarea id="shipAddress" required rows="2" placeholder="House/Flat number, Street name, Locality">Hill Palace Road, Tripunithura, Kochi</textarea>
+                    <label for="shipAddress">Delivery address</label>
+                    <textarea id="shipAddress" required rows="2" autocomplete="street-address" placeholder="House or flat, street, locality, city"></textarea>
+                  </div>
+                  <div class="form-group full">
+                    <label for="shipBy">Need it by <span class="co-opt">optional</span></label>
+                    <input type="date" id="shipBy">
                   </div>
                 </div>
               </div>
               <div class="checkout-step">
-                <h4>2. Payment Method</h4>
+                <h4>How you'd like to pay</h4>
                 <div class="payment-methods">
                   <label class="payment-opt active">
                     <input type="radio" name="payMethod" value="upi" checked>
-                    <span class="pay-title">UPI (Google Pay, PhonePe, Paytm)</span>
-                    <span class="pay-desc">Instant &amp; secure</span>
-                  </label>
-                  <label class="payment-opt">
-                    <input type="radio" name="payMethod" value="card">
-                    <span class="pay-title">Credit / Debit Card</span>
-                    <span class="pay-desc">Visa, Mastercard, RuPay</span>
+                    <span class="pay-title">UPI link on WhatsApp</span>
+                    <span class="pay-desc">Sent once we confirm your order</span>
                   </label>
                   <label class="payment-opt">
                     <input type="radio" name="payMethod" value="cod">
-                    <span class="pay-title">Cash on Delivery (COD)</span>
-                    <span class="pay-desc">Zero extra fee</span>
+                    <span class="pay-title">Cash on delivery</span>
+                    <span class="pay-desc">Pay when your parcel arrives</span>
                   </label>
                 </div>
               </div>
               <div class="checkout-summary" id="checkoutSummary"></div>
               <div class="checkout-actions">
-                <button type="submit" class="btn" id="placeOrderBtn" style="width:100%;justify-content:center">Place Order</button>
+                <button type="submit" class="btn" id="placeOrderBtn" style="width:100%;justify-content:center">Send order request <span aria-hidden="true">→</span></button>
+                <p class="co-fine">By sending, you agree to hear from us on WhatsApp about this order.</p>
               </div>
             </form>
             <div class="order-confirmed" id="orderConfirmed" hidden></div>
           </div>
         </div>`;
+      const pin = $('#shipPin'), fb = $('#pinFeedback'), ph = $('#shipPhone');
+      pin.addEventListener('input', () => {
+        pin.value = pin.value.replace(/\D/g, '').slice(0, 6);
+        const ok = /^[1-9]\d{5}$/.test(pin.value);
+        fb.hidden = !ok;
+        if (ok) fb.textContent = /^6[7-9]/.test(pin.value) ? '✓ Kerala: delivered in 2–4 days' : '✓ Delivered in 4–6 business days';
+      });
+      ph.addEventListener('input', () => { ph.value = ph.value.replace(/\D/g, '').slice(0, 10); });
     }
   }
 
@@ -518,6 +640,14 @@
       closeAllModalsExcept('account');
       modal.hidden = false;
       checkScrimState();
+      const L = getLead();
+      const set = (sel, v) => { const el = modal.querySelector(sel); if (el) el.textContent = v; };
+      const nm = (L && L.name) || 'Guest';
+      set('.profile-name', nm);
+      set('.profile-avatar', nm.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase());
+      set('.profile-phone', L && L.phone ? '+91 ' + L.phone.replace(/(\d{5})(\d{5})/, '$1 $2') : 'Add your WhatsApp number at checkout');
+      set('.profile-location', '');
+      set('.profile-tier', L ? 'Sopanam client' : '');
       renderAccountOrders();
     } else {
       modal.hidden = true;
@@ -605,7 +735,13 @@
       if (form) form.hidden = false;
       if (confirmed) confirmed.hidden = true;
 
+      const cj = $('#coJourney');
+      if (cj) cj.innerHTML = journey(3);
+      const L = getLead() || {};
+      if (L.name && !$('#shipName').value) $('#shipName').value = L.name;
+      if (L.phone && !$('#shipPhone').value) $('#shipPhone').value = L.phone;
       renderCheckoutSummary();
+      setTimeout(() => { const f = ['#shipName', '#shipPhone', '#shipPin', '#shipAddress'].map(x => $(x)).find(x => x && !x.value); if (f) f.focus(); }, 60);
     } else {
       modal.hidden = true;
       checkScrimState();
@@ -618,7 +754,7 @@
     const subtotal = bag.reduce((a, b) => a + b.total, 0);
 
     sumEl.innerHTML = `
-      <h4 style="margin-top:0;margin-bottom:12px;font-size:17px;">3. Order Summary (${bag.length} ${bag.length === 1 ? 'item' : 'items'})</h4>
+      <h4 style="margin-top:0;margin-bottom:12px;font-size:17px;">Order summary (${bag.length} ${bag.length === 1 ? 'item' : 'items'})</h4>
       <div style="display:flex;flex-direction:column;gap:8px;max-height:140px;overflow-y:auto;margin-bottom:14px;padding-right:4px;">
         ${bag.map(b => {
       if (b.kind === 'orn') {
@@ -647,11 +783,11 @@
         <span>${inr(subtotal)}</span>
       </div>
       <div class="row" style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--good,#2f6b4b);font-weight:600;">
-        <span>Complimentary Express Shipping</span>
+        <span>Shipping across India</span>
         <span>FREE</span>
       </div>
       <div class="row total" style="display:flex;justify-content:space-between;padding-top:10px;border-top:1px dashed var(--line);margin-top:8px;font-size:18px;font-weight:700;">
-        <span>Total Payable</span>
+        <span>Total <small style="font-weight:400;font-size:12px;color:var(--muted)">pay after we confirm</small></span>
         <span>${inr(subtotal)}</span>
       </div>`;
   }
@@ -677,8 +813,8 @@
       if (nameInput) nameInput.focus();
       return;
     }
-    if (!/^\d{10}$/.test(phone)) {
-      toast('Please enter a valid 10-digit mobile number');
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      toast('Enter the 10-digit number you use on WhatsApp');
       if (phoneInput) phoneInput.focus();
       return;
     }
@@ -696,9 +832,8 @@
     const checkedPay = $('input[name="payMethod"]:checked') || $('input[name="paymentMethod"]:checked');
     const payVal = checkedPay ? checkedPay.value : 'upi';
     const payMap = {
-      upi: 'UPI (Google Pay / PhonePe)',
-      card: 'Credit / Debit Card',
-      cod: 'Cash on Delivery (COD)'
+      upi: 'UPI link on WhatsApp',
+      cod: 'Cash on delivery'
     };
     const paymentLabel = payMap[payVal] || payVal;
 
@@ -718,7 +853,8 @@
         pincode: pin,
         address: addr
       },
-      status: 'Confirmed',
+      status: 'Requested',
+      needBy: ($('#shipBy') || {}).value || '',
       estDelivery: '4-6 business days'
     };
 
@@ -728,6 +864,8 @@
     try {
       localStorage.setItem('sd-orders', JSON.stringify(orders));
     } catch (e) { }
+
+    setLead({ name: name, phone: phone });
 
     // Clear Cart
     bag = [];
@@ -741,32 +879,29 @@
     if (form) form.hidden = true;
     if (confirmed) {
       confirmed.hidden = false;
+      const first = name.split(' ')[0];
+      const lines = orderItems.map(b => b.kind === 'orn'
+        ? `• ${(ORN[b.oid] || [, 'Ornament'])[1]} (${inr(b.total)})`
+        : `• ${(saree(b.sid) || { name: 'Saree' }).name}${b.names && b.names.length ? ' + ' + b.names.join(', ') : ''} (${inr(b.total)})`).join('\n');
+      const waText = `Hi Sopanam Drapes, I just sent order request ${orderId}.\n${lines}\nTotal: ${inr(total)}\nPayment: ${paymentLabel}\nName: ${name}, PIN ${pin}`;
       confirmed.innerHTML = `
         <div class="checkmark-circle">✓</div>
-        <h2>Order Confirmed!</h2>
-        <p class="lead-confirm">Thank you, ${name}. Your handloom drape order has been registered and is being prepared with extreme care.</p>
+        <h2>Request sent</h2>
+        <p class="lead-confirm">Thank you, ${first}. Your pieces are set aside. A stylist will message you on WhatsApp at +91 ${phone} within 2 hours.</p>
         <div class="order-ref-pill">${orderId}</div>
-        <div>
-          <span class="delivery-badge">Estimated Delivery: 4-6 business days</span>
-        </div>
-        <div style="border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);padding:16px;text-align:left;margin-bottom:20px;font-size:13.5px;">
-          <div style="padding-bottom:8px;border-bottom:1px solid var(--line);">
-            <div><strong>Shipping to:</strong> ${name}</div>
-            <div style="color:var(--muted);margin-top:2px;">${addr}</div>
-            <div style="color:var(--muted);">PIN: ${pin} · Mobile: +91 ${phone}</div>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;">
-            <span>Payment: <strong>${paymentLabel}</strong></span>
-            <span>Total Paid: <strong style="font-size:16px;color:var(--accent);">${inr(total)}</strong></span>
-          </div>
-        </div>
+        <ol class="co-next">
+          <li><b>Within 2 hours</b><span>We check each piece and confirm blouse size and drape with you on WhatsApp.</span></li>
+          <li><b>Payment</b><span>${payVal === 'cod' ? 'Pay in cash when your parcel arrives.' : 'We send a secure UPI link in the same chat.'}</span></li>
+          <li><b>Delivery</b><span>Packed by hand and delivered in 4–6 business days.</span></li>
+        </ol>
+        <div class="co-total"><span>${orderItems.length} ${orderItems.length === 1 ? 'item' : 'items'} · ${paymentLabel}</span><b>${inr(total)}</b></div>
         <div class="confirm-actions">
-          <button class="btn" id="viewInOrdersBtn">View in My Orders</button>
-          <button class="btn ghost" id="continueShopBtn">Continue Shopping</button>
+          <a class="btn co-wa" href="https://wa.me/919847012345?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener noreferrer">Confirm on WhatsApp</a>
+          <button class="btn ghost" id="viewInOrdersBtn" type="button">View my orders</button>
         </div>`;
     }
 
-    toast(`Order placed: ${orderId}`);
+    toast(`Request ${orderId} sent`);
   }
 
   // --- 4. Look Builder Functionality (index.html) ---
@@ -892,7 +1027,8 @@
           <div class="room-sum-save"><span>Ensemble savings</span><b>${saving ? '−' + inr(saving) : '—'}</b>${!t.save ? `<small>${t.ids.length === 1 ? 'Add one more ornament for 10% off' : 'Two or more ornaments: 10% off'}</small>` : ''}</div>
           <div class="room-sum-total"><span>Total</span><b>${inr(t.total)}</b></div>
         </div>
-        <button class="btn room-add" data-add type="button">Add complete look to bag <span aria-hidden="true">→</span></button>`;
+        <button class="btn room-add" data-add type="button">Add complete look to bag <span aria-hidden="true">→</span></button>
+        <button class="room-send" data-sendlook type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.6 17.2L2.5 21.5l4.4-1.1A11 11 0 1 0 20.5 3.5Zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-2.6.7.7-2.5-.2-.3A9 9 0 1 1 12 20.5Z" fill="currentColor"/></svg>Not ready yet? Send this look to your WhatsApp</button>`;
     }
 
     // Mobile Action Bar
@@ -1407,7 +1543,7 @@
         bag.push({ kind: 'orn', oid: t.dataset.orn, names: [o[1]], total: o[3] });
         saveBag();
         renderBag();
-        toast('Added to your bag');
+        afterAdd(`${o[1]} added`);
       }
       return;
     }
@@ -1419,7 +1555,7 @@
         bag.push({ sid: s.id, names: [], total: s.eff });
         saveBag();
         renderBag();
-        toast('Saree added to your bag');
+        afterAdd('Saree added to your bag');
       }
       return;
     }
@@ -1432,7 +1568,7 @@
         bag.push({ sid: s.id, names: x.ids.map(id => ORN[id][1]), total: x.total });
         saveBag();
         renderBag();
-        toast('Look added to your bag');
+        afterAdd('Look added to your bag');
       }
       return;
     }
@@ -1444,7 +1580,17 @@
       bag.push({ sid: s.id, names: tt.ids.map(id => ORN[id][1]), total: tt.total });
       saveBag();
       renderBag();
-      toast('Look added to your bag');
+      afterAdd('Look added to your bag');
+      return;
+    }
+
+    // Lead sheet
+    if ('sendlook' in t.dataset) {
+      openLead('send');
+      return;
+    }
+    if ('leadskip' in t.dataset) {
+      closeLead(true);
       return;
     }
 
@@ -1503,8 +1649,7 @@
       return;
     }
     if (t.id === 'placeOrderBtn') {
-      handlePlaceOrder();
-      return;
+      return; // handled by the form's submit event
     }
     if (t.id === 'viewInOrdersBtn') {
       openCheckout(false);
@@ -1738,10 +1883,13 @@
     if (e.target && e.target.id === 'scrim') {
       closeAllModals();
     }
+    if (e.target && e.target.id === 'leadModal') closeLead(true);
   });
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
+      const lm = $('#leadModal');
+      if (lm && !lm.hidden) { closeLead(true); return; }
       closeAllModals();
     }
     if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('saree-plate-art') && e.target.dataset.style) {
@@ -1766,25 +1914,6 @@
     }
     if (target.id === 'searchInput') {
       renderSearchResults(target.value);
-    }
-    if (target.id === 'shipPin') {
-      const digits = target.value.replace(/\D/g, '').slice(0, 6);
-      target.value = digits;
-      const feedback = $('#pinFeedback');
-      if (feedback) {
-        if (digits.length === 6) {
-          if (/^6[789]/.test(digits)) {
-            feedback.textContent = '✓ Kerala Express Delivery (4-6 business days)';
-            feedback.style.color = 'var(--good,#2f6b4b)';
-          } else {
-            feedback.textContent = '✓ Valid India PIN · Insured Express Delivery (4-6 business days)';
-            feedback.style.color = 'var(--good,#2f6b4b)';
-          }
-        } else {
-          feedback.textContent = 'Please enter a 6-digit India PIN code';
-          feedback.style.color = 'var(--muted)';
-        }
-      }
     }
     if (target.id === 'shipPhone') {
       target.value = target.value.replace(/\D/g, '').slice(0, 10);
@@ -1846,6 +1975,11 @@
       window.addEventListener('scroll', syncHeaderScroll, { passive: true });
     }
     renderBag();
+    window.SD = { reloadBag, openBag, openCheckout: () => openCheckout(true) };
+    if (/[?&]checkout=1/.test(location.search)) {
+      try { history.replaceState(null, '', location.pathname); } catch (e) { }
+      if (bag.length) setTimeout(() => openCheckout(true), 80);
+    }
 
     // Check if on subpage or home page
     const CFG = window.PAGE_CFG;
