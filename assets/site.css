@@ -5419,3 +5419,11 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); max-width: calc(100% - 28px);
 }
 .heritage-proto b { text-transform: uppercase; letter-spacing: .16em; color: var(--zari-light, #e9c98a); margin-right: 4px; }
+
+/* Inner-page heroes: same height as the home hero. The photos are made at
+   2048×720 (the home hero's shape), so on desktop the box keeps that ratio
+   and nothing is cropped; very narrow laptops keep a 440px minimum. */
+@media (min-width: 861px) {
+  .banner.banner-short .slide picture { height: auto; aspect-ratio: 2048 / 720; min-height: 440px; max-height: 680px; }
+  .banner.banner-short .slide img { object-position: 50% 40%; }
+}
