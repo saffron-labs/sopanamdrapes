@@ -311,7 +311,7 @@ function lookCard(L,key){
       <h5>Why it suits you</h5><ul>${L.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>
       <h5>How to wear it</h5><ul>${L.tips.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>
       <h5>Price</h5><ul><li>Saree ${inr(s.eff)}${s.mrp>s.eff?' (was '+inr(s.mrp)+')':''} · ${esc(s.blouse)}</li>${t.ids.map(id=>`<li>${esc(ORN[id][1])} ${inr(ORN[id][2])}</li>`).join('')}${t.save?'<li>10% off ornaments when bought as a look</li>':''}${L.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>
-      <a class="lk-link" href="index.html?style=${s.id}#builder" target="${EMBED?'_top':'_self'}">Open in the look builder →</a>
+      <a class="lk-link" href="styling-room.html?style=${s.id}" target="${EMBED?'_top':'_self'}">Open in the look builder →</a>
      </div>
     </details>
    </div></article>`;
@@ -623,7 +623,7 @@ document.addEventListener('click',e=>{
   if(d.save){const L=looks[d.save],k=sig(L),i=saved.findIndex(x=>x.key===k);
     if(i>=0){saved.splice(i,1);b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Save look')}else{const t=totals(L.s,L.sel);saved.unshift({key:k,sid:L.s.id,title:L.s.name+', '+L.s.tone,total:t.total,n:t.ids.length+1,sel:L.sel});b.setAttribute('aria-pressed','true');b.setAttribute('aria-label','Saved');toast('Saved to your profile')}
     store.set('sd-sakhi-saved',saved);renderProfile();return}
-  if(d.share){const L=looks[d.share],t=totals(L.s,L.sel);const txt=`My look from Sopanam Drapes, styled by Sakhi:\n${L.s.name}, ${L.s.tone} (${inr(L.s.eff)})\n${t.ids.map(id=>'+ '+ORN[id][1]).join('\n')}\nFull look: ${inr(t.total)}\n${location.origin}/index.html?style=${L.s.id}`;window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');return}
+  if(d.share){const L=looks[d.share],t=totals(L.s,L.sel);const txt=`My look from Sopanam Drapes, styled by Sakhi:\n${L.s.name}, ${L.s.tone} (${inr(L.s.eff)})\n${t.ids.map(id=>'+ '+ORN[id][1]).join('\n')}\nFull look: ${inr(t.total)}\n${new URL('styling-room.html?style='+L.s.id,location.href).href.replace(/embed=1&?/,'')}`;window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');return}
   if(d.edit){toggleSide(false);me('Change my '+d.edit.replace('Cm','').replace(/([A-Z])/g,' $1').toLowerCase());startQuiz(d.edit);return}
   if(d.unsave){saved.splice(+d.unsave,1);store.set('sd-sakhi-saved',saved);renderProfile();return}
   if(d.remove){bag.splice(+d.remove,1);store.set('sd-bag',bag);renderBag();notifyParent();return}

@@ -17,7 +17,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Albert+Sans:wght@400;500;600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/site.css?v=20261114g">
+  <link rel="stylesheet" href="assets/site.css?v=20261114h">
   <style>
     /* phone: keep the hero compact so the page below the photo is reachable */
     @media(max-width:860px) {
@@ -56,6 +56,7 @@
           <a href="occasions.html">Occasions</a>
           <a href="everyday.html">Everyday</a>
           <a href="ornaments.html">Ornaments</a>
+        <a href="styling-room.html">Styling Room</a>
         </nav>
         <div class="tools">
           <button class="ibtn hide-m" id="searchBtn" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true">
@@ -92,7 +93,7 @@
             <p class="eyebrow">Sopanam Atelier</p>
             <h1 class="hl">Drape your dream.</h1>
             <div class="cta">
-              <button class="btn" data-go="builder">Build a look</button>
+              <a class="btn" href="styling-room.html">Build a look</a>
               <button class="btn ghost" data-go="worlds">Explore by occasion</button>
             </div>
           </div>
@@ -150,37 +151,7 @@
         </div>
       </section>
 
-      <section id="builder" class="room full-bleed-edge" aria-labelledby="roomTitle">
-        <div class="room-in">
-          <div class="room-views" id="views" role="group" aria-label="Photo view"></div>
-          <div class="room-photo art" id="stageArt"></div>
-
-          <div class="room-panel">
-            <p class="room-eyebrow">The Sopanam Styling Room</p>
-            <h2 id="roomTitle">A look, beautifully composed.</h2>
-            <p class="room-sub">Discover the saree. Find its ornaments. Create something unforgettable.</p>
-
-            <div class="room-row-h">
-              <h3>1. Choose your saree</h3>
-              <div class="room-arrows"><button class="room-arrow" data-scroll="picker" data-dir="-1" type="button" aria-label="Previous sarees">‹</button><button class="room-arrow" data-scroll="picker" data-dir="1" type="button" aria-label="More sarees">›</button></div>
-            </div>
-            <div class="room-track room-sarees" id="picker" role="group" aria-label="Choose a saree"></div>
-
-            <div class="room-row-h">
-              <h3>2. Complete your ensemble</h3>
-              <div class="room-sets" id="sets" role="group" aria-label="Start from a pairing"></div>
-            </div>
-            <div class="room-tabs" id="slotTabs" role="group" aria-label="Ornament type"></div>
-            <div class="room-ens">
-              <button class="room-arrow room-arrow-side" data-scroll="slots" data-dir="-1" type="button" aria-label="Previous ornaments">‹</button>
-              <div class="room-track room-orns" id="slots"></div>
-              <button class="room-arrow room-arrow-side" data-scroll="slots" data-dir="1" type="button" aria-label="More ornaments">›</button>
-            </div>
-
-            <div class="room-sum" id="totals" aria-live="polite"></div>
-          </div>
-        </div>
-      </section>
+      <section id="roomTeaser" class="room-teaser full-bleed-edge" aria-labelledby="teaserTitle"></section>
 
       <section id="heritage" class="heritage-band full-bleed-edge">
         <div class="heritage-split">
@@ -249,7 +220,7 @@
                 <ul>
                   <li><a href="ornaments.html">Fine Ornaments</a></li>
                   <li><a href="#collection">All Sarees</a></li>
-                  <li><a href="#builder">Styling Atelier</a></li>
+                  <li><a href="styling-room.html">Styling Room</a></li>
                   <li><a href="#heritage">Our Heritage</a></li>
                 </ul>
               </div>
@@ -415,7 +386,7 @@
   </div>
 
   <script src="assets/data.js"></script>
-  <script src="assets/site.js?v=20261114g"></script>
+  <script src="assets/site.js?v=20261114h"></script>
   <script src="assets/stylist-launcher.js?v=20261114b" defer></script>
 </body>
 </html>

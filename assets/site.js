@@ -58,14 +58,14 @@
     return `
       <article class="card catalog-card">
         <div class="art">
-          <a class="art-link" href="index.html?style=${s.id}#builder" aria-label="Style ${s.name} in the atelier">
+          <a class="art-link" href="styling-room.html?style=${s.id}" aria-label="Style ${s.name} in the atelier">
             ${photo(s.id, `${s.name}, ${s.tone}, worn by a model`)}
             ${hasD ? photo(s.id + '-detail', `Weave detail of the ${s.name}`, 'alt') : ''}
           </a>
           <button class="wish-btn" data-wish="${s.id}" aria-pressed="${wished}" aria-label="Save ${s.name} to wishlist" type="button">${wishHeartSvg}</button>
         </div>
         <div class="card-copy">
-          <h3><a href="index.html?style=${s.id}#builder">${s.name},</a></h3>
+          <h3><a href="styling-room.html?style=${s.id}">${s.name},</a></h3>
           <div class="meta">${s.tone}</div>
           <div class="price">
             <b>${inr(s.eff)}</b>${s.disc ? `<s>${inr(s.mrp)}</s>` : ''}
@@ -487,7 +487,7 @@
             ${s.disc ? `<s>${inr(s.mrp)}</s>` : ''}
           </div>
           <div class="actions">
-            <a class="btn small ghost" href="index.html?style=${s.id}#builder">Style the look</a>
+            <a class="btn small ghost" href="styling-room.html?style=${s.id}">Style the look</a>
             <button class="btn small" data-quick="${s.id}">Quick add saree</button>
           </div>
         </article>`;
@@ -813,6 +813,11 @@
           <span class="room-saree-t">${x.tone}</span>
         </button>`).join('');
       pickerEl.scrollLeft = keep;
+      if (!pickerEl.dataset.init) {
+        pickerEl.dataset.init = '1';
+        const on = pickerEl.querySelector('[aria-pressed="true"]');
+        if (on) pickerEl.scrollLeft = on.getBoundingClientRect().left - pickerEl.getBoundingClientRect().left - 4;
+      }
     }
 
     // Big photo + thumbnail column
@@ -891,6 +896,41 @@
     renderMobileBuilderBar(s, t);
   }
 
+  // Home: a slim preview of the Styling Room with one composed look
+  function renderRoomTeaser() {
+    const el = $('#roomTeaser');
+    if (!el) return;
+    const s = saree('SA00001') || SAREES[0];
+    const ids = Object.values(s.combo || {}).filter(Boolean);
+    const sum = ids.reduce((a, id) => a + ORN[id][3], 0);
+    const save = ids.length >= 2 ? Math.round(sum * 0.10) : 0;
+    const total = s.eff + sum - save;
+    const pieces = [[`img/${s.id}.jpg`, s.name, s.eff], ...ids.map(id => [`img/orn/${id}-s.jpg`, ORN[id][1], ORN[id][3]])];
+    const starts = SAREES.filter(x => x.id !== s.id).slice(0, 4);
+    el.innerHTML = `
+      <div class="rt-in">
+        <a class="rt-photo" href="styling-room.html?style=${s.id}" aria-label="Open this look in the Styling Room">${photo(s.id, `${s.name}, ${s.tone}, styled with ornaments`)}</a>
+        <div class="rt-copy">
+          <p class="room-eyebrow">The Sopanam Styling Room</p>
+          <h2 id="teaserTitle">A look, beautifully composed.</h2>
+          <p class="rt-sub">Pick a saree, add its ornaments, see the total. Two or more pieces take 10% off the jewellery.</p>
+          <div class="rt-look">
+            ${pieces.map(([img, n, p], i) => `${i ? '<span class="rt-plus" aria-hidden="true">+</span>' : ''}<span class="rt-piece"><img src="${img}" alt="" loading="lazy"><b>${n}</b><span>${inr(p)}</span></span>`).join('')}
+            <span class="rt-eq" aria-hidden="true">=</span>
+            <span class="rt-total"><b>${inr(total)}</b>${save ? `<span>you save ${inr(save + (s.mrp - s.eff))}</span>` : ''}</span>
+          </div>
+          <div class="rt-cta">
+            <a class="btn" href="styling-room.html">Compose your own look <span aria-hidden="true">→</span></a>
+            <a class="btn ghost" href="styling-room.html?style=${s.id}">Style this one</a>
+          </div>
+        </div>
+        <div class="rt-starts">
+          <p class="rt-starts-h">Or start from</p>
+          <div class="rt-grid">${starts.map(x => `<a class="rt-start" href="styling-room.html?style=${x.id}">${photo(x.id, '')}<span>${x.name}<small>${x.tone}</small></span></a>`).join('')}</div>
+        </div>
+      </div>`;
+  }
+
   function renderMobileBuilderBar(s, t) {
     let bar = $('#mobileBuilderBar');
     if (!bar && $('#builder')) {
@@ -936,7 +976,7 @@
       renderBuilder();
       go('builder');
     } else {
-      location.href = `index.html?style=${id}#builder`;
+      location.href = `styling-room.html?style=${id}`;
     }
   }
 
@@ -1318,7 +1358,7 @@
           `<div class="row total"><span>Ensemble Total</span><span>${inr(t.total)}</span></div>`;
       }
       if (lookAdd) lookAdd.dataset.look = '1';
-      if (lookEdit) lookEdit.href = `index.html?style=${s.id}#builder`;
+      if (lookEdit) lookEdit.href = `styling-room.html?style=${s.id}`;
     }
 
     renderEdits(P.key);
@@ -1828,6 +1868,7 @@
       renderChips();
       renderGrid();
       renderBuilder();
+      renderRoomTeaser();
 
       const ornBand = $('#ornBand');
       if (ornBand && window.ORN) {
@@ -1859,7 +1900,6 @@
         homeState.view = 'model';
         homeState.sel = { ...(saree(styleParam) || {}).combo };
         renderBuilder();
-        setTimeout(() => go('builder'), 60);
       }
     }
   }
