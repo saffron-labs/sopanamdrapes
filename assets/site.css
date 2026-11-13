@@ -5772,3 +5772,54 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
 }
 .studio-tabs button { white-space: nowrap; }
 @media (max-width: 980px) { .studio-tabs i { display: none; } }
+
+/* Styling Room: "Your look" board on the stage */
+.studio-photo.is-back img { filter: blur(22px) brightness(.55) saturate(1.1); transform: scale(1.15); }
+.studio-photo img { transition: transform .9s cubic-bezier(.2, .7, .1, 1), filter .5s ease; }
+.studio-views button i { font-style: normal; min-width: 18px; height: 18px; padding: 0 5px; display: inline-grid; place-items: center; border-radius: 9px; background: #b8923f; color: #fff; font-size: 11px; font-weight: 700; }
+.studio-board { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; padding: 26px 96px 84px 26px; overflow-y: auto; animation: studioIn .35s ease; }
+.studio-board[hidden] { display: none; }
+.sb-in { width: min(640px, 100%); background: rgba(252, 248, 240, .96); color: #2b1316; border-radius: 18px; padding: 24px 24px 20px; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
+.sb-in h2 { font-family: var(--display); font-weight: 500; font-size: 32px; line-height: 1; margin: 0; color: #2b1316; }
+.sb-sub { margin: 6px 0 18px; font-size: 13.5px; color: #6b5a55; }
+.sb-grid { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; }
+.sb-grid figure { margin: 0; position: relative; }
+.sb-saree img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 15%; border-radius: 12px; display: block; }
+.sb-grid figcaption { display: flex; flex-direction: column; gap: 1px; margin-top: 7px; font-size: 13px; }
+.sb-grid figcaption b { font-weight: 600; line-height: 1.25; }
+.sb-grid figcaption span { color: #6b5a55; font-size: 12.5px; }
+.sb-grid figcaption em { font-style: normal; font-variant-numeric: tabular-nums; }
+.sb-orns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; }
+.sb-grid.many .sb-orns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sb-orns img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; display: block; }
+.sb-orns button { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(252, 248, 240, .94); color: #6e1b2b; font-size: 17px; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .2); }
+.sb-empty { grid-column: 1 / -1; margin: 0; font-size: 13.5px; line-height: 1.5; color: #6b5a55; }
+.sb-foot { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 16px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(43, 19, 22, .14); }
+.sb-foot span { font-size: 13px; color: #2f6b4b; font-weight: 600; }
+.sb-foot b { font-family: var(--display); font-weight: 500; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.sb-foot .btn { min-height: 46px; border-radius: 10px; }
+@media (max-width: 1240px) { .studio-board { padding: 16px 78px 76px 16px; } .sb-grid { grid-template-columns: 150px minmax(0, 1fr); } }
+@media (max-width: 980px) {
+  .studio-board { padding: 66px 12px 66px; place-items: start center; }
+  .sb-in { padding: 16px; }
+  .sb-in h2 { font-size: 26px; }
+  .sb-sub { margin-bottom: 12px; }
+  .sb-grid, .sb-grid.many { grid-template-columns: 96px minmax(0, 1fr); gap: 12px; }
+  .sb-grid.many .sb-orns { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .sb-grid.many .sb-orns figcaption b { font-size: 11.5px; }
+  .sb-foot { grid-template-columns: 1fr auto; }
+  .sb-foot .btn { grid-column: 1 / -1; justify-content: center; }
+  .studio-views { max-width: calc(100% - 20px); overflow-x: auto; scrollbar-width: none; }
+  .studio-views button { padding: 8px 10px; }
+}
+.studio-stage.has-board .studio-tools { display: none; }
+.studio-board { padding: 22px 22px 84px; place-items: start center; }
+.sb-in { margin-block: auto; }
+.sb-grid figure { align-self: start; }
+.sb-saree img { height: auto; }
+.sb-orns img { height: auto; }
+@media (max-width: 1240px) { .studio-board { padding: 16px 16px 76px; } }
+@media (max-width: 980px) {
+  .studio-stage.has-board { height: auto; min-height: min(64svh, 600px); }
+  .studio-stage.has-board .studio-board { position: relative; padding: 14px 12px 70px; overflow: visible; }
+}

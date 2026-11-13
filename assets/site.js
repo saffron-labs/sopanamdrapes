@@ -985,11 +985,42 @@
         stageArtEl.innerHTML = view === 'detail' ? photo(s.id + '-detail', `Weave detail of the ${s.name}`) : photo(s.id, `${s.name}, ${s.tone}, worn by a model`);
       }
       stageArtEl.classList.toggle('is-close', view === 'close');
+      stageArtEl.classList.toggle('is-back', view === 'look');
+    }
+    // "Your look": everything chosen, laid out on the stage
+    const stageEl = $('#stage');
+    if (stageEl) {
+      let board = $('#stageBoard');
+      if (!board) { board = document.createElement('div'); board.id = 'stageBoard'; board.className = 'studio-board'; stageEl.insertBefore(board, $('#stageTools')); }
+      board.hidden = view !== 'look';
+      stageEl.classList.toggle('has-board', view === 'look');
+      if (view === 'look') {
+        const slotOf = id => Object.keys(homeState.sel).find(k => homeState.sel[k] === id);
+        const mrpSave = (s.mrp - s.eff) + t.ids.reduce((a, id) => a + Math.max(0, ORN[id][2] - ORN[id][3]), 0);
+        board.innerHTML = `
+          <div class="sb-in">
+            <h2>Your look</h2>
+            <p class="sb-sub">${t.ids.length + 1} ${t.ids.length ? 'pieces' : 'piece'}, chosen by you</p>
+            <div class="sb-grid${t.ids.length > 4 ? ' many' : ''}">
+              <figure class="sb-saree">${photo(s.id, '')}<figcaption><b>${s.name}</b><span>${s.tone}</span><em>${inr(s.eff)}</em></figcaption></figure>
+              <div class="sb-orns">
+                ${t.ids.map(id => `<figure><img src="img/orn/${id}-s.jpg" alt=""><button data-clear-slot="${slotOf(id)}" type="button" aria-label="Remove ${ORN[id][1]}">×</button><figcaption><b>${ORN[id][1]}</b><em>${inr(ORN[id][3])}</em></figcaption></figure>`).join('')}
+                ${t.ids.length ? '' : '<p class="sb-empty">No ornaments yet. Pick a type on the left, or try a suggestion on the right.</p>'}
+              </div>
+            </div>
+            <div class="sb-foot">
+              <span>${t.save + mrpSave ? `You save ${inr(t.save + mrpSave)}` : 'Two or more ornaments take 10% off'}</span>
+              <b>${inr(t.total)}</b>
+              <button class="btn" data-add type="button">Add look to bag</button>
+            </div>
+          </div>`;
+      }
     }
     const viewsEl = $('#views');
     if (viewsEl) {
       const V = [['model', 'Full view', '<circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3"/>'], ['close', 'Close-up', '<path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="3"/>']];
       if (hasD) V.push(['detail', 'The weave', '<path d="M4 8h16M4 12h16M4 16h16M8 4v16M12 4v16M16 4v16"/>']);
+      V.push(['look', `Your look <i>${t.ids.length + 1}</i>`, '<path d="M5.5 8.5h13l-1 11h-11z"/><path d="M9 8.5V7a3 3 0 016 0v1.5"/>']);
       viewsEl.innerHTML = V.map(([k, l, ic]) => `<button data-view="${k}" aria-pressed="${view === k}" type="button"><svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>${l}</button>`).join('');
     }
     const toolsEl = $('#stageTools');
