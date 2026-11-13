@@ -777,7 +777,7 @@
     sel: {},
     showAllWorlds: false,
     showAllSarees: false,
-    slotGroup: 'primary'
+    slotGroup: 'necklace'
   };
 
   function initHomeState() {
@@ -800,105 +800,91 @@
     const s = saree(homeState.cur) || SAREES[0];
     if (!s) return;
 
-    // 1. Saree picker
+    const CHECK = '<span class="room-check" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></span>';
+
+    // 1. Saree carousel
     const pickerEl = $('#picker');
     if (pickerEl) {
+      const keep = pickerEl.scrollLeft;
       pickerEl.innerHTML = SAREES.map(x => `
-        <button class="pick" data-pick="${x.id}" aria-pressed="${x.id === homeState.cur}" aria-label="${x.name}, ${x.tone}" title="${x.name} · ${x.tone}">
-          ${photo(x.id, '')}
+        <button class="room-saree" data-pick="${x.id}" aria-pressed="${x.id === homeState.cur}" type="button">
+          <span class="room-saree-img">${photo(x.id, '')}${x.id === homeState.cur ? CHECK : ''}</span>
+          <span class="room-saree-n">${x.name}</span>
+          <span class="room-saree-t">${x.tone}</span>
         </button>`).join('');
+      pickerEl.scrollLeft = keep;
     }
 
-    // Large photo + view switch
+    // Big photo + thumbnail column
     const hasD = (HAS_DETAIL || []).includes(s.id);
     const isDetail = hasD && homeState.view === 'detail';
     const stageArtEl = $('#stageArt');
     if (stageArtEl) {
-      stageArtEl.innerHTML = isDetail ? photo(s.id + '-detail', `Weave detail of the ${s.name}`) : photo(s.id, `${s.name}, ${s.tone}, worn by a model`);
+      stageArtEl.innerHTML = (isDetail ? photo(s.id + '-detail', `Weave detail of the ${s.name}`) : photo(s.id, `${s.name}, ${s.tone}, worn by a model`))
+        + `<div class="room-photo-tabs">${hasD ? `<button class="room-ptab" data-view="model" aria-pressed="${!isDetail}" type="button">On the model</button><button class="room-ptab" data-view="detail" aria-pressed="${isDetail}" type="button">The weave</button>` : ''}</div>`;
     }
     const viewsEl = $('#views');
     if (viewsEl) {
-      viewsEl.innerHTML = hasD ? `
-        <button class="atl-view" data-view="model" aria-pressed="${!isDetail}">On the model</button>
-        <button class="atl-view" data-view="detail" aria-pressed="${isDetail}">The weave</button>` : '';
+      viewsEl.innerHTML = `
+        <button class="room-thumb" data-view="model" aria-pressed="${!isDetail}" aria-label="On the model" type="button">${photo(s.id, '')}</button>
+        ${hasD ? `<button class="room-thumb" data-view="detail" aria-pressed="${isDetail}" aria-label="The weave, close up" type="button">${photo(s.id + '-detail', '')}</button>` : ''}`;
     }
 
-    // 2. Pairing presets
+    // Pairing shortcuts
     const setsEl = $('#sets');
     if (setsEl) {
       const selStr = JSON.stringify(Object.entries(homeState.sel || {}).filter(([, v]) => v).sort());
       const eq = obj => JSON.stringify(Object.entries(obj || {}).filter(([, v]) => v).sort()) === selStr;
       const isNone = Object.keys(homeState.sel || {}).filter(k => homeState.sel[k]).length === 0;
-      const sets = [
-        ['default', 'Our pairing', eq(s.combo)],
-        ['bridal', 'Full bridal', eq(BRIDAL_FULL)],
-        ['light', 'Just earrings', eq({ earrings: s.combo.earrings || 'OR00009' })],
-        ['none', 'Saree only', isNone]
-      ];
-      setsEl.innerHTML = sets.map(([k, l, on]) => `<button class="atl-set" data-set="${k}" aria-pressed="${on}" type="button">${l}</button>`).join('');
+      setsEl.innerHTML = [['default', 'Our pairing', eq(s.combo)], ['bridal', 'Full bridal', eq(BRIDAL_FULL)], ['none', 'Saree only', isNone]]
+        .map(([k, l, on]) => `<button class="room-set" data-set="${k}" aria-pressed="${on}" type="button">${l}</button>`).join('');
     }
 
-    // Ornament type tabs
-    const slotGroups = {
-      primary: ['necklace', 'bangles'],
-      ears: ['earrings', 'ring'],
-      acc: ['anklet', 'bracelet', 'waistband'],
-      all: SLOTS.map(([k]) => k)
-    };
-    const visibleSlots = slotGroups[homeState.slotGroup] || slotGroups.primary;
+    // Ornament tabs: one per main piece, the rest under More
+    const TABS = [['necklace', 'Necklaces', ['necklace']], ['bangles', 'Bangles', ['bangles']], ['earrings', 'Earrings', ['earrings']], ['ring', 'Rings', ['ring']], ['more', 'More', ['anklet', 'bracelet', 'waistband']]];
+    if (!TABS.some(([k]) => k === homeState.slotGroup)) homeState.slotGroup = 'necklace';
+    const tab = TABS.find(([k]) => k === homeState.slotGroup);
     const slotTabsEl = $('#slotTabs');
     if (slotTabsEl) {
-      const tabDefs = [['primary', 'Necklace & bangles'], ['ears', 'Earrings & ring'], ['acc', 'Anklet & waist'], ['all', 'Everything']];
-      slotTabsEl.innerHTML = tabDefs.map(([k, label]) => {
-        const n = slotGroups[k].filter(x => homeState.sel[x]).length;
-        return `<button class="atl-tab" data-slot-group="${k}" aria-pressed="${homeState.slotGroup === k}" type="button">${label}${n && k !== 'all' ? `<span class="atl-tab-n">${n}</span>` : ''}</button>`;
+      slotTabsEl.innerHTML = TABS.map(([k, l, ks]) => {
+        const n = ks.filter(x => homeState.sel[x]).length;
+        return `<button class="room-tab" data-slot-group="${k}" aria-pressed="${k === homeState.slotGroup}" type="button">${l}${n ? `<i>${n}</i>` : ''}</button>`;
       }).join('');
     }
 
-    // Ornament rows: one row per slot, options side by side
+    // Ornament carousel
     const slotsEl = $('#slots');
     if (slotsEl) {
-      slotsEl.innerHTML = SLOTS.filter(([k]) => visibleSlots.includes(k)).map(([k, label]) => {
-        const selId = homeState.sel[k];
+      const label = Object.fromEntries(SLOTS);
+      slotsEl.innerHTML = tab[2].flatMap(k => (OPTS[k] || []).map(id => {
+        const o = ORN[id], on = homeState.sel[k] === id;
         return `
-        <div class="atl-slot">
-          <div class="atl-slot-h">
-            <span>${label}</span>
-            ${selId ? `<button class="atl-clear" data-clear-slot="${k}" type="button" aria-label="Remove ${label}">Remove</button>` : '<small>Optional</small>'}
-          </div>
-          <div class="atl-opts">
-            ${(OPTS[k] || []).map(id => {
-              const o = ORN[id];
-              return `
-              <button class="atl-opt" data-slot="${k}" data-id="${id}" aria-pressed="${selId === id}" type="button">
-                <span class="atl-opt-img"><img src="img/orn/${id}-s.jpg" alt="" width="120" height="120" loading="lazy"></span>
-                <span class="atl-opt-n">${o[1]}</span>
-                <span class="atl-opt-p">${inr(o[3])}${o[3] < o[2] ? ` <s>${inr(o[2])}</s>` : ''}</span>
-              </button>`;
-            }).join('')}
-          </div>
-        </div>`;
-      }).join('');
+        <button class="room-orn" data-slot="${k}" data-id="${id}" aria-pressed="${on}" type="button" aria-label="${on ? 'Remove' : 'Add'} ${o[1]}, ${inr(o[3])}">
+          <span class="room-orn-img"><img src="img/orn/${id}-s.jpg" alt="" width="240" height="160" loading="lazy">${on ? CHECK : ''}${tab[0] === 'more' ? `<em>${label[k]}</em>` : ''}</span>
+          <span class="room-orn-n">${o[1]}</span>
+          <span class="room-orn-f"><span class="room-orn-p">${inr(o[3])}${o[3] < o[2] ? ` <s>${inr(o[2])}</s>` : ''}</span><span class="room-orn-a">${on ? 'In your look' : 'Add to look <b>+</b>'}</span></span>
+        </button>`;
+      })).join('');
+      slotsEl.scrollLeft = 0;
     }
 
-    // Saree line under step 1
+    // Composed look summary
     const t = ornTotalsHome();
-    const yoursEl = $('#yours');
-    if (yoursEl) {
-      yoursEl.innerHTML = `${s.name} <span>${s.tone} · ${s.disc ? `<s>${inr(s.mrp)}</s> ` : ''}${inr(s.eff)}</span>`;
-    }
-
-    // Total bar
     const totalsEl = $('#totals');
     if (totalsEl) {
-      const n = t.ids.length;
+      const items = [[s.id, s.name, s.eff, `img/${s.id}.jpg`], ...t.ids.map(id => [id, ORN[id][1], ORN[id][3], `img/orn/${id}-s.jpg`])];
+      const mrpSave = (s.mrp - s.eff) + t.ids.reduce((a, id) => a + Math.max(0, ORN[id][2] - ORN[id][3]), 0);
+      const saving = t.save + mrpSave;
       totalsEl.innerHTML = `
-        <div class="atl-total-l">
-          <span class="atl-total-k">Your look</span>
-          <span class="atl-total-d">Saree ${inr(s.eff)}${n ? ` + ${n} ornament${n === 1 ? '' : 's'} ${inr(t.sum)}` : ''}${t.save ? ` <em>−${inr(t.save)} look saving</em>` : n === 1 ? ' · <i>add one more ornament for 10% off</i>' : ''}</span>
+        <div class="room-sum-row">
+          <div class="room-sum-items">
+            <span class="room-sum-k">Your composed look</span>
+            <div class="room-sum-list">${items.map(([id, n, p, img], i) => `${i ? '<span class="room-plus" aria-hidden="true">+</span>' : ''}<span class="room-item"><img src="${img}" alt="" loading="lazy"><span><b>${n}</b>${inr(p)}</span></span>`).join('')}</div>
+          </div>
+          <div class="room-sum-save"><span>Ensemble savings</span><b>${saving ? '−' + inr(saving) : '—'}</b>${!t.save ? `<small>${t.ids.length === 1 ? 'Add one more ornament for 10% off' : 'Two or more ornaments: 10% off'}</small>` : ''}</div>
+          <div class="room-sum-total"><span>Total</span><b>${inr(t.total)}</b></div>
         </div>
-        <b class="atl-total-v">${inr(t.total)}</b>
-        <button class="btn atl-add" data-add type="button">Add look to bag</button>`;
+        <button class="btn room-add" data-add type="button">Add complete look to bag <span aria-hidden="true">→</span></button>`;
     }
 
     // Mobile Action Bar
@@ -1544,6 +1530,11 @@
         homeState.showAllSarees = !homeState.showAllSarees;
       }
       renderGrid();
+      return;
+    }
+    if (t.dataset.scroll) {
+      const el = $('#' + t.dataset.scroll);
+      if (el) el.scrollBy({ left: Number(t.dataset.dir) * el.clientWidth * 0.8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
       return;
     }
     if (t.id === 'reelToggle') {
