@@ -5867,3 +5867,21 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
 #picks.catalog-grid.grid.orn { display: grid; grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: minmax(200px, 1fr); gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; padding-bottom: 6px; }
 #picks > * { scroll-snap-align: start; min-width: 0; }
 @media (max-width: 760px) { #picks.catalog-grid.grid.orn { grid-auto-columns: 62%; gap: 10px; } }
+
+/* Home Styling Room photo in the carved frame used by the House Edit cards */
+.rt-defs { position: absolute; width: 0; height: 0; }
+#roomTeaser .rt-photo { position: relative; aspect-ratio: 780 / 1088; max-height: 470px; border-radius: 0; overflow: visible; clip-path: url(#rtFrame); -webkit-clip-path: url(#rtFrame); justify-self: start; }
+#roomTeaser .rt-photo img { position: absolute; inset: 0; object-position: 50% 14%; }
+#roomTeaser .rt-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 58%, rgba(110, 34, 16, .55) 78%, rgba(110, 34, 16, .94) 100%); pointer-events: none; }
+.rt-label { position: absolute; z-index: 1; left: 0; right: 0; bottom: 8.5%; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #fbf3e4; text-align: center; pointer-events: none; }
+.rt-label b { font-family: var(--display); font-weight: 600; font-size: clamp(22px, 2.2vw, 32px); letter-spacing: .08em; text-transform: uppercase; line-height: 1; }
+.rt-label small { font-size: 10.5px; letter-spacing: .32em; text-transform: uppercase; opacity: .9; }
+.rt-line { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.rt-line path { fill: none; stroke: #d9b56a; stroke-width: 1.2px; vector-effect: non-scaling-stroke; opacity: .85; }
+@media (max-width: 1100px) { #roomTeaser .rt-photo { max-height: 400px; } }
+@media (max-width: 760px) { #roomTeaser .rt-photo { max-height: 380px; width: min(280px, 72vw); justify-self: center; aspect-ratio: 780 / 1088; } }
+#roomTeaser .rt-photo { width: clamp(250px, 22vw, 336px); height: auto; max-height: none; align-self: center; }
+@media (max-width: 1100px) { #roomTeaser .rt-photo { width: clamp(220px, 26vw, 290px); } }
+@media (max-width: 760px) { #roomTeaser .rt-photo { width: min(270px, 70vw); max-height: none; } }
+#roomTeaser .rt-photo { width: min(100%, 320px); justify-self: center; }
+@media (max-width: 760px) { #roomTeaser .rt-photo { width: min(270px, 70vw); } }

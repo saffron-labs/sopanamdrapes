@@ -1292,6 +1292,7 @@
   });
 
   // Home: a slim preview of the Styling Room with one composed look
+  const RT_FRAME = 'M0.5,0.0 C0.6282,0.0 0.7154,0.0221 0.7564,0.0643 C0.7769,0.0846 0.8051,0.0809 0.8282,0.0772 C0.9487,0.0625 1.0,0.1085 1.0,0.1728 C1.0,0.2371 1.0,0.2831 1.0,0.3199 C1.0,0.3428 0.9692,0.3428 0.9692,0.3658 C0.9692,0.3888 1.0,0.3888 1.0,0.4118 C1.0,0.6324 1.0,0.7702 1.0,0.8438 C1.0,0.8897 0.9769,0.9127 0.9359,0.9191 C0.9077,0.9237 0.9,0.9412 0.8718,0.9485 C0.7564,0.9651 0.6154,0.9614 0.5615,0.9706 C0.5282,0.9761 0.5154,0.9926 0.5,1.0 C0.4846,0.9926 0.4718,0.9761 0.4385,0.9706 C0.3846,0.9614 0.2436,0.9651 0.1282,0.9485 C0.1,0.9412 0.0923,0.9237 0.0641,0.9191 C0.0231,0.9127 0.0,0.8897 0.0,0.8438 C0.0,0.7702 0.0,0.6324 0.0,0.4118 C0.0,0.3888 0.0308,0.3888 0.0308,0.3658 C0.0308,0.3428 0.0,0.3428 0.0,0.3199 C0.0,0.2831 0.0,0.2371 0.0,0.1728 C0.0,0.1085 0.0513,0.0625 0.1718,0.0772 C0.1949,0.0809 0.2231,0.0846 0.2436,0.0643 C0.2846,0.0221 0.3718,0.0 0.5,0.0 Z';
   function renderRoomTeaser() {
     const el = $('#roomTeaser');
     if (!el) return;
@@ -1304,7 +1305,12 @@
     const starts = SAREES.filter(x => x.id !== s.id).slice(0, 4);
     el.innerHTML = `
       <div class="rt-in">
-        <a class="rt-photo" href="styling-room.html?style=${s.id}" aria-label="Open this look in the Styling Room">${photo(s.id, `${s.name}, ${s.tone}, styled with ornaments`)}</a>
+        <svg class="rt-defs" width="0" height="0" aria-hidden="true" focusable="false"><clipPath id="rtFrame" clipPathUnits="objectBoundingBox"><path d="${RT_FRAME}"/></clipPath></svg>
+        <a class="rt-photo" href="styling-room.html?style=${s.id}" aria-label="Open this look in the Styling Room">
+          ${photo(s.id, `${s.name}, ${s.tone}, styled with ornaments`)}
+          <span class="rt-label" aria-hidden="true"><b>${s.fabric.replace(/ Silk$/, '')}</b><small>The styled look</small></span>
+          <svg class="rt-line" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="${RT_FRAME}" transform="translate(.5 .5) scale(.955 .968) translate(-.5 -.5)"/></svg>
+        </a>
         <div class="rt-copy">
           <p class="room-eyebrow">The Sopanam Styling Room</p>
           <h2 id="teaserTitle">A look, beautifully composed.</h2>
