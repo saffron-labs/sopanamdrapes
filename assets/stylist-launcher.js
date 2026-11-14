@@ -1,6 +1,6 @@
 /* Puts "Ask Sakhi" on every store page and opens the stylist in a side drawer. */
 (function(){
-  var V='20261114e'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
+  var V='20261114g'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
   var page=(location.pathname.split('/').pop()||'index.html').replace('.html','')||'index';
   var lines={bridal:'Style my bridal look',festive:'Style my Onam look',celebrations:'Style my festive look',occasions:'Style my party look',everyday:'Style my office look',ornaments:'Help me pick ornaments'};
   var css=document.createElement('link');css.rel='stylesheet';css.href='assets/stylist-launcher.css?v='+V;document.head.appendChild(css);
@@ -8,6 +8,24 @@
   btn.innerHTML='<span class="mono" aria-hidden="true">S</span><span class="txt">Ask Sakhi<small>'+(lines[page]||'Your personal stylist')+'</small></span>';
   btn.setAttribute('aria-label','Ask Sakhi, your personal stylist');
   document.body.appendChild(btn);
+
+  // Context: the subtitle follows what the shopper is looking at, and the drawer is told too
+  var small=btn.querySelector('small'), base=small.textContent, ctx=window.SD_CTX||null;
+  function nm(id){var s=(window.SAREES||[]).find(function(x){return x.id===id});return s?s.name.replace(/ Saree$/,''):''}
+  function on(id){var o=(window.ORN||{})[id];return o?o[1]:''}
+  function lineFor(c){
+    if(!c)return base;
+    if(c.section==='room')return 'Your styling companion';
+    if(c.focus&&c.focus.kind==='saree'&&nm(c.focus.id))return 'Ask about the '+nm(c.focus.id);
+    if(c.focus&&c.focus.kind==='orn'&&on(c.focus.id))return 'Ask about the '+on(c.focus.id).replace(/, set of \d/,'');
+    if(c.section==='jewellery')return 'Which of these suit you?';
+    if(c.section==='look'&&c.lead&&nm(c.lead))return 'Ask about this '+nm(c.lead)+' look';
+    if(c.section==='catalogue')return c.page==='ornaments'?'Help me pick ornaments':'Help me choose from these';
+    if(c.section==='festivals')return 'What should I wear for my festival?';
+    return base;
+  }
+  function tell(){var f=drawer&&drawer.querySelector('iframe');if(f&&f.contentWindow){try{f.contentWindow.postMessage({type:'sd-context',ctx:ctx},location.origin)}catch(e){}}}
+  addEventListener('sd-ctx',function(e){ctx=e.detail;var l=lineFor(ctx);if(small.textContent!==l)small.textContent=l;tell()});
   var drawer=null,scrim=null;
   function open(){
     if(typeof dropTease==='function')dropTease();
@@ -17,7 +35,7 @@
     drawer=document.createElement('div');drawer.className='sk-drawer';drawer.setAttribute('role','dialog');drawer.setAttribute('aria-label','Sakhi, your stylist');
     var th=document.documentElement.dataset.theme;
     drawer.innerHTML='<iframe title="Sakhi, your stylist" src="stylist.html?embed=1&v='+V+'&from='+page+(th?'&theme='+th:'')+'"></iframe>';
-    document.body.appendChild(scrim);document.body.appendChild(drawer);btn.hidden=true;
+    document.body.appendChild(scrim);document.body.appendChild(drawer);btn.hidden=true;drawer.querySelector('iframe').addEventListener('load',tell);
     document.documentElement.style.overflow='hidden';
     setTimeout(function(){try{drawer.querySelector('iframe').focus()}catch(e){}},50);
   }

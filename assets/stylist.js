@@ -397,7 +397,7 @@ async function styleNow(intro){
 
 /* ---------- AI ---------- */
 async function askAI(text,image){
-  const payload={messages:history.slice(-14),profile,page:FROM,shown,stage};
+  const payload={messages:history.slice(-14),profile,page:FROM,shown,stage,context:describeHere()};
   const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),20000);
   try{
     const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctl.signal});
@@ -423,6 +423,8 @@ async function send(text,image){
   quiz=null;chips([]);
   me(text||'Here is a look I like.',image);
   history.push({role:'user',content:text||'Find the closest look to this photo in your collection and explain.',image:image||undefined});
+  const ab=image?null:aboutHere(text||'');
+  if(ab&&ab.cmd){const t0=typing();await wait(350);t0.remove();say(ab.text);chips(ab.chips||ctxQs());return}
   const local=parse(text||'');
   const changed=applyProfile(local);
   const t=typing();
@@ -430,6 +432,7 @@ async function send(text,image){
   t.remove();
   if(ai){
     applyProfile(ai.profile);
+    if(ai.stage&&ROOM&&typeof ai.stage==='object'){const a={};const g=ai.stage;if(VIEW_LABEL[g.view])a.view=g.view;if(g.saree&&S(g.saree))a.saree=g.saree;if(g.set&&typeof g.set==='object'){a.set={};for(const k in g.set)if(ORN[g.set[k]])a.set[k]=g.set[k]}if(Array.isArray(g.remove))a.remove=g.remove.filter(k=>SLOT_LABEL[k]);if(Object.keys(a).length)act(a)}
     say(ai.reply,{noHistory:false});
     const ids=(ai.sarees||[]).filter(id=>S(id)).slice(0,3);
     if(ids.length){
@@ -444,6 +447,7 @@ async function send(text,image){
     return;
   }
   // on-device answer
+  if(ab){say(ab.text,{src:'Answered on device'});chips(ab.chips||ctxQs().concat(defaultChips()).slice(0,4));return}
   const faq=localFaq(text);
   if(faq&&!changed){say(faq,{src:'Answered on device'});chips(defaultChips());return}
   if(/cheaper|budget|less expensive|lower price/.test(text.toLowerCase())&&!local.budget){return cheaper()}
@@ -456,7 +460,7 @@ async function send(text,image){
   say('I can style a complete look for you, or answer anything about sarees, ornaments, draping, delivery and returns. Shall we start with the occasion?');
   chips(['Find my look','How do I care for silk?','What is your return policy?','Kanjivaram vs Banarasi?']);
 }
-const defaultChips=()=>profile.occasion?['Show me other options','Make it cheaper','How do I drape it?','What blouse should I wear?']:['Find my look','Match an inspiration photo','What suits dusky skin?','What is your return policy?'];
+const defaultChips=()=>subject()?ctxQs().concat(['Find my look']).slice(0,4):profile.occasion?['Show me other options','Make it cheaper','How do I drape it?','What blouse should I wear?']:['Find my look','Match an inspiration photo','What suits dusky skin?','What is your return policy?'];
 function cheaper(){
   const cur=shown.length?Math.min(...shown.map(id=>S(id).eff)):5000;
   const target=profile.budget?Math.round(profile.budget*.7):Math.max(3000,Math.round(cur*1.1+2000));
@@ -669,6 +673,155 @@ if(SR){const mic=$('#micBtn');mic.hidden=false;let rec=null;
     rec.onend=()=>{rec=null;mic.setAttribute('aria-pressed','false')};rec.onerror=()=>{rec=null;mic.setAttribute('aria-pressed','false')};rec.start();
   })}
 
+const NOTES={"SA00001": {"one": "Banarasi silk with a soft sheen and gold zari buttas. It has some weight but drapes softly, so it photographs richly at weddings.", "feel": "Banarasi silk: medium-heavy with a soft fall. Comfortable for a wedding or reception of a few hours; warm for a full outdoor day in peak summer.", "drape": "A Nivi drape with 5 to 7 deep pleats suits it best. Leave the pallu open to about knee length so the gold buttas show, or pleat and pin it on the shoulder for a neater, formal look.", "blouse": "It comes with an unstitched blouse piece. A maroon or red blouse with elbow-length sleeves and a boat or sweetheart neck is classic; gold zari edging on the sleeves echoes the border.", "back": "From behind, the gold zari pallu is the hero. A deep-back blouse with a dori tie and small latkans shows it off without competing.", "pallu": "The pallu carries dense gold buttas and a woven zari end panel. Open pallu for photos, pleated and pinned if you will be moving around a lot.", "weave": "Look for the small gold buttas spaced across the body and the solid zari band at the border: that density is what gives Banarasi its richness.", "care": "Dry clean only. Store it folded in a muslin cloth away from damp, and refold it every few months so the zari does not crack along the folds.", "best": "weddings, receptions and festive evenings", "jewel": "Gold-tone temple or kundan pieces: a mid-length necklace, studs or jhumkas and a couple of bangles. Skip silver; it fights the zari."}, "SA00002": {"one": "Kanjivaram silk in emerald with a wide gold border and a temple-motif pallu. It is heavy and structured: the statement bridal saree.", "feel": "Kanjivaram silk is heavy and structured. It holds crisp pleats all day and feels substantial; plan for a light inner layer and comfortable footwear on a long muhurtham day.", "drape": "Nivi drape with fewer, wider pleats (5 is plenty with this weight), pressed flat. The pallu is best pleated and pinned for a bride, or let it fall open for portraits.", "blouse": "It comes with an unstitched blouse piece. Brides usually go for a contrast gold or maroon silk blouse, elbow sleeves, and a high back neck or a deep back with tassels.", "back": "The back is where the temple-motif pallu shows: a high-neck or deep-back blouse frames it. Hair in a braid or bun with jasmine completes the view from behind.", "pallu": "The pallu has a large temple motif woven in gold. Spread it open across the arm for photos; it is the most photographed part of a Kanjivaram.", "weave": "The border is woven separately and interlocked with the body (the korvai join), which is why the contrast is so crisp and the saree feels heavy.", "care": "Dry clean only. Wrap it in muslin, never plastic, and refold every couple of months. Keep perfume and deodorant off the zari.", "best": "bridal looks, muhurtham, and weddings where you want to stand out", "jewel": "This one carries a full set: a polki choker or temple necklace, kada bangles, chandbalis, a ring, temple anklets and a waist belt. Gold-tone throughout."}, "SA00003": {"one": "A light peach chiffon with an all-over floral print. Very soft and flowy, easy to wear for hours.", "feel": "Chiffon is very light and fluid. It falls close to the body and moves with you, so it is comfortable for long afternoon events and warm weather.", "drape": "Nivi drape with narrow pleats; chiffon slips, so pin the pleats at the waist. A free-flowing open pallu suits the print, or a pleated pinned pallu for a neater line.", "blouse": "It comes with a stitched blouse. A sleeveless or cap-sleeve blouse keeps it airy; a pearl or champagne blouse works if you want to swap.", "back": "From behind, the open pallu shows the floral print falling in soft folds. A simple round or V back suits it better than heavy embroidery.", "pallu": "The pallu continues the floral print with no heavy border, so it looks best left open and loose.", "weave": "Chiffon is a sheer, finely twisted fabric; the print sits on the surface, which is why it feels so light and drapes so close.", "care": "Gentle hand wash in cold water or dry clean. Do not wring; roll it in a towel to dry, and iron on low with a cloth on top.", "best": "afternoon events, small celebrations and day parties", "jewel": "Keep it light: pearl or delicate gold-tone pieces, jhumkas or studs and a couple of bangles. A heavy necklace overwhelms chiffon."}, "SA00004": {"one": "Royal blue organza with a fine sequin border. Crisp and light, it holds its shape and adds volume.", "feel": "Organza is crisp and light. It stands away from the body a little, so it adds volume, and it is cool to wear. It can feel slightly stiff at first.", "drape": "Fewer pleats (4 to 5), pressed with a cool iron so they stay sharp. An open pallu shows the sheen; pin it at the shoulder so it does not slip.", "blouse": "It comes as the saree only, so pair any blouse. A silver or gold sequin blouse lifts it for evenings; a contrast blush or ivory blouse feels fresh for day festivals.", "back": "From behind the sheer organza pallu catches the light; a backless or deep-back blouse with a tie looks striking for an evening reception.", "pallu": "The pallu is sheer with the sequin border running along its edge, so it reads best open and spread.", "weave": "Organza is a sheer, tightly twisted weave, which is why it is crisp and holds its shape. The sequins are worked along the border.", "care": "Dry clean only. Do not wring or crush it; hang or fold loosely with tissue between folds so it keeps its crispness.", "best": "festivals like Onam, receptions and evening parties", "jewel": "An emerald drop necklace and chandbalis look regal with the blue. Keep bangles minimal so the sequin border stays the focus."}, "SA00005": {"one": "A mustard handloom cotton with a slim zari-edged border. Breathable and easy for long working days.", "feel": "Handloom cotton is breathable and light. It is the most comfortable saree here for a full working day in Kerala heat.", "drape": "A neat Nivi drape with 5 to 6 pleats, pinned. A light starch keeps the pleats crisp for office; pleat and pin the pallu so it stays out of the way.", "blouse": "It comes with a stitched blouse. A three-quarter sleeve blouse in a contrast colour (rust, maroon or bottle green) looks smart for work.", "back": "From behind the pinned pallu and slim zari edge keep it tidy. A simple round back suits office wear.", "pallu": "The pallu is plain mustard with a thin zari edge; it looks best pleated and pinned.", "weave": "Handloom cotton has a slightly uneven, textured weave that softens with every wash.", "care": "Hand wash in cold water separately for the first few washes (the colour can bleed), dry in shade, and iron on medium while slightly damp.", "best": "office, college and everyday wear", "jewel": "Kundan studs and a single bracelet or bangle. Skip the heavy necklace for work."}, "SA00006": {"one": "Wine georgette with a sequin-and-stone border. Fluid with a slight shimmer, made for evenings.", "feel": "Georgette is fluid and light with a slight grain. It falls close to the body and does not crease easily, so it stays neat through a long party.", "drape": "Nivi drape with narrow pleats pinned well. Pleat and pin the pallu for a sleek line, or leave it open over the arm for photos.", "blouse": "It comes with a stitched blouse. A sleeveless or halter blouse in wine or gold suits an evening; add a deep back for drama.", "back": "From behind the shimmer catches the light; a deep-back blouse with a sparkly tie is the classic party look.", "pallu": "The pallu carries the sequin and stone border, so it shimmers when it moves.", "weave": "Georgette is woven from tightly twisted yarns, which gives it that slight grain and fluid fall.", "care": "Dry clean recommended. If hand washing, use cold water and no wringing. Store folded with the border inside so stones do not snag.", "best": "evening parties, Deepavali, Christmas and Perunnal", "jewel": "Statement chandbalis or a polki choker, with pearl studded bangles. Pick one hero piece rather than both."}, "SA00007": {"one": "An ivory Kerala kasavu with a gold zari border. Crisp handwoven cotton, the classic Onam and temple saree.", "feel": "Kasavu cotton is crisp and breathable, cool to wear even through a long Onam day.", "drape": "Wear it Nivi style with crisp, starched pleats, or in the traditional Kerala style with the pallu over the left shoulder and tucked at the back. Keep the gold border visible at the hem.", "blouse": "It comes as the saree only. Traditional choices are a gold tissue, deep green, maroon or mustard blouse; elbow sleeves look classic.", "back": "From behind the gold kasavu border runs along the pallu; hair in a braid with jasmine is the traditional finish.", "pallu": "The pallu is ivory with the gold kasavu border along its edge, quiet and elegant; pleat and pin it for temple visits.", "weave": "Kasavu is handwoven cotton with a pure zari band woven into the border, which is why the gold has a soft metallic glow.", "care": "Hand wash in cold water separately, dry in shade, and starch lightly. Iron on the reverse to protect the zari.", "best": "Onam, Vishu, temple visits and Kerala weddings as a guest", "jewel": "A temple necklace, jhumkas, gold bangles and temple anklets, with jasmine in the hair."}, "SA00008": {"one": "Rust tussar silk with a hand-printed border. Textured and light, an easy silk for everyday festive wear.", "feel": "Tussar is a light, textured silk, much lighter than Kanjivaram or Banarasi, so it is comfortable for a full day.", "drape": "Nivi drape with 5 to 6 pleats and an open pallu so the printed border shows. It holds pleats well without starch.", "blouse": "It comes with an unstitched blouse piece. A black, deep green or ivory blouse with three-quarter sleeves looks smart; a high neck works for office events.", "back": "From behind the printed border runs along the open pallu; a simple boat-neck back suits the earthy look.", "pallu": "The pallu has the hand-printed border along its edge and the natural slub texture of tussar.", "weave": "Tussar has a natural slubby, uneven texture and a matte golden sheen, which gives it an earthy, handcrafted feel.", "care": "Dry clean for the first few times. Later, a gentle cold hand wash is fine; dry in shade and iron on low.", "best": "everyday festive wear, office events and small functions", "jewel": "Kundan studs and gold plated bangles; oxidised pieces also suit the earthy rust."}};
+/* ---------- context: what the shopper is looking at ---------- */
+const VIEW_LABEL={model:'Full view',close:'Close-up',back:'Back view',pallu:'Pallu',detail:'The weave',look:'Your look'};
+const SLOT_WORDS={necklace:/necklace|choker|haar/,bangles:/bangle|kada|bracelet(?!s? )/,earrings:/earring|jhumka|chandbali|stud/,ring:/\bring\b/,anklet:/anklet|payal/,bracelet:/bracelet/,waistband:/waist|belt|kamarbandh|oddiyanam/};
+let here=null, stageSid=null, noted={};
+const BRIDAL_SET={...S('SA00002').combo};
+try{if(!ROOM){const c=JSON.parse(sessionStorage.getItem('sd-ctx')||'null');if(c&&Date.now()-c.at<30*60e3&&(!FROM||c.page===FROM))here=c}}catch(e){}
+const short=s=>s.name.replace(/ Saree$/,'');
+function subject(){
+  if(!here)return null;
+  if(here.stage&&S(here.stage.sid))return {kind:'saree',s:S(here.stage.sid),sel:here.stage.sel||{},view:here.stage.view||'model',room:true};
+  if(here.focus&&here.focus.kind==='saree'&&S(here.focus.id))return {kind:'saree',s:S(here.focus.id),sel:S(here.focus.id).combo};
+  if(here.focus&&here.focus.kind==='orn'&&ORN[here.focus.id])return {kind:'orn',id:here.focus.id};
+  if(here.lead&&S(here.lead)&&/look|jewellery/.test(here.section))return {kind:'saree',s:S(here.lead),sel:here.leadSel||S(here.lead).combo,lead:true};
+  return null;
+}
+function selIds(sel){return Object.values(sel||{}).filter(id=>ORN[id])}
+function describeHere(){
+  if(!here)return '';
+  const sub=subject(),bits=[];
+  if(sub&&sub.room){const s=sub.s;bits.push(`They are in the Styling Room. On the stage: ${s.name}, ${s.tone}, ${s.fabric}, ${inr(s.eff)}. Ornaments on the look: ${selIds(sub.sel).map(id=>ORN[id][1]).join(', ')||'none'}. The photo they are viewing: ${VIEW_LABEL[sub.view]||sub.view}. Look total ${inr(here.stage.total||0)}.`)}
+  else{
+    bits.push(`They are browsing the ${here.page} page${here.label?', currently at '+here.label:''}.`);
+    if(sub&&sub.kind==='saree')bits.push(`${sub.lead?'The styled look on this page':'They just pointed at'}: ${sub.s.name}, ${sub.s.tone}, ${inr(sub.s.eff)}${selIds(sub.sel).length?', styled with '+selIds(sub.sel).map(id=>ORN[id][1]).join(', '):''}.`);
+    if(sub&&sub.kind==='orn')bits.push(`They just pointed at the ornament ${ORN[sub.id][1]} (${inr(ORN[sub.id][2])}).`);
+    const items=(here.items||[]).map(x=>x.split(':')).map(([k,id])=>k==='saree'&&S(id)?S(id).name:k==='orn'&&ORN[id]?ORN[id][1]:null).filter(Boolean);
+    if(items.length)bits.push(`On screen: ${items.join(', ')}.`);
+  }
+  if(here.bag&&here.bag.length)bits.push(`In their bag: ${here.bag.map(id=>S(id)?S(id).name:ORN[id]?ORN[id][1]:'').filter(Boolean).join(', ')}.`);
+  return bits.join(' ');
+}
+function ctxQs(){
+  const sub=subject();
+  if(sub&&sub.kind==='saree'){
+    const v=sub.view;
+    if(sub.room){
+      if(v==='back')return ['What blouse back suits this?','How do I wear my hair with it?','Show me the pallu'];
+      if(v==='pallu')return ['How should I drape the pallu?','Open or pinned pallu?','Show me the weave'];
+      if(v==='detail')return ['How do I care for this fabric?','Is it heavy to wear?','Show me the back'];
+      if(v==='look')return ['Is this too much jewellery?','Make it lighter','Is this right for my occasion?'];
+      return ['Is this right for my occasion?','What blouse goes with it?','Make the jewellery lighter','Show me the back'];
+    }
+    return [`Is the ${short(sub.s)} right for my occasion?`,'What blouse goes with it?','How do I drape it?','Which ornaments suit it?'];
+  }
+  if(sub&&sub.kind==='orn')return [`Which saree goes with the ${ORN[sub.id][1].replace(/, set of \d/,'')}?`,'Is it real gold?','What else pairs with it?'];
+  if(here&&here.section==='jewellery')return ['Which of these suit me?','Can I skip the necklace?','Is it real gold?'];
+  if(here&&here.section==='catalogue')return ['Which of these suits me?','Which is lightest to wear?','Kanjivaram vs Banarasi?'];
+  if(here&&here.section==='festivals')return ['What do I wear for Onam?','Something for Deepavali','Which saree for a temple visit?'];
+  return [];
+}
+function hereLine(){
+  const sub=subject();if(!sub)return here&&here.label&&here.section!=='hero'?{t:'Looking at',v:here.label.replace(/^the /,'').replace(/^./,c=>c.toUpperCase())}:null;
+  if(sub.kind==='orn')return {t:'Looking at',v:ORN[sub.id][1],img:`img/orn/${sub.id}-s.jpg`};
+  return {t:sub.room?'On the stage':sub.lead?'This page’s look':'Looking at',v:sub.s.name+(sub.room&&sub.view!=='model'?' · '+(VIEW_LABEL[sub.view]||''):''),img:`img/${sub.s.id}${sub.room&&sub.view&&!/model|look/.test(sub.view)?'-'+sub.view:''}.jpg`};
+}
+function renderHere(){
+  let el=$('#here');
+  if(!el){el=document.createElement('div');el.id='here';el.className='sk-here';$('#log').before(el)}
+  const h=hereLine();el.hidden=!h;if(!h)return;
+  el.innerHTML=`${h.img?`<img src="${h.img}" alt="">`:''}<span><small>${esc(h.t)}</small>${esc(h.v)}</span>`;
+  const st=$('#starters');
+  if(st&&$('.sk-chat').classList.contains('is-empty')){const q=ctxQs();st.querySelectorAll('.starter.q').forEach(b=>b.remove());st.insertAdjacentHTML('beforeend',(q.length?q:['What suits dusky skin?','Kanjivaram vs Banarasi?','How do I care for silk?']).map(x=>`<button class="starter q" data-chip="${esc(x)}" type="button">${esc(x)}</button>`).join(''));
+    const p=log.querySelector('.sk-hello p'),hh=hereHello();if(p&&hh)p.textContent=hh}
+}
+function hereHello(){const sub=subject();if(!sub)return '';
+  if(sub.kind==='orn')return `You’re looking at the ${ORN[sub.id][1]}. Ask me what it goes with, or let me style a full look around it.`;
+  if(sub.room)return `I’m right here while you style. The ${sub.s.name} is on the stage: ask me anything about it, or tell me to change the jewellery or show you another angle.`;
+  return `You’re looking at the ${sub.s.name}. Ask me anything about it, or let me style a full look for you.`}
+function act(a){try{parent.postMessage({type:'sd-act',act:a},location.origin)}catch(e){}}
+function occVerdict(s,occ){
+  occ=occ||profile.occasion;const N=NOTES[s.id];
+  if(!occ)return `It is made for ${N.best}. Tell me your occasion and I will tell you honestly if it fits.`;
+  const f=(OCC_FIT[occ]&&OCC_FIT[occ][s.id])||.4,lab=OCC_LABEL[occ].toLowerCase();
+  if(f>=.8)return `Yes, it is a strong choice for ${lab}. It is made for ${N.best}.`;
+  if(f>=.55)return `It works for ${lab}, though it is really made for ${N.best}. Style it ${s.feel==='heavy'?'lighter, with fewer ornaments,':'up with a statement piece'} to fit the day.`;
+  const alt=SAREES.filter(x=>x.id!==s.id).sort((a,b)=>((OCC_FIT[occ]||{})[b.id]||0)-((OCC_FIT[occ]||{})[a.id]||0))[0];
+  return `Honestly, it is not my first pick for ${lab}: it is made for ${N.best}. For ${lab} I would choose the **${alt.name}** in ${alt.tone.toLowerCase()}.`+(subject()&&subject().room?' Want me to put it on the stage?':'');
+}
+function aboutHere(text){
+  const t=text.toLowerCase(),sub=subject();
+  const named=SAREES.find(s=>t.includes(s.fabric.toLowerCase().split(' ')[0])&&!/ vs |versus|difference|compare/.test(t));
+  const s=(named&&(!sub||sub.kind!=='saree'||sub.s.id!==named.id)&&/this|it\b/.test(t)===false)?named:(sub&&sub.kind==='saree'?sub.s:named);
+  const room=!!(sub&&sub.room);
+  // stage commands in the Styling Room
+  if(room){
+    const V=[[/\bback\b|behind/, 'back'],[/pallu|pallav/, 'pallu'],[/weave|fabric up close|texture|close[- ]?up of the (fabric|saree)/, 'detail'],[/close[- ]?up|closer|face|neckline/, 'close'],[/full view|full length|whole saree/, 'model'],[/(my|the|whole) look|everything (i|i've)|all (the )?pieces/, 'look']];
+    if(/show|see|view|turn|let me|look at/.test(t)){for(const [re,v] of V)if(re.test(t)){const N=NOTES[sub.s.id];act({view:v});
+      const say={back:N.back,pallu:N.pallu,detail:N.weave,close:N.blouse,model:N.one,look:`Here is everything on your look: the ${sub.s.name}${selIds(sub.sel).length?' with '+selIds(sub.sel).map(id=>ORN[id][1]).join(', '):''}, ${inr(here.stage.total||sub.s.eff)} in all.`}[v];
+      return {text:say,cmd:true}}}
+    if(/too much|too heavy|overdone|enough/.test(t)&&/\?|is (it|this)/.test(t)){const n=selIds(sub.sel).length;
+      return n>=5&&sub.s.feel!=='heavy'?{text:`A little, yes. ${n} pieces on a ${sub.s.fabric.toLowerCase()} saree competes with it. I would keep earrings and bangles and drop the rest.`,chips:['Make it lighter','Show my look']}
+        :n>=5?{text:`Not for this saree. ${sub.s.fabric} is rich enough to carry ${n} pieces; that is a proper ${sub.s.feel==='heavy'?'bridal':'festive'} look.`,chips:['Make it lighter','Show my look']}
+        :{text:`No, ${n||'no'} piece${n===1?'':'s'} is balanced. ${n<2?'You could add a necklace for more presence.':''}`,chips:['Add a necklace','Show my look']}}
+    if(/lighter|less jewel|less heavy|simpler|minimal|toned? down/.test(t)){
+      const keep={};['earrings','bangles'].forEach(k=>{if(sub.sel[k])keep[k]=sub.sel[k]});if(!keep.earrings)keep.earrings=sub.s.combo.earrings||'OR00009';
+      act({sel:keep});return {text:`Done. I have kept just ${selIds(keep).map(id=>'the '+ORN[id][1]).join(' and ')}. With ${sub.s.fabric.toLowerCase()} this lets the saree do the talking.`,cmd:true,chips:['Add a necklace back','Show my look','Is this right for my occasion?']}}
+    if(/full (set|bridal|look)|heavier|grand|go all out|bridal set/.test(t)){act({sel:{...BRIDAL_SET}});return {text:`I have put the full seven-piece set on: necklace to waist belt. ${sub.s.feel==='heavy'?'This saree carries it well.':'On a lighter saree like this, a full set is a lot; consider skipping the waist belt and anklets.'}`,cmd:true,chips:['Make it lighter','Show my look','How much is it now?']}}
+    for(const k in SLOT_WORDS){if(SLOT_WORDS[k].test(t)){
+      if(/remove|no |without|skip|take (off|out)|drop/.test(t)&&sub.sel[k]){act({remove:[k]});return {text:`Removed the ${ORN[sub.sel[k]][1]}.`,cmd:true}}
+      if(/different|another|swap|change|other|instead|next/.test(t)||(/add|put|give/.test(t))){const opts=SLOT_OPTS[k];const cur=sub.sel[k];const nx=opts[(opts.indexOf(cur)+1)%opts.length];act({set:{[k]:nx}});
+        return {text:`Try the **${ORN[nx][1]}** (${inr(ORN[nx][2])}). ${cur?'Say “another” to keep going, or “back” to see it from behind.':'It is on your look now.'}`,cmd:true,chips:[`Another ${SLOT_LABEL[k].toLowerCase()}`,'Show my look','Make it lighter']}}
+    }}
+    if(/put (it|the|that)|try (it|the|that)|switch to|change (the )?saree/.test(t)&&named&&named.id!==sub.s.id){act({saree:named.id,view:'model'});return {text:`Here is the **${named.name}** in ${named.tone.toLowerCase()}. ${NOTES[named.id].one}`,cmd:true}}
+  }
+  if(sub&&sub.kind==='orn'&&/saree|go with|pair|match|wear with|suit/.test(t)){
+    const k=ORN[sub.id][0];const with_=SAREES.filter(x=>x.combo[k]===sub.id);
+    const list=with_.length?with_:SAREES.filter(x=>x.feel===(['OR00003','OR00001','OR00005','OR00020','OR00014'].includes(sub.id)?'heavy':'crisp'));
+    return {text:`The **${ORN[sub.id][1]}** is paired with ${list.slice(0,3).map(x=>'the **'+x.name+'** ('+x.tone.toLowerCase()+')').join(', ')}. ${['OR00003','OR00001','OR00020','OR00014','OR00005'].includes(sub.id)?'It is a statement piece, so it belongs with a rich silk.':'It is light enough for everyday sarees too.'}`,chips:list.slice(0,2).map(x=>'Style the '+short(x))}
+  }
+  if(!room&&s&&/styling room|open it|try it on|style (it|this|the)/.test(t)){const tgt=/^style the /.test(t)&&named?named:s;const add=sub&&sub.kind==='orn'?{[ORN[sub.id][0]]:sub.id}:{};
+    const sel={...tgt.combo,...add};setTimeout(()=>{try{(EMBED?top:window).location.href='styling-room.html?style='+tgt.id+'&sel='+Object.values(sel).join(',')}catch(e){}},500);return {text:`Opening the ${tgt.name} in the Styling Room.`,cmd:true}}
+  if(!s)return null;
+  const N=NOTES[s.id];
+  {const up=parse(text);if(up.skinTone&&text.length<24){applyProfile(up);const c=colorFit(s,profile);return {text:(c.why||'')+(c.v<.7?` For more glow I would look at the ${SAREES.filter(x=>x.id!==s.id).sort((a,b)=>colorFit(b,profile).v-colorFit(a,profile).v)[0].name}.`:` The ${s.tone.toLowerCase()} will suit you.`)}}}
+  if(/back/.test(t)&&/blouse/.test(t))return {text:N.back};
+  if(/drape|wear it|pleat|how (do|to) (i )?(wear|tie)/.test(t))return {text:N.drape};
+  if(/blouse|neck|sleeve/.test(t))return {text:N.blouse};
+  if(/hair|bun|braid|jasmine/.test(t))return {text:`${/heavy/.test(s.feel)||/Kasavu/.test(s.fabric)?'A low bun or a braid with jasmine suits it':'Soft waves or a sleek low bun suits it'}. ${N.back}`};
+  if(/wash|care|dry ?clean|clean|store|iron/.test(t))return {text:N.care};
+  if(/heavy|weight|light|comfortable|hot|summer|all day|itchy/.test(t))return {text:N.feel};
+  if(/pallu/.test(t))return {text:N.pallu};
+  if(/weave|zari|texture|fabric|material|made/.test(t))return {text:N.weave};
+  if(/real gold|gold plated|is it gold/.test(t))return null;
+  if(/occasion|right for|good for|suit(able)? for|wear (it|this) (to|for)|office|wedding|party|temple|onam|reception|interview/.test(t)&&/\b(this|it|that|right for|good for|occasion)\b/.test(t)){const up=parse(text);return {text:occVerdict(s,up.occasion),chips:['What blouse goes with it?','Which ornaments suit it?','Show me something else']}}
+  if(/jewel|ornament|necklace|earring|bangle|match|go with|pair/.test(t)){const ids=selIds(sub&&sub.s.id===s.id?sub.sel:s.combo);return {text:`${N.jewel}${ids.length?' '+(room?'On your look right now':'Our pairing')+': '+ids.map(id=>ORN[id][1]).join(', ')+'.':''}`,chips:room?['Make it lighter','Another necklace','Full bridal set']:['Open it in the Styling Room','Is it real gold?']}}
+  if(/price|cost|how much|discount|offer|total|expensive|cheap/.test(t)){const x=room?here.stage.total:s.eff;return {text:`The ${s.name} is ${inr(s.eff)}${s.mrp>s.eff?` (down from ${inr(s.mrp)})`:''}.${room&&selIds(sub.sel).length?` With the ornaments on your look, it comes to ${inr(x)}${selIds(sub.sel).length>=2?', including 10% off the ornaments':''}.`:''}`}}
+  if(/skin|colou?r|complexion|suit me|look good on me/.test(t)){if(!profile.skinTone)return {text:`Tell me your skin tone and I will tell you honestly how the ${s.tone.toLowerCase()} will look on you.`,chips:['Fair','Wheatish','Dusky','Deep']};const c=colorFit(s,profile);return {text:(c.why||'')+(c.v<.7?` If you want more glow, I would look at ${SAREES.filter(x=>x.id!==s.id).sort((a,b)=>colorFit(b,profile).v-colorFit(a,profile).v)[0].name}.`:'')}}
+  if(/tall|short|petite|height|curvy|slim|plus/.test(t)){const up=parse(text);applyProfile(up);const b=bodyFit(s,profile);return {text:b.why||N.drape}}
+  if(/tell me about|what is this|describe|about this|about it|details/.test(t))return {text:`**${s.name}, ${s.tone}.** ${N.one} ${N.feel.split('. ').slice(1).join('. ')}`};
+  return null;
+}
+function stageNote(){
+  const sub=subject();if(!sub||!sub.room)return;
+  const sid=sub.s.id;if(sid===stageSid)return;const first=stageSid===null;stageSid=sid;
+  if(first||noted[sid])return;
+  if($('.sk-chat').classList.contains('is-empty'))return;
+  noted[sid]=1;
+  const c=profile.skinTone?colorFit(sub.s,profile):null;
+  const occ=profile.occasion,f=occ&&OCC_FIT[occ]?OCC_FIT[occ][sid]||.4:null;
+  const fit=f===null?'':f>=.8?` A strong pick for ${OCC_LABEL[occ].toLowerCase()}.`:f<.55?` Honestly, not my first pick for ${OCC_LABEL[occ].toLowerCase()}.`:'';
+  say(`**${sub.s.name}, ${sub.s.tone}.** ${NOTES[sid].one}${fit}${c&&c.why?' '+c.why:''}`,{noHistory:true}).classList.add('note');
+  chips(ctxQs());
+}
+addEventListener('message',e=>{
+  if(e.origin!==location.origin||!e.data)return;
+  if(e.data.type==='sd-context'&&!ROOM){here=e.data.ctx;renderHere()}
+  if(e.data.type==='sd-stage'&&ROOM&&e.data.stage){here={section:'room',page:'styling-room',stage:e.data.stage};renderHere();stageNote()}
+});
+
 /* ---------- start ---------- */
 const OPENERS={bridal:'Planning a wedding look? I can style the full seven-piece bridal set around your skin tone and height.',festive:'Getting ready for Onam or Vishu? Tell me a little about you and I will style a kasavu look that suits you.',celebrations:'Deepavali, Christmas or Perunnal? Let me find the evening saree that suits you best.',occasions:'Going to a party or reception? I will find something light, dressy and right for you.',everyday:'Looking for something for work or everyday? I will keep it comfortable and smart.',ornaments:'Choosing ornaments? Tell me the saree and the occasion, and I will style the pieces for you.'};
 const OCC_FROM={bridal:'bride',festive:'onam-vishu',celebrations:'festival',occasions:'party',everyday:'office'};
@@ -686,12 +839,12 @@ function hello(back){
   const d=document.createElement('div');d.className='sk-hello';
   const summary=[profile.occasion&&OCC_LABEL[profile.occasion],profile.skinTone&&TONE(profile.skinTone)&&TONE(profile.skinTone).label.toLowerCase()+' skin'].filter(Boolean).join(', ');
   d.innerHTML=`<h1>${back?'Welcome back':'What are we dressing for?'}</h1>
-   <p>${back?(summary?'Last time: '+esc(summary)+'. Pick up there, or start something new.':'Pick up where we left off, or start something new.'):esc(HELLO[FROM]||'I’m Sakhi, your personal stylist. I’ll put together the saree, the ornaments and how to wear it.')}</p>`;
+   <p>${!back&&hereHello()?esc(hereHello()):back?(summary?'Last time: '+esc(summary)+'. Pick up there, or start something new.':'Pick up where we left off, or start something new.'):esc(HELLO[FROM]||'I’m Sakhi, your personal stylist. I’ll put together the saree, the ornaments and how to wear it.')}</p>`;
   log.appendChild(d);
   const acts=back
     ?[['Restyle me','Show my looks again',I_SPARK],['Style a new look','Style a new look',I_SPARK],['Match an inspiration photo','Match a photo',I_PIC]]
     :[['Find my look','Style my look',I_SPARK],['Match an inspiration photo','Match a photo',I_PIC],['Read my skin tone from a selfie','Find my colours',I_FACE]];
-  const qs=['What suits dusky skin?','Kanjivaram vs Banarasi?','How do I care for silk?'];
+  const qs=ctxQs().length?ctxQs():['What suits dusky skin?','Kanjivaram vs Banarasi?','How do I care for silk?'];
   $('#starters').innerHTML=acts.map(([c,l,i])=>`<button class="starter" data-chip="${esc(c)}" type="button">${i}${esc(l)}</button>`).join('')
     +qs.map(q=>`<button class="starter q" data-chip="${esc(q)}" type="button">${esc(q)}</button>`).join('');
   $('.sk-chat').classList.add('is-empty');
@@ -709,5 +862,5 @@ document.body.classList.add('sk-page');
 {const sc=document.createElement('div');sc.id='sideScrim';sc.className='sk-side-scrim';sc.hidden=true;sc.addEventListener('click',()=>toggleSide(false));document.body.appendChild(sc)}
 function setHH(){const h=document.querySelector('.site-head');document.documentElement.style.setProperty('--hh',(EMBED||!h?0:h.getBoundingClientRect().height)+'px')}
 setHH();addEventListener('resize',setHH);
-renderProfile();renderBag();greet(false);
+renderProfile();renderBag();greet(false);renderHere();
 })();

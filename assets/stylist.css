@@ -351,3 +351,13 @@ html.room .sk-fine{display:none}
 .lk-views button:hover{opacity:1}
 .lk-views button[aria-pressed="true"]{outline-color:var(--accent);opacity:1}
 .lk-views img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block}
+
+/* What Sakhi can see: the thing you're looking at */
+.sk-here{display:flex;align-items:center;gap:10px;margin:10px auto 0;width:min(768px,calc(100% - 40px));padding:8px 12px 8px 8px;border:1px solid var(--line);border-radius:14px;background:var(--surface,#fff);font-size:13.5px;color:var(--ink);line-height:1.3}
+.sk-here[hidden]{display:none}
+.sk-here img{width:38px;height:46px;border-radius:8px;object-fit:cover;object-position:50% 20%;flex:none}
+.sk-here span{display:flex;flex-direction:column;min-width:0}
+.sk-here small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.sk-here span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.embed .sk-here,html.room .sk-here{width:calc(100% - 28px)}
+.m.bot.note{border-left:3px solid var(--accent);padding-left:12px}

@@ -33,7 +33,7 @@
     const typeLabel = TYPE[o[0]] || o[0];
     const wished = wish.has(id);
     return `
-      <article class="card catalog-card">
+      <article class="card catalog-card" data-ctx="orn:${id}">
         <div class="art wide orn-frame">
           <img src="img/orn/${id}-s.jpg" alt="${o[1]}" width="640" height="360" loading="lazy">
           <button class="wish-btn" data-wish="${id}" aria-pressed="${wished}" aria-label="Save ${o[1]} to wishlist" type="button">${wishHeartSvg}</button>
@@ -56,7 +56,7 @@
     const hasD = (HAS_DETAIL || []).includes(s.id);
     const wished = wish.has(s.id);
     return `
-      <article class="card catalog-card">
+      <article class="card catalog-card" data-ctx="saree:${s.id}">
         <div class="art">
           <a class="art-link" href="styling-room.html?style=${s.id}" aria-label="Style ${s.name} in the Styling Room">
             ${photo(s.id, `${s.name}, ${s.tone}, worn by a model`)}
@@ -1149,7 +1149,85 @@
     // Mobile Action Bar
     renderMobileBuilderBar(s, t);
     tellSakhi();
+    ctxSoon();
   }
+
+  // ---- Where the shopper is: Sakhi reads this to answer in context ----
+  const CTX_SECTIONS = [
+    ['#builder', 'room', 'the Styling Room'],
+    ['#picksWrap', 'jewellery', 'the jewellery for this look'],
+    ['#look', 'look', 'the styled look'],
+    ['#roomTeaser', 'look', 'the styled look'],
+    ['.festive-mosaic', 'festivals', 'the festival collections'],
+    ['#worldGrid', 'edits', 'the House Edit'],
+    ['.ornaments-banner', 'ornaments', 'ornaments'],
+    ['#collection', 'catalogue', 'the collection'],
+    ['#edits', 'chapters', 'other collections'],
+    ['#heritage', 'story', 'our story'],
+    ['.banner', 'hero', 'the top of the page']
+  ];
+  const ctxPage = (location.pathname.split('/').pop() || 'index.html').replace('.html', '') || 'index';
+  let ctxFocus = null, ctxFocusAt = 0, ctxLast = '';
+  function ctxIdFrom(el) {
+    if (!el || !el.closest) return null;
+    const c = el.closest('[data-ctx]');
+    if (c) { const [kind, id] = c.dataset.ctx.split(':'); return { kind, id }; }
+    const a = el.closest('a[href*="style=SA"]');
+    if (a) { const m = a.getAttribute('href').match(/style=(SA\d{5})/); if (m) return { kind: 'saree', id: m[1] }; }
+    const im = el.closest('img[src*="img/orn/OR"]');
+    if (im) { const m = im.getAttribute('src').match(/(OR\d{5})/); if (m) return { kind: 'orn', id: m[1] }; }
+    return null;
+  }
+  function ctxSection() {
+    const y = innerHeight * 0.45;
+    for (const [sel, k, l] of CTX_SECTIONS) {
+      for (const el of $$(sel)) {
+        const r = el.getBoundingClientRect();
+        if (r.height && r.top <= y && r.bottom >= y) return { el, k, l };
+      }
+    }
+    return null;
+  }
+  function sakhiContext() {
+    const sec = ctxSection();
+    const P = window.PAGE_CFG || null;
+    const ctx = { page: ctxPage, section: sec ? sec.k : 'page', label: sec ? sec.l : '' };
+    if (P && P.lead) {
+      const ls = saree(P.lead);
+      ctx.lead = P.lead;
+      const set = P.set === 'bridal' ? BRIDAL_FULL : P.set === 'combo' ? (ls ? ls.combo : {}) : (typeof P.set === 'object' ? P.set : {});
+      ctx.leadSel = Object.fromEntries(Object.values(set || {}).filter(id => ORN[id]).map(id => [ORN[id][0], id]));
+    }
+    if (sec && sec.el) {
+      const ids = [...new Set($$('[data-ctx]', sec.el).map(e => e.dataset.ctx))].slice(0, 8);
+      if (ids.length) ctx.items = ids;
+    }
+    if (ctxFocus && Date.now() - ctxFocusAt < 45000) ctx.focus = ctxFocus;
+    if ($('#builder')) {
+      const t = ornTotalsHome();
+      ctx.section = 'room';
+      ctx.stage = { sid: homeState.cur, sel: { ...homeState.sel }, view: homeState.view || 'model', total: t.total };
+    }
+    ctx.bag = bag.map(b => b.kind === 'orn' ? b.oid : b.sid).filter(Boolean);
+    return ctx;
+  }
+  function pushContext() {
+    const ctx = sakhiContext();
+    const key = JSON.stringify(ctx);
+    if (key === ctxLast) return;
+    ctxLast = key;
+    window.SD_CTX = ctx;
+    try { sessionStorage.setItem('sd-ctx', JSON.stringify({ ...ctx, at: Date.now() })); } catch (e) { }
+    window.dispatchEvent(new CustomEvent('sd-ctx', { detail: ctx }));
+  }
+  let ctxTimer = 0;
+  function ctxSoon() { clearTimeout(ctxTimer); ctxTimer = setTimeout(pushContext, 220); }
+  ['scroll', 'resize'].forEach(ev => addEventListener(ev, ctxSoon, { passive: true }));
+  const ctxPoint = e => { const f = ctxIdFrom(e.target); if (f) { ctxFocus = f; ctxFocusAt = Date.now(); ctxSoon(); } };
+  document.addEventListener('pointerover', e => { if (e.pointerType === 'mouse') ctxPoint(e); }, { passive: true });
+  document.addEventListener('focusin', ctxPoint);
+  document.addEventListener('pointerdown', ctxPoint, { passive: true });
+  setTimeout(pushContext, 400);
 
   // Sakhi sits in the room's side panel and always knows what is on the stage
   function stageText() {
@@ -1159,7 +1237,11 @@
   }
   function tellSakhi() {
     const f = $('#sakhiPane iframe');
-    if (f && f.contentWindow) { try { f.contentWindow.postMessage({ type: 'sd-stage', text: stageText() }, location.origin); } catch (e) { } }
+    if (f && f.contentWindow) {
+      const t = ornTotalsHome();
+      const stage = { sid: homeState.cur, sel: { ...homeState.sel }, view: homeState.view || 'model', total: t.total, save: t.save };
+      try { f.contentWindow.postMessage({ type: 'sd-stage', text: stageText(), stage }, location.origin); } catch (e) { }
+    }
   }
   function setPanelTab(tab) {
     const pane = $('#sakhiPane'), browse = $('#browsePane');
@@ -1169,7 +1251,7 @@
       const th = document.documentElement.dataset.theme;
       const f = document.createElement('iframe');
       f.title = 'Sakhi, your stylist';
-      f.src = 'stylist.html?embed=1&room=1&from=styling-room&v=20261114f' + (th ? '&theme=' + th : '');
+      f.src = 'stylist.html?embed=1&room=1&from=styling-room&v=20261114g' + (th ? '&theme=' + th : '');
       f.addEventListener('load', tellSakhi);
       pane.appendChild(f);
     }
@@ -1188,6 +1270,17 @@
       homeState.sel = { ...(e.data.sel || {}) };
       renderBuilder();
       if (innerWidth <= 980) $('#stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+    if (e.data.type === 'sd-act') {
+      const a = e.data.act || {};
+      if (a.saree && saree(a.saree) && a.saree !== homeState.cur) { homeState.cur = a.saree; homeState.sel = { ...saree(a.saree).combo }; }
+      if (a.sel) homeState.sel = { ...a.sel };
+      if (a.set) Object.keys(a.set).forEach(k => { if (ORN[a.set[k]] && ORN[a.set[k]][0] === k) homeState.sel[k] = a.set[k]; });
+      if (Array.isArray(a.remove)) a.remove.forEach(k => { delete homeState.sel[k]; });
+      if (a.view) homeState.view = a.view;
+      renderBuilder();
+      if (innerWidth <= 980 && (a.view || a.saree)) $('#stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      return;
     }
     if (e.data.type === 'sd-view') {
       if (saree(e.data.sid) && e.data.sid !== homeState.cur) { homeState.cur = e.data.sid; homeState.sel = { ...(e.data.sel || saree(e.data.sid).combo) }; }

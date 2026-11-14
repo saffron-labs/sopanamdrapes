@@ -5861,3 +5861,9 @@ body.home-page header:not(.is-scrolled):not(.open) .badge {
 .rt-piece img { width: 100%; }
 .rt-total { flex: none; }
 @media (max-width: 760px) { .rt-look { flex-wrap: wrap; } .rt-total { margin-top: 0; flex-basis: 100%; } .rt-eq { display: none; } }
+
+/* Jewellery for this look: one full-width row */
+#picksWrap { margin-top: 8px; }
+#picks.catalog-grid.grid.orn { display: grid; grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: minmax(200px, 1fr); gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; padding-bottom: 6px; }
+#picks > * { scroll-snap-align: start; min-width: 0; }
+@media (max-width: 760px) { #picks.catalog-grid.grid.orn { grid-auto-columns: 62%; gap: 10px; } }
