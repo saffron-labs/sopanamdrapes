@@ -1251,7 +1251,7 @@
       const th = document.documentElement.dataset.theme;
       const f = document.createElement('iframe');
       f.title = 'Sakhi, your stylist';
-      f.src = 'stylist.html?embed=1&room=1&from=styling-room&v=20261114g' + (th ? '&theme=' + th : '');
+      f.src = 'stylist.html?embed=1&room=1&from=styling-room&v=20261114h' + (th ? '&theme=' + th : '');
       f.addEventListener('load', tellSakhi);
       pane.appendChild(f);
     }

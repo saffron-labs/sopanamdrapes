@@ -1,6 +1,6 @@
 /* Puts "Ask Sakhi" on every store page and opens the stylist in a side drawer. */
 (function(){
-  var V='20261114g'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
+  var V='20261114h'; // bump together with the ?v= in the HTML pages so every Sakhi file updates as one set
   var page=(location.pathname.split('/').pop()||'index.html').replace('.html','')||'index';
   var lines={bridal:'Style my bridal look',festive:'Style my Onam look',celebrations:'Style my festive look',occasions:'Style my party look',everyday:'Style my office look',ornaments:'Help me pick ornaments'};
   var css=document.createElement('link');css.rel='stylesheet';css.href='assets/stylist-launcher.css?v='+V;document.head.appendChild(css);

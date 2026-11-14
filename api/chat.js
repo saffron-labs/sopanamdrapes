@@ -76,6 +76,7 @@ OUTPUT FORMAT: Reply with a single JSON object and nothing else:
  "ornaments": {"SA0000X": ["OR000YY", ...]}, // optional: your ornament picks per suggested saree
  "profile": {"occasion": "", "skinTone": "", "undertone": "", "heightCm": 0, "build": "", "budget": 0, "jewellery": ""}, // only fields the customer revealed in THIS message; omit the rest
  "chips": ["short follow-up reply 1", "short follow-up 2", "3"], // 2-4 tappable next steps, under 6 words each
+ "pieces": ["OR000YY", ...], // 1-7 ornaments to show as cards when you talk about specific ornaments (best first). Omit otherwise.
  "stage": {"view": "model|close|back|pallu|detail|look", "saree": "SA0000X", "set": {"necklace": "OR000YY"}, "remove": ["waistband"]} // ONLY in the Styling Room, ONLY when they ask to see or change something; include just the keys needed
 }
 Allowed profile values: occasion one of bride, wedding-guest, onam-vishu, festival, party, office, temple, everyday; skinTone one of fair, light, wheatish, medium, dusky, deep; undertone warm, cool, neutral; build petite, slim, average, curvy, plus, athletic; jewellery temple, kundan-polki, pearl, oxidised, minimal, statement.`;

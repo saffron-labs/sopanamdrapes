@@ -423,6 +423,12 @@ async function send(text,image){
   quiz=null;chips([]);
   me(text||'Here is a look I like.',image);
   history.push({role:'user',content:text||'Find the closest look to this photo in your collection and explain.',image:image||undefined});
+  {const tl=(text||'').toLowerCase(),sub=subject();
+    if(sub&&sub.room&&/put (my|the|your) pick on|put it on|wear (it|that)/.test(tl)&&lastPick){const t0=typing();await wait(300);t0.remove();act({set:{[ORN[lastPick][0]]:lastPick}});say(`The **${ORN[lastPick][1]}** ${/s$|pair|set of/i.test(ORN[lastPick][1])?'are':'is'} on your look.`);chips(['Show my look','Show me the back','Make it lighter']);return}
+    if(sub&&sub.room&&/whole set on|put (the )?set on/.test(tl)&&lastSet){const t0=typing();await wait(300);t0.remove();const set={};lastSet.forEach(id=>set[ORN[id][0]]=id);act({set});say(`Done. ${lastSet.map(id=>ORN[id][1]).join(', ')} are on your look.`);chips(['Show my look','How much is it now?','Make it lighter']);return}
+    if(sub&&!sub.room&&/whole set to bag/.test(tl)&&lastSet){lastSet.forEach(id=>bag.push({kind:'orn',oid:id,names:[ORN[id][1]],total:ORN[id][2]}));store.set('sd-bag',bag);renderBag();notifyParent();say(`Added ${lastSet.length} ornaments to your bag.`);chips(['Buy now','Open it in the Styling Room']);return}
+    if(/^(buy now|checkout|check out)$/.test(tl.trim())){openBag(true);return}
+    if(!image&&ornAnswer(text||'')){return}}
   const ab=image?null:aboutHere(text||'');
   if(ab&&ab.cmd){const t0=typing();await wait(350);t0.remove();say(ab.text);chips(ab.chips||ctxQs());return}
   const local=parse(text||'');
@@ -433,7 +439,9 @@ async function send(text,image){
   if(ai){
     applyProfile(ai.profile);
     if(ai.stage&&ROOM&&typeof ai.stage==='object'){const a={};const g=ai.stage;if(VIEW_LABEL[g.view])a.view=g.view;if(g.saree&&S(g.saree))a.saree=g.saree;if(g.set&&typeof g.set==='object'){a.set={};for(const k in g.set)if(ORN[g.set[k]])a.set[k]=g.set[k]}if(Array.isArray(g.remove))a.remove=g.remove.filter(k=>SLOT_LABEL[k]);if(Object.keys(a).length)act(a)}
-    say(ai.reply,{noHistory:false});
+    const aiMsg=say(ai.reply,{noHistory:false});
+    const pcs=(Array.isArray(ai.pieces)?ai.pieces:[]).filter(id=>ORN[id]).slice(0,7);
+    if(pcs.length){const sb=subject();aiMsg.insertAdjacentHTML('beforeend',ornCards(pcs,sb&&sb.kind==='saree'?sb.s.id:''));lastPick=pcs[0];scrollDown()}
     const ids=(ai.sarees||[]).filter(id=>S(id)).slice(0,3);
     if(ids.length){
       const list=ids.map((id,i)=>{const s=S(id);const r={s,score:.8,c:colorFit(s,profile),b:bodyFit(s,profile)};
@@ -631,6 +639,8 @@ document.addEventListener('click',e=>{
   if(d.lkview!==undefined){const [key,v]=d.lkview.split('|');const L=looks[key];if(!L)return;const card=b.closest('.lk');card.querySelectorAll('[data-lkview]').forEach(x=>x.setAttribute('aria-pressed',x===b));
     if(ROOM){try{parent.postMessage({type:'sd-view',sid:L.s.id,sel:L.sel,view:v||'model'},location.origin)}catch(e){}}else{card.querySelector('.lk-ph img').src='img/'+L.s.id+(v?'-'+v:'')+'.jpg'}return}
   if(d.stage){toStage(looks[d.stage]);toast('On the stage');return}
+  if(d.puton){act({set:{[ORN[d.puton][0]]:d.puton}});b.closest('.oc-row').querySelectorAll('[data-puton]').forEach(x=>{const on=x===b||(ORN[x.dataset.puton][0]!==ORN[d.puton][0]&&x.classList.contains('on'));x.classList.toggle('on',on);x.textContent=on?'On your look ✓':'Put it on'});return}
+  if(d.addorn){const id=d.addorn;bag.push({kind:'orn',oid:id,names:[ORN[id][1]],total:ORN[id][2]});store.set('sd-bag',bag);renderBag();notifyParent();b.textContent='In your bag ✓';b.disabled=true;toast(ORN[id][1]+' added');return}
   if(d.addlook){const L=looks[d.addlook],t=totals(L.s,L.sel);bag.push({sid:L.s.id,names:t.ids.map(id=>ORN[id][1]),total:t.total});store.set('sd-bag',bag);renderBag();if(ROOM){try{parent.postMessage({type:'sd-added'},location.origin)}catch(e){}}else{notifyParent();toast('Look added to your bag')}return}
   if(d.save){const L=looks[d.save],k=sig(L),i=saved.findIndex(x=>x.key===k);
     if(i>=0){saved.splice(i,1);b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Save look')}else{const t=totals(L.s,L.sel);saved.unshift({key:k,sid:L.s.id,title:L.s.name+', '+L.s.tone,total:t.total,n:t.ids.length+1,sel:L.sel});b.setAttribute('aria-pressed','true');b.setAttribute('aria-label','Saved');toast('Saved to your profile')}
@@ -804,6 +814,101 @@ function aboutHere(text){
   if(/tell me about|what is this|describe|about this|about it|details/.test(t))return {text:`**${s.name}, ${s.tone}.** ${N.one} ${N.feel.split('. ').slice(1).join('. ')}`};
   return null;
 }
+/* ---------- ornaments Sakhi can pull up ---------- */
+// level: 1 light, 2 medium, 3 statement. look: gold, temple, kundan, pearl, stone, oxidised, bead
+const ORN_INFO={
+OR00001:[2.6,'temple','Antique-gold temple pendants set with kundan stones; the Kerala classic.'],
+OR00002:[2.2,'stone','A gold-tone chain with emerald-green drops; regal against blues and greens.'],
+OR00003:[3,'kundan','A close-fitting polki choker; the bridal statement piece.'],
+OR00004:[1.2,'gold','A slim pair of gold-plated bangles that goes with everything.'],
+OR00005:[2.8,'temple','A broad pair of antique-gold kadas with a carved finish.'],
+OR00006:[2,'pearl','Gold bangles studded with small pearls; soft and elegant.'],
+OR00007:[2.2,'temple','Bell-shaped gold jhumkas that sway as you move.'],
+OR00008:[2.6,'kundan','Crescent chandbalis in kundan and beads; dressy and face-framing.'],
+OR00009:[1,'kundan','Small kundan studs: quiet, polished, all-day comfortable.'],
+OR00010:[1.2,'kundan','A simple adjustable kundan ring.'],
+OR00011:[1.6,'gold','A gold floral ring with a raised bloom.'],
+OR00012:[1.8,'pearl','A cluster of small pearls on a gold band.'],
+OR00013:[1.4,'oxidised','A light oxidised silver payal with tiny bells.'],
+OR00014:[2.8,'temple','Heavy gold temple anklets with coin details.'],
+OR00015:[1,'bead','A light beaded anklet pair for daywear.'],
+OR00016:[1.2,'gold','A fine gold-tone chain bracelet.'],
+OR00017:[1.4,'pearl','A single strand of pearls for the wrist.'],
+OR00018:[1.4,'gold','A playful gold charm bracelet.'],
+OR00019:[2,'gold','A delicate kamarbandh chain that sits at the waist.'],
+OR00020:[3,'temple','A broad temple waist belt (oddiyanam); the bridal finish.'],
+OR00021:[2,'oxidised','An oxidised waistband with an earthy, handcrafted look.']};
+const SAREE_LEVEL={SA00001:2.6,SA00002:3,SA00003:1.6,SA00004:2.1,SA00005:1,SA00006:2.2,SA00007:2.3,SA00008:1.5};
+const SAREE_LOOKS={SA00001:['gold','temple','kundan'],SA00002:['temple','kundan','gold'],SA00003:['pearl','gold'],SA00004:['stone','kundan','pearl'],SA00005:['kundan','gold','oxidised'],SA00006:['kundan','pearl','stone'],SA00007:['temple','gold'],SA00008:['kundan','oxidised','gold']};
+const TASTE_LOOKS={temple:['temple','gold'],'kundan-polki':['kundan','stone'],pearl:['pearl'],oxidised:['oxidised'],minimal:['gold','kundan']};
+const SLOT_RE={necklace:/neck ?l?ace|necklac|choker|haar|mala/,earrings:/ear ?r?ings?|earing|jhum|chandbal|studs?\b/,bangles:/bang(le|el)s?|kada|valai/,ring:/\brings?\b/,anklet:/ank(le|el)ts?|payal|kolusu|ankle/,bracelet:/bracel+e?ts?|braclet/,waistband:/waist|belt|kamar|oddiyanam|vaddanam|hip chain/};
+const slotIn=t=>Object.keys(SLOT_RE).filter(k=>SLOT_RE[k].test(t));
+function ornScore(s,id){
+  const [lv,look]=ORN_INFO[id];let want=SAREE_LEVEL[s.id]||2;
+  const occ=profile.occasion;if(occ==='bride')want+=.6;if(occ==='office'||occ==='everyday')want-=.8;if(occ==='party')want+=.2;
+  let v=2-Math.abs(want-lv);
+  const fits=SAREE_LOOKS[s.id]||[];if(fits[0]===look)v+=.8;else if(fits.includes(look))v+=.5;
+  if(s.combo[ORN[id][0]]===id)v+=.6;
+  if(profile.jewellery&&(TASTE_LOOKS[profile.jewellery]||[]).includes(look))v+=.7;
+  return v;
+}
+function rankSlot(s,k){return SLOT_OPTS[k].slice().sort((a,b)=>ornScore(s,b)-ornScore(s,a))}
+function ornWhy(s,id){
+  const [lv,look]=ORN_INFO[id],fits=SAREE_LOOKS[s.id]||[];
+  const bits=[];
+  if(s.combo[ORN[id][0]]===id)bits.push('our pairing for this saree');
+  if(fits[0]===look)bits.push(`${look==='temple'?'temple gold':look} is what ${s.fabric.toLowerCase()} wants`);
+  const want=SAREE_LEVEL[s.id]||2;
+  if(lv>=2.6&&want>=2.5)bits.push('a statement piece that matches the saree’s weight');
+  else if(lv<=1.4&&want<=1.8)bits.push('light enough not to overpower it');
+  else if(lv>=2.6&&want<2)bits.push('bold for this saree, so wear it on its own');
+  if(profile.occasion==='office'&&lv<=1.4)bits.push('right for work');
+  return bits.length?bits.join('; ').replace(/^./,c=>c.toUpperCase())+'.':'';
+}
+function ornCards(ids,sid){
+  const sub=subject(),room=!!(sub&&sub.room),sel=room?sub.sel:{};
+  return `<div class="oc-row">${ids.map((id,i)=>{const o=ORN[id],on=room&&sel[o[0]]===id,s=S(sid);
+    return `<div class="oc${i===0?' top':''}">
+      <img src="img/orn/${id}-s.jpg" alt="" loading="lazy">
+      ${i===0?'<span class="oc-pick">My pick</span>':''}
+      <b>${esc(o[1])}</b><span class="oc-p">${inr(o[2])}</span>
+      <small>${esc(ORN_INFO[id][2])}</small>
+      ${s&&ornWhy(s,id)?`<small class="oc-why">${esc(ornWhy(s,id))}</small>`:''}
+      ${room?`<button class="oc-go${on?' on':''}" data-puton="${id}" type="button">${on?'On your look ✓':'Put it on'}</button>`
+        :`<button class="oc-go" data-addorn="${id}" data-sid="${sid||''}" type="button">Add to bag</button>`}
+    </div>`}).join('')}</div>`;
+}
+function showOrns(text,ids,sid){
+  const d=say(text);d.insertAdjacentHTML('beforeend',ornCards(ids,sid));scrollDown();return d;
+}
+// Answers about ornaments for the saree in view. Returns true when it handled the message.
+function ornAnswer(text){
+  const t=text.toLowerCase(),sub=subject();
+  const jewelQ=/jewel|ornament|accessor|earr?ing|necklac|bangle|ring|anklet|bracelet|waist|jhumk|chandbal|stud|choker|kada|payal|match|go(es)? with|goes|pair|suits?|best|recommend|which|what/.test(t);
+  // a named ornament: "tell me about the jhumka", "is the polki choker heavy"
+  const named=Object.keys(ORN).find(id=>{const n=ORN[id][1].toLowerCase().replace(/,.*$/,'');return t.includes(n)||n.split(' ').filter(w=>w.length>4&&!/(earrings|necklace|bangles|bracelet|anklet|pair|plated)/.test(w)).some(w=>t.includes(w))});
+  if(named&&!/go(es)? with|which saree/.test(t)){
+    const s=sub&&sub.kind==='saree'?sub.s:null;
+    showOrns(`**${ORN[named][1]}**, ${inr(ORN[named][2])}. ${ORN_INFO[named][2]}${s?' '+(ornWhy(s,named)||''):''}`,[named],s?s.id:'');
+    chips(s?[`Other ${SLOT_LABEL[ORN[named][0]].toLowerCase()} options`,'Show my look','Make it lighter']:['Which saree goes with it?','Is it real gold?']);return true}
+  if(!sub||sub.kind!=='saree'||!jewelQ)return false;
+  const s=sub.s,slots=slotIn(t.replace(/earr?ings?/g,'earrings ')).filter((k,i,a)=>!(k==='ring'&&a.includes('earrings')&&!/\bring\b/.test(t.replace(/earr?ings?/g,''))));
+  if(slots.length){
+    const k=slots[0];if(!/jewel|best|go(es)? with|suit|match|pair|which|what|recommend|option|show|other|more|choose|pick|good/.test(t))return false;
+    const ids=rankSlot(s,k);
+    showOrns(`For the ${s.name}, my pick is the **${ORN[ids[0]][1]}**. ${ornWhy(s,ids[0])} Here are all three ${SLOT_LABEL[k].toLowerCase()} options, best first.`,ids,s.id);
+    chips(sub.room?['Put my pick on','Show my look','Make it lighter']:['Open it in the Styling Room','Is it real gold?']);
+    lastPick=ids[0];return true}
+  if(/jewel|ornament|accessor|go(es)? with|what to wear with|complete (the|my) look|style (it|this)/.test(t)){
+    const want=profile.occasion==='bride'?['necklace','earrings','bangles','ring','anklet','bracelet','waistband']:profile.occasion==='office'||profile.occasion==='everyday'?['earrings','bangles','bracelet']:['necklace','earrings','bangles'];
+    const ids=want.map(k=>rankSlot(s,k)[0]);
+    showOrns(`For the ${s.name}${profile.occasion?' for '+OCC_LABEL[profile.occasion].toLowerCase().replace(/^my /,'your '):''}, this is the set I would build. ${NOTES[s.id].jewel}`,ids,s.id);
+    lastSet=ids;
+    chips(sub.room?['Put the whole set on','Show my look','Make it lighter']:['Add the whole set to bag','Open it in the Styling Room']);return true}
+  return false;
+}
+let lastPick=null,lastSet=null;
+
 function stageNote(){
   const sub=subject();if(!sub||!sub.room)return;
   const sid=sub.s.id;if(sid===stageSid)return;const first=stageSid===null;stageSid=sid;

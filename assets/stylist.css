@@ -361,3 +361,18 @@ html.room .sk-fine{display:none}
 .sk-here span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html.embed .sk-here,html.room .sk-here{width:calc(100% - 28px)}
 .m.bot.note{border-left:3px solid var(--accent);padding-left:12px}
+
+/* Ornament cards Sakhi pulls up */
+.oc-row{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(124px,1fr);gap:10px;margin-top:12px;overflow-x:auto;scrollbar-width:thin;padding-bottom:4px}
+.oc{position:relative;display:flex;flex-direction:column;gap:3px;padding:8px 8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface,#fff);font-size:13px;line-height:1.35;min-width:0}
+.oc.top{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.oc img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;margin-bottom:5px;display:block}
+.oc-pick{position:absolute;top:14px;left:14px;padding:2px 8px;border-radius:999px;background:var(--accent);color:#fff;font-size:10.5px;font-weight:600;letter-spacing:.04em}
+.oc b{font-weight:600;font-size:13px}
+.oc-p{font-variant-numeric:tabular-nums;font-weight:600}
+.oc small{color:var(--muted);font-size:12px}
+.oc small.oc-why{color:var(--ink)}
+.oc-go{margin-top:auto;padding:8px;border:1px solid var(--accent);border-radius:8px;background:var(--accent);color:#fff;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.oc-go.on{background:transparent;color:var(--accent)}
+.oc-go:disabled{opacity:.7;cursor:default}
+.m.bot .oc-row{margin-left:0}
