@@ -29,7 +29,7 @@ OTP codes print in the server log while `OTP_DRIVER=console`. Production refuses
 
 1. **Supabase**: create the project (Mumbai region), copy the *pooled* connection string into `DATABASE_URL`, create a **public** storage bucket `product-images`, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (server only; never expose it to the browser).
 2. **Run `npm run db:migrate` then `npm run db:seed`** against it (use the direct connection string for migrations).
-3. **Razorpay**: set `RAZORPAY_KEY_ID/SECRET`; add webhook `https://<domain>/api/v1/webhooks/razorpay` with events `payment.captured`, `payment.failed`, `refund.processed`, `refund.failed`, and put its secret in `RAZORPAY_WEBHOOK_SECRET`.
+3. **Razorpay**: set `RAZORPAY_KEY_ID/SECRET`; add webhook `https://<domain>/api/v1/webhooks/razorpay` with events `order.paid`, `payment.captured`, `payment.failed`, `refund.processed`, `refund.failed`, and put its secret in `RAZORPAY_WEBHOOK_SECRET`.
 4. **OTP**: `OTP_DRIVER=msg91` (needs DLT-registered sender and template, which takes days) or `whatsapp` (needs a verified Meta business and an approved authentication template).
 5. **Secrets**: `openssl rand -base64 48` for `SESSION_PEPPER`, `openssl rand -base64 32` for `DATA_ENC_KEY`, any 32+ chars for `CRON_SECRET`. Set `TRUST_PROXY=1`, `APP_ORIGIN=https://<domain>`, `STORAGE_DRIVER=supabase`.
 6. **Cron**: call `GET /api/v1/cron/maintenance` with `Authorization: Bearer $CRON_SECRET` every 5 minutes (releases stock held by unpaid orders, cleans old sessions).
