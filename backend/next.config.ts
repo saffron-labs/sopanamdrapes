@@ -28,6 +28,7 @@ const baseHeaders = [
 const config: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  experimental: { serverActions: { bodySizeLimit: '6mb' } },
   serverExternalPackages: ['postgres', '@electric-sql/pglite'],
   async headers() {
     return [

@@ -11,7 +11,7 @@ import { ADMIN_COOKIE, PENDING_COOKIE, cookieOpts, requestMeta, requireAdmin } f
 import { fromLocalInput } from '@/admin/format';
 import { adminLogout, adminPasswordLogin, adminVerifyTotp, changeOwnPassword } from '@/services/admin-auth';
 import { createAdminUser, resetAdminCredentials, updateAdmin } from '@/services/admin-users';
-import { adjustStock, saveProduct, setDefaultLook, setProductStatus, type Kind } from '@/services/admin-catalog';
+import { addProductImage, adjustStock, saveProduct, setDefaultLook, setProductStatus, type Kind } from '@/services/admin-catalog';
 import { adminRefund, adminResolveReturn, adminSetNote, adminTransition } from '@/services/admin-orders';
 import { savePromo, setCustomerBlocked, setPromoActive, updateSettings } from '@/services/admin-misc';
 
@@ -223,3 +223,14 @@ export async function updateAdminAction(f: FormData) {
   });
 }
 
+
+export async function uploadImageAction(f: FormData) {
+  const ctx = await requireAdmin('catalog.write');
+  const kind = kindOf(str(f, 'kind')); const id = str(f, 'id');
+  const file = f.get('photo');
+  return run(`/admin/catalog/${kind}/${id}`, async () => {
+    if (!(file instanceof File) || file.size === 0) throw new ApiError('bad_request', 'Choose a photo to upload');
+    await addProductImage(db(), ctx, kind, id, new Uint8Array(await file.arrayBuffer()));
+    return 'Photo added. Reorder by editing the Images list below';
+  });
+}

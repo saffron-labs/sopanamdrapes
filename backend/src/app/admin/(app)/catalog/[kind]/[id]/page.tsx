@@ -8,7 +8,7 @@ import { can } from '@/lib/rbac';
 import { ApiError } from '@/lib/errors';
 import { label, toLocalInput, when } from '@/admin/format';
 import { getProduct, type Kind } from '@/services/admin-catalog';
-import { defaultLookAction, productStatusAction, saveProductAction, stockAction } from '../../../../actions';
+import { uploadImageAction, defaultLookAction, productStatusAction, saveProductAction, stockAction } from '../../../../actions';
 import { Badge, Field, Flash, Head, one, type SP } from '../../../../ui';
 
 export const dynamic = 'force-dynamic';
@@ -75,6 +75,13 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
           {write ? <button className="btn" type="submit">{isNew ? `Create ${kind}` : 'Save changes'}</button> : null}
         </fieldset>
       </form>
+
+      {p && write ? (
+        <form action={uploadImageAction} className="card"><input type="hidden" name="kind" value={kind} /><input type="hidden" name="id" value={p.id} />
+          <h2>Add a photo</h2>
+          <div className="actions"><input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required aria-label="Photo" style={{ maxWidth: 360 }} /><button className="btn sm" type="submit">Upload</button></div>
+          <div className="sub" style={{ marginTop: 6 }}>JPG, PNG or WebP, up to 5 MB. It is added to the Images list above; edit that list to reorder or remove.</div>
+        </form>) : null}
 
       {p && can(ctx.role, 'stock.adjust') ? (
         <div className="grid g2">

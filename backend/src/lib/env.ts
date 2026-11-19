@@ -51,6 +51,8 @@ export function env(): Env {
     if (!e.CRON_SECRET) missing.push('CRON_SECRET');
     if (!e.RAZORPAY_KEY_ID || !e.RAZORPAY_KEY_SECRET || !e.RAZORPAY_WEBHOOK_SECRET) missing.push('RAZORPAY_*');
     if (e.OTP_DRIVER === 'console') missing.push('OTP_DRIVER (console is dev-only)');
+    if (!e.TRUST_PROXY) missing.push('TRUST_PROXY=1 (needed behind Vercel so rate limits see the real client IP)');
+    if (e.STORAGE_DRIVER !== 'supabase' || !e.SUPABASE_URL || !e.SUPABASE_SERVICE_ROLE_KEY) missing.push('STORAGE_DRIVER=supabase + SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (server disk is not permanent)');
     if (e.SESSION_PEPPER.startsWith('change-me')) missing.push('SESSION_PEPPER (still the example value)');
     if (!e.APP_ORIGIN.startsWith('https://')) missing.push('APP_ORIGIN (must be https in production)');
     if (missing.length) throw new Error(`Production configuration incomplete: ${missing.join(', ')}`);

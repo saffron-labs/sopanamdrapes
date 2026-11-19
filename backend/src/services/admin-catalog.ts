@@ -5,6 +5,7 @@ import { defaultLooks, ornaments, sarees, SLOTS, stockMovements, WORLDS } from '
 import { audit, type AdminCtx } from '@/lib/audit';
 import { badRequest, notFound } from '@/lib/errors';
 import { assertCan } from '@/lib/rbac';
+import { storeProductImage } from './storage';
 
 export type Kind = 'saree' | 'ornament';
 const table = (k: Kind) => (k === 'saree' ? sarees : ornaments);
@@ -147,4 +148,21 @@ export async function setDefaultLook(db: Db, ctx: AdminCtx, sareeId: string, orn
     }
     await audit(tx, ctx, 'saree.default_look', 'saree', sareeId, before, unique);
   });
+}
+
+/** Uploads one photo and appends it to the product (first photo becomes the main one). */
+export async function addProductImage(db: Db, ctx: AdminCtx, kind: Kind, id: string, bytes: Uint8Array): Promise<string> {
+  assertCan(ctx.role, 'catalog.write');
+  const t = table(kind);
+  const [row] = await db.select({ images: t.images }).from(t).where(eq(t.id, id));
+  if (!row) throw notFound('Product not found');
+  if (row.images.length >= 8) throw badRequest('A product can have up to 8 photos. Remove one first');
+  const url = await storeProductImage(kind, id, bytes);
+  await db.transaction(async (tx) => {
+    const [cur] = await tx.select({ images: t.images }).from(t).where(eq(t.id, id)).for('update');
+    const next = [...(cur?.images ?? []), url].slice(0, 8);
+    await tx.update(t).set({ images: next, updatedAt: new Date() }).where(eq(t.id, id));
+    await audit(tx, ctx, `${kind}.image_add`, kind, id, null, { url });
+  });
+  return url;
 }

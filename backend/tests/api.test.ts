@@ -124,3 +124,15 @@ describe('public API', () => {
     expect(ok.status).toBe(200);
   });
 });
+
+describe('production configuration guard', () => {
+  it('refuses to start production with unsafe or incomplete settings', async () => {
+    const { env, resetEnvCache } = await import('@/lib/env');
+    const keep = { ...process.env };
+    try {
+      Object.assign(process.env, { NODE_ENV: 'production', APP_ORIGIN: 'http://insecure.example', OTP_DRIVER: 'console', TRUST_PROXY: '0', STORAGE_DRIVER: 'local' });
+      resetEnvCache();
+      expect(() => env()).toThrow(/APP_ORIGIN[\s\S]*OTP_DRIVER[\s\S]*TRUST_PROXY|TRUST_PROXY[\s\S]*STORAGE_DRIVER/);
+    } finally { process.env = keep; resetEnvCache(); }
+  });
+});
