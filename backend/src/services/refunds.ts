@@ -1,4 +1,4 @@
-import { and, eq, ne } from 'drizzle-orm';
+import { and, asc, eq, ne } from 'drizzle-orm';
 import type { Db, Executor } from '@/db/client';
 import { orders, payments, refunds } from '@/db/schema';
 import { ApiError, badRequest, conflict, notFound } from '@/lib/errors';
@@ -14,10 +14,15 @@ export async function syncRefundStatus(ex: Executor, orderId: string) {
   const rows = await ex.select().from(refunds).where(and(eq(refunds.orderId, orderId), ne(refunds.status, 'failed')));
   const done = rows.filter((r) => r.status === 'processed' || r.status === 'manual').reduce((a, r) => a + r.amountPaise, 0);
   const pending = rows.some((r) => r.status === 'initiated');
+  // With nothing pending, a failed refund must not leave the order stuck in "refund pending" (it would sit on the
+  // dashboard forever), unless the order itself is cancelled/returned, in which case the money is still owed.
+  const owed = o.status === 'cancelled' || o.status === 'returned';
+  const base = owed ? 'refund_pending' : o.paymentMethod === 'cod' ? 'cod_collected' : 'paid';
   let next = o.paymentStatus;
   if (done >= o.totalPaise) next = 'refunded';
   else if (pending) next = 'refund_pending';
   else if (done > 0) next = 'partially_refunded';
+  else if (o.paymentStatus === 'refund_pending') next = base;
   if (next !== o.paymentStatus) await ex.update(orders).set({ paymentStatus: next, updatedAt: new Date() }).where(eq(orders.id, orderId));
 }
 
@@ -45,7 +50,7 @@ export async function refundOrder(db: Db, orderId: string, amountPaise: number |
       await syncRefundStatus(tx, o.id);
       return { kind: 'manual' as const, refundId: r?.id as string };
     }
-    const [pay] = await tx.select().from(payments).where(and(eq(payments.orderId, o.id), eq(payments.provider, 'razorpay'), eq(payments.status, 'captured')));
+    const [pay] = await tx.select().from(payments).where(and(eq(payments.orderId, o.id), eq(payments.provider, 'razorpay'), eq(payments.status, 'captured'))).orderBy(asc(payments.createdAt)).limit(1);
     if (!pay?.providerPaymentId) throw conflict('No captured online payment was found for this order');
     const [r] = await tx.insert(refunds).values({ orderId: o.id, paymentId: pay.id, amountPaise: amount, status: 'initiated', reason, createdBy: label(actor) }).returning();
     await tx.update(orders).set({ paymentStatus: 'refund_pending', updatedAt: new Date() }).where(eq(orders.id, o.id));
@@ -65,11 +70,17 @@ export async function refundOrder(db: Db, orderId: string, amountPaise: number |
     });
     return { refundId: prep.refundId, status: rz.status === 'processed' ? ('processed' as const) : ('initiated' as const) };
   } catch (e) {
+    if (!(e instanceof ApiError)) {
+      // Timeout or network error: Razorpay may have created the refund anyway. Leave it "initiated" (still counted
+      // against the refundable amount) so a retry can never pay the customer twice. The webhook settles it.
+      console.error('[refund] outcome unknown', prep.refundId, e);
+      throw new ApiError('payment_failed', 'We could not confirm the refund with Razorpay. Check the Razorpay dashboard before trying again');
+    }
     await db.transaction(async (tx) => {
       await tx.update(refunds).set({ status: 'failed' }).where(eq(refunds.id, prep.refundId));
       await syncRefundStatus(tx, orderId);
     });
-    throw e instanceof ApiError ? e : new ApiError('payment_failed', 'The refund could not be started. Please try again');
+    throw e;
   }
 }
 

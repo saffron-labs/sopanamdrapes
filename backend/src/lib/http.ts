@@ -51,14 +51,30 @@ export function errorResponse(e: unknown): Response {
   return NextResponse.json({ error: { code: 'internal', message: 'Something went wrong on our side. Please try again' } }, { status: 500 });
 }
 
+/** Reads the body but stops as soon as it passes `max` bytes, so a huge upload cannot exhaust memory. */
+export async function readTextCapped(req: Request, max: number): Promise<string> {
+  if (Number(req.headers.get('content-length') ?? 0) > max) throw new ApiError('bad_request', 'Request is too large');
+  if (!req.body) return '';
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) { await reader.cancel().catch(() => {}); throw new ApiError('bad_request', 'Request is too large'); }
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
+
 /** Reads a JSON body with a hard size cap, without trusting Content-Length alone. */
 export async function readJson(req: Request): Promise<unknown> {
   const declared = Number(req.headers.get('content-length') ?? 0);
   if (declared > MAX_BODY_BYTES) throw new ApiError('bad_request', 'Request is too large');
   const type = req.headers.get('content-type') ?? '';
   if (!type.toLowerCase().startsWith('application/json')) throw new ApiError('bad_request', 'Send JSON');
-  const text = await req.text();
-  if (Buffer.byteLength(text) > MAX_BODY_BYTES) throw new ApiError('bad_request', 'Request is too large');
+  const text = await readTextCapped(req, MAX_BODY_BYTES);
   try { return text ? JSON.parse(text) : {}; } catch { throw new ApiError('bad_request', 'Invalid JSON'); }
 }
 

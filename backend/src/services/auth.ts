@@ -32,6 +32,7 @@ export async function requestOtp(db: Db, rawPhone: string, ip: string) {
   }
 
   await enforceRateLimit(db, `otp:ip:${ip}`, 20, 3600);
+  await enforceRateLimit(db, 'otp:global', 600, 3600, 'We are seeing unusually high demand. Please try again in a few minutes');
   await enforceRateLimit(db, `otp:phone:${phone}`, 5, 900, 'Too many codes requested for this number. Please try again in a few minutes');
 
   const [existing] = await db.select({ status: customers.status }).from(customers).where(eq(customers.phone, phone));

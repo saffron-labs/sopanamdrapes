@@ -220,3 +220,15 @@ describe('maintenance', () => {
     expect(await expireStaleOrders(d)).toBe(0);
   });
 });
+
+describe('audit fixes', () => {
+  it('caps unpaid online orders per customer so one account cannot hold the whole catalogue', async () => {
+    const d = await freshDb(); await seedCatalogue(d);
+    let k = 0;
+    setRazorpayClient({ createOrder: async (p) => ({ id: `order_C${++k}`, amount: p.amountPaise, currency: 'INR', receipt: p.receipt, status: 'created' }), fetchPayment: async () => { throw new Error('x'); }, createRefund: async () => { throw new Error('x'); } });
+    const me = await makeCustomer(d);
+    const mk = () => createOrder(d, { customer: me.customer, addressId: me.addressId, paymentMethod: 'online', looks: [{ sareeId: 'SA00007', ornamentIds: [], qty: 1 }] });
+    await mk(); await mk(); await mk();
+    await expect(mk()).rejects.toThrow(/unpaid orders/);
+  });
+});

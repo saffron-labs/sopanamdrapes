@@ -3,11 +3,14 @@ import { env } from './env';
 /** Best-effort client IP. Only trusts forwarded headers when TRUST_PROXY=1 (set on Vercel). */
 export function clientIp(h: Headers): string {
   if (env().TRUST_PROXY) {
-    const xff = h.get('x-forwarded-for');
-    const first = xff?.split(',')[0]?.trim();
-    if (first) return first;
-    const real = h.get('x-real-ip');
-    if (real) return real.trim();
+    // Headers set by the platform itself win. Otherwise take the RIGHT-most X-Forwarded-For entry: that is the address
+    // our own proxy saw. The left-most entries are whatever the client chose to send, so they can be spoofed.
+    for (const name of ['x-vercel-forwarded-for', 'x-real-ip']) {
+      const v = h.get(name)?.split(',')[0]?.trim();
+      if (v) return v.slice(0, 64);
+    }
+    const last = h.get('x-forwarded-for')?.split(',').map((s) => s.trim()).filter(Boolean).at(-1);
+    if (last) return last.slice(0, 64);
   }
   return 'unknown';
 }

@@ -10,7 +10,7 @@ Next.js 16 (App Router) + TypeScript + Postgres (Drizzle). One deployable app th
 | Admin panel | `src/app/admin/*` | dashboard, orders, catalogue + photo upload + stock, customers, promo codes, settings, team, activity log |
 | Business logic | `src/services/*`, `src/lib/*` | pricing engine, orders, payments, refunds, auth, admin auth, storage |
 | Database | `src/db/schema.ts`, `drizzle/*.sql` | migrations include row-level security and append-only triggers |
-| Tests | `tests/*` | 91 tests against a real Postgres engine (PGlite) running the real migrations |
+| Tests | `tests/*` | 99 tests against a real Postgres engine (PGlite) running the real migrations |
 
 ## Run locally
 
@@ -29,7 +29,7 @@ OTP codes print in the server log while `OTP_DRIVER=console`. Production refuses
 
 1. **Supabase**: create the project (Mumbai region), copy the *pooled* connection string into `DATABASE_URL`, create a **public** storage bucket `product-images`, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (server only; never expose it to the browser).
 2. **Run `npm run db:migrate` then `npm run db:seed`** against it (use the direct connection string for migrations).
-3. **Razorpay**: set `RAZORPAY_KEY_ID/SECRET`; add webhook `https://<domain>/api/v1/webhooks/razorpay` with events `order.paid`, `payment.captured`, `payment.failed`, `refund.processed`, `refund.failed`, and put its secret in `RAZORPAY_WEBHOOK_SECRET`.
+3. **Razorpay**: set `RAZORPAY_KEY_ID/SECRET`; add webhook `https://<domain>/api/v1/webhooks/razorpay` with events `order.paid`, `payment.captured`, `payment.failed`, `refund.processed`, `refund.failed`, and put its secret in `RAZORPAY_WEBHOOK_SECRET`. In Razorpay settings, turn on **automatic capture** (otherwise payments stay "authorized" and orders never move to placed).
 4. **OTP**: `OTP_DRIVER=msg91` (needs DLT-registered sender and template, which takes days) or `whatsapp` (needs a verified Meta business and an approved authentication template).
 5. **Secrets**: `openssl rand -base64 48` for `SESSION_PEPPER`, `openssl rand -base64 32` for `DATA_ENC_KEY`, any 32+ chars for `CRON_SECRET`. Set `TRUST_PROXY=1`, `APP_ORIGIN=https://<domain>`, `STORAGE_DRIVER=supabase`.
 6. **Cron**: call `GET /api/v1/cron/maintenance` with `Authorization: Bearer $CRON_SECRET` every 5 minutes (releases stock held by unpaid orders, cleans old sessions).
@@ -53,3 +53,22 @@ Cash on delivery limit (default ₹5,000), shipping charge (default free), GST a
 ## Not yet verified (needs real credentials)
 
 Razorpay live calls, MSG91 and WhatsApp request formats, Supabase Storage upload, and email via Resend. They follow the providers' documented APIs and sit behind small adapters, but have only been exercised with test doubles.
+
+## Security audit (19 Nov 2026)
+
+Reviewed every service, route, admin action and migration. Fixed:
+
+- Client IP for rate limits came from the left end of `X-Forwarded-For`, which the client controls; now platform header or right-most entry.
+- Request bodies are capped while streaming (a chunked upload with no Content-Length was read fully into memory).
+- A second payment on an already-paid order was kept; it is now refunded automatically (or flagged "ACTION NEEDED" on the dashboard).
+- A late payment could revive an order the customer or team had cancelled on purpose; only expired holds are revived now, everything else is refunded.
+- A refund that timed out was marked failed, so a retry could refund twice; unknown outcomes now stay "initiated" until Razorpay confirms.
+- A refund Razorpay rejected left the order stuck in "refund pending"; it now returns to its real state.
+- Payment currency is checked, not just the amount.
+- One account could hold stock with unlimited unpaid orders; capped at 3, and checkouts per customer are serialised (also makes the per-customer promo limit race-free). Customers can now cancel an unpaid checkout.
+- A global hourly cap on OTP sends bounds SMS cost if someone sprays many numbers.
+- Order emails now run with `after()` so serverless hosting cannot drop them.
+- CSV export also neutralises formulas hidden behind leading spaces.
+- New migration revokes Supabase's default grants on future tables.
+
+Known trade-offs, accepted for launch: admin CSP allows inline scripts (Next.js needs nonces to remove it; React escaping is the main XSS defence); 5 wrong admin passwords lock that account for 15 minutes (use `ADMIN_IP_ALLOWLIST` if that becomes a nuisance); "ACTION NEEDED" items stay on the dashboard for 30 days.

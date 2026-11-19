@@ -88,8 +88,8 @@ export async function orderTransitionAction(f: FormData) {
   const ctx = await requireAdmin('orders.update');
   const id = uuid(str(f, 'id'));
   const to = str(f, 'to') as OrderStatus;
-  if (!(ORDER_STATUSES as readonly string[]).includes(to)) throw new ApiError('bad_request', 'Unknown status');
   return run(`/admin/orders/${id}`, async () => {
+    if (!(ORDER_STATUSES as readonly string[]).includes(to)) throw new ApiError('bad_request', 'Unknown status');
     await adminTransition(db(), ctx, id, to, { note: str(f, 'note') || undefined, carrier: str(f, 'carrier') || undefined, awb: str(f, 'awb') || undefined, restock: bool(f, 'restock') });
     revalidatePath('/admin', 'layout');
     return `Order marked ${to.replace(/_/g, ' ')}`;

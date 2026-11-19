@@ -122,7 +122,7 @@ export async function dashboard(db: Db, ctx: AdminCtx) {
     db.select({ status: orders.status, n: sql<number>`count(*)::int` }).from(orders).groupBy(orders.status),
     db.select({ id: orders.id, number: orders.number, total: orders.totalPaise }).from(orders).where(eq(orders.paymentStatus, 'refund_pending')).limit(20),
     db.select({ id: orders.id, number: orders.number }).from(orders).where(eq(orders.status, 'return_requested')).limit(20),
-    db.select({ id: orderEvents.orderId, note: orderEvents.note }).from(orderEvents).where(sql`${orderEvents.note} like 'AMOUNT MISMATCH%'`).orderBy(desc(orderEvents.id)).limit(10),
+    db.select({ id: orderEvents.orderId, note: orderEvents.note }).from(orderEvents).where(sql`(${orderEvents.note} like 'AMOUNT MISMATCH%' or ${orderEvents.note} like 'ACTION NEEDED%') and ${orderEvents.createdAt} > now() - interval '30 days'`).orderBy(desc(orderEvents.id)).limit(10),
     Promise.all([
       db.select({ id: sarees.id, name: sarees.name, stock: sarees.stock }).from(sarees).where(and(eq(sarees.status, 'active'), sql`${sarees.stock} <= ${sarees.lowStockThreshold}`)).orderBy(sarees.stock).limit(10),
       db.select({ id: ornaments.id, name: ornaments.name, stock: ornaments.stock }).from(ornaments).where(and(eq(ornaments.status, 'active'), sql`${ornaments.stock} <= ${ornaments.lowStockThreshold}`)).orderBy(ornaments.stock).limit(10),
@@ -141,7 +141,7 @@ export async function dashboard(db: Db, ctx: AdminCtx) {
   const pendingMismatch = [];
   for (const m of mismatches) {
     const [o] = await db.select({ status: orders.status, paymentStatus: orders.paymentStatus, number: orders.number }).from(orders).where(eq(orders.id, m.id));
-    if (o && o.paymentStatus !== 'paid' && o.paymentStatus !== 'refunded') pendingMismatch.push({ id: m.id, number: o.number, note: m.note });
+    if (o && (m.note.startsWith('ACTION NEEDED') || (o.paymentStatus !== 'paid' && o.paymentStatus !== 'refunded'))) pendingMismatch.push({ id: m.id, number: o.number, note: m.note });
   }
   return {
     todayPaise: Number(s.today ?? 0), todayOrders: Number(s.today_orders ?? 0), weekPaise: Number(s.week ?? 0), monthPaise: Number(s.month ?? 0), monthOrders: Number(s.month_orders ?? 0),

@@ -12,6 +12,11 @@ import { notifyOrderPlaced } from './notify';
 import { razorpay } from './razorpay';
 import { env } from '@/lib/env';
 import { rowsOf } from '@/lib/sql-rows';
+import { background } from '@/lib/background';
+
+/** Reason recorded when the cron releases an unpaid order. Late payments may only revive orders cancelled for this reason. */
+export const EXPIRED_REASON = 'Payment not completed in time';
+const MAX_PENDING_ONLINE = 3;
 
 export type Actor = { type: 'customer' | 'admin' | 'system' | 'razorpay'; id?: string };
 const actorLabel = (a: Actor) => (a.id ? `${a.type}:${a.id}` : a.type);
@@ -31,7 +36,8 @@ export const TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
   closed: [],
 };
 
-export const CUSTOMER_CANCELLABLE: readonly OrderStatus[] = ['placed', 'confirmed', 'packed'];
+// pending_payment is included so a shopper can abandon a checkout; a payment that still lands afterwards is refunded, not revived.
+export const CUSTOMER_CANCELLABLE: readonly OrderStatus[] = ['pending_payment', 'placed', 'confirmed', 'packed'];
 
 export const canTransition = (from: OrderStatus, to: OrderStatus) => TRANSITIONS[from].includes(to);
 
@@ -164,6 +170,14 @@ export async function createOrder(db: Db, input: CreateOrderInput): Promise<Chec
   let created: { id: string; number: string; status: OrderStatus; totalPaise: number };
   try {
     created = await db.transaction(async (tx) => {
+      // Serialise checkouts per customer: makes the per-customer promo limit and the pending-order cap race-free.
+      await tx.execute(sql`select id from customers where id = ${input.customer.id} for update`);
+      if (input.paymentMethod === 'online') {
+        const [{ n } = { n: 0 }] = await tx.select({ n: sql<number>`count(*)::int` }).from(orders)
+          .where(and(eq(orders.customerId, input.customer.id), eq(orders.status, 'pending_payment')));
+        // Unpaid orders hold stock; without a cap one account could lock up the whole catalogue.
+        if (n >= MAX_PENDING_ONLINE) throw new ApiError('unprocessable', 'You have unpaid orders waiting. Complete or cancel one of them first, or wait 30 minutes');
+      }
       const catalogue = await loadCatalogueForPricing(tx, input.looks.map((l) => l.sareeId), input.looks.flatMap((l) => l.ornamentIds));
       const promo = await loadPromo(tx, input.promoCode, input.customer.id);
       let cart: PricedCart;
@@ -218,7 +232,7 @@ export async function createOrder(db: Db, input: CreateOrderInput): Promise<Chec
   }
 
   if (input.paymentMethod === 'cod') {
-    void notifyOrderPlaced(db, created.id).catch((e) => console.error('[notify]', e));
+    background('notify', () => notifyOrderPlaced(db, created.id));
     return { order: { ...created, paymentMethod: 'cod' }, payment: null, reused: false };
   }
 
@@ -392,7 +406,7 @@ export async function expireStaleOrders(db: Db, graceMinutes = 5): Promise<numbe
     .where(and(eq(orders.status, 'pending_payment'), lt(orders.reservedUntil, cutoff))).limit(100);
   let n = 0;
   for (const s of stale) {
-    try { await cancelInternal(db, s.id, { type: 'system' }, 'Payment not completed in time', 'expire'); n++; } catch (e) {
+    try { await cancelInternal(db, s.id, { type: 'system' }, EXPIRED_REASON, 'expire'); n++; } catch (e) {
       if (!(e instanceof ApiError)) console.error('[expire]', s.id, e);
     }
   }

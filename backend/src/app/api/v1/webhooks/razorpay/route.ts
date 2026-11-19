@@ -2,6 +2,7 @@ import { db } from '@/db/client';
 import { handleRazorpayWebhook } from '@/services/payments';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { clientIp } from '@/lib/request-context';
+import { readTextCapped } from '@/lib/http';
 
 export const dynamic = 'force-dynamic';
 const MAX = 256 * 1024;
@@ -10,8 +11,8 @@ const MAX = 256 * 1024;
 export async function POST(req: Request) {
   try {
     await enforceRateLimit(db(), `wh:${clientIp(req.headers)}`, 300, 60);
-    const raw = await req.text();
-    if (Buffer.byteLength(raw) > MAX) return new Response('too large', { status: 400 });
+    let raw: string;
+    try { raw = await readTextCapped(req, MAX); } catch { return new Response('too large', { status: 400 }); }
     const r = await handleRazorpayWebhook(db(), raw, req.headers.get('x-razorpay-signature'), req.headers.get('x-razorpay-event-id'));
     return new Response(r.body, { status: r.status });
   } catch (e) {

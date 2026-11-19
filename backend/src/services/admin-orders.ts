@@ -85,7 +85,7 @@ export async function adminSetNote(db: Db, ctx: AdminCtx, id: string, note: stri
 /** Spreadsheet formula injection guard: a cell starting with = + - @ is executed by Excel/Sheets. */
 export const csvCell = (v: unknown): string => {
   let s = v == null ? '' : String(v);
-  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  if (/^[\s]*[=+\-@]/.test(s) || /^[\t\r]/.test(s)) s = `'${s}`;
   return `"${s.replace(/"/g, '""')}"`;
 };
 

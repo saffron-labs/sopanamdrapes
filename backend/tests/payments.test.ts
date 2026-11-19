@@ -193,16 +193,64 @@ describe('refunds', () => {
     expect(await stock('SA00007')).toBe(25);
   });
 
-  it('leaves the order refund_pending if Razorpay is down, never losing track of the money owed', async () => {
+  it('a refund Razorpay definitely rejected is marked failed and can be retried', async () => {
     const o = await paidOrder();
-    setRazorpayClient({ ...fake, createRefund: async () => { throw new Error('boom'); } });
+    const { ApiError } = await import('@/lib/errors');
+    setRazorpayClient({ ...fake, createRefund: async () => { throw new ApiError('payment_failed', 'rejected'); } });
     await expect(refundOrder(d, o.orderId, undefined, 'x', { type: 'admin' })).rejects.toBeTruthy();
     const rows = await d.select().from(refunds).where(eq(refunds.orderId, o.orderId));
     expect(rows[0]!.status).toBe('failed');
+    expect((await status(o.orderId)).paymentStatus).toBe('paid'); // not stuck in "refund pending"
+    setRazorpayClient(fake);
+    await refundOrder(d, o.orderId, undefined, 'retry', { type: 'admin' });
+    expect((await status(o.orderId)).paymentStatus).toBe('refunded');
+  });
+
+  it('a refund whose outcome is unknown (timeout) stays initiated so a retry can never pay twice', async () => {
+    const o = await paidOrder();
+    setRazorpayClient({ ...fake, createRefund: async () => { throw new Error('socket hang up'); } });
+    await expect(refundOrder(d, o.orderId, undefined, 'x', { type: 'admin' })).rejects.toThrow(/Razorpay dashboard/);
+    const rows = await d.select().from(refunds).where(eq(refunds.orderId, o.orderId));
+    expect(rows[0]!.status).toBe('initiated');
     expect((await status(o.orderId)).paymentStatus).toBe('refund_pending');
     setRazorpayClient(fake);
-    await refundOrder(d, o.orderId, undefined, 'retry', { type: 'admin' }); // can be retried
-    expect((await status(o.orderId)).paymentStatus).toBe('refunded');
+    await expect(refundOrder(d, o.orderId, undefined, 'retry', { type: 'admin' })).rejects.toThrow(/nothing left/);
+    expect(refundCalls).toHaveLength(0);
+  });
+
+  it('refunds a second, duplicate payment on an already-paid order automatically', async () => {
+    const o = await paidOrder();
+    await webhook('payment.captured', { id: 'pay_dup', order_id: o.rzOrder, amount: o.amount, currency: 'INR', status: 'captured' });
+    expect(refundCalls.map((r) => r.paymentId)).toEqual(['pay_dup']);
+    const row = await status(o.orderId);
+    expect([row.status, row.paymentStatus]).toEqual(['placed', 'paid']);
+    const [dup] = await d.select().from(payments).where(eq(payments.providerPaymentId, 'pay_dup'));
+    expect(dup!.status).toBe('refunded');
+    // A replay of the ORIGINAL payment is not a duplicate.
+    await webhook('payment.captured', { id: 'pay_1', order_id: o.rzOrder, amount: o.amount, currency: 'INR', status: 'captured' });
+    expect(refundCalls).toHaveLength(1);
+    // The order's own refund still works and uses the real payment.
+    await refundOrder(d, o.orderId, undefined, 'customer asked', { type: 'admin' });
+    expect(refundCalls.at(-1)!.paymentId).toBe('pay_1');
+  });
+
+  it('never revives an order the customer cancelled; a late payment is refunded instead', async () => {
+    const o = await startOnline();
+    const { cancelByCustomer } = await import('@/services/orders');
+    await cancelByCustomer(d, me.customer.id, o.orderId, 'changed my mind');
+    expect(await stock('SA00007')).toBe(25);
+    await webhook('payment.captured', { id: 'pay_late', order_id: o.rzOrder, amount: o.amount, currency: 'INR', status: 'captured' });
+    const row = await status(o.orderId);
+    expect(row.status).toBe('cancelled');
+    expect(row.paymentStatus).toBe('refunded');
+    expect(refundCalls.map((r) => r.paymentId)).toEqual(['pay_late']);
+    expect(await stock('SA00007')).toBe(25);
+  });
+
+  it('treats a payment in another currency as a mismatch', async () => {
+    const o = await startOnline();
+    await webhook('payment.captured', { id: 'pay_usd', order_id: o.rzOrder, amount: o.amount, currency: 'USD', status: 'captured' });
+    expect((await status(o.orderId)).paymentStatus).toBe('unpaid');
   });
 
   it('records COD refunds as manual', async () => {

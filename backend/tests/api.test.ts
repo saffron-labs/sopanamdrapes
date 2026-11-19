@@ -136,3 +136,24 @@ describe('production configuration guard', () => {
     } finally { process.env = keep; resetEnvCache(); }
   });
 });
+
+describe('request hygiene', () => {
+  it('uses the proxy-observed client IP, not a spoofed X-Forwarded-For prefix', async () => {
+    const { clientIp } = await import('@/lib/request-context');
+    expect(clientIp(new Headers({ 'x-forwarded-for': '6.6.6.6, 203.0.113.9' }))).toBe('203.0.113.9');
+    expect(clientIp(new Headers({ 'x-real-ip': '198.51.100.4', 'x-forwarded-for': '6.6.6.6' }))).toBe('198.51.100.4');
+  });
+
+  it('stops reading a body without Content-Length once it passes the cap', async () => {
+    const { readTextCapped } = await import('@/lib/http');
+    const big = new ReadableStream({ start(c) { for (let i = 0; i < 20; i++) c.enqueue(new Uint8Array(10_000)); c.close(); } });
+    const req = new Request('http://localhost/x', { method: 'POST', body: big, duplex: 'half' } as RequestInit);
+    await expect(readTextCapped(req, 64 * 1024)).rejects.toThrow(/too large/);
+  });
+
+  it('CSV export neutralises formulas, including ones hidden behind spaces', async () => {
+    const { csvCell } = await import('@/services/admin-orders');
+    for (const v of ['=HYPERLINK("x")', ' =1+1', '+91 98', '-2', '@SUM(A1)']) expect(csvCell(v).startsWith(`"'`)).toBe(true);
+    expect(csvCell('Asha')).toBe('"Asha"');
+  });
+});
