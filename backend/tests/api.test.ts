@@ -96,7 +96,7 @@ describe('public API', () => {
 
     const list = await (await call(ordersGet, 'GET', '/api/v1/orders', undefined, cookie)).json();
     expect(list).toHaveLength(1);
-    const detail = await call(orderGet as never, 'GET', `/api/v1/orders/${order.id}`, undefined, cookie);
+    const detail = await orderGet(new Request(`${ORIGIN}/x`, { headers: { cookie } }), ctxFor(order.id));
     expect(detail.status).toBe(200);
 
     // Another customer cannot read or cancel it.
